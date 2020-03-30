@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<color name="colorPrimary">#ECEFF1</color>
+	<color name="colorPrimaryDark">#B0BEC5</color>
+	<color name="colorAccent">#9C27B0</color>
+	
+	<color name="colorSkinWhite">#D2F2D9</color>
+	<color name="colorSkinWheat">#66F295</color>
+	<color name="colorSkinDark">#228B39</color>
+	
+	<color name="colorHairBlonde">#D2F2D9</color>
+	<color name="colorHairBrown">#228B39</color>
+	<color name="colorHairDark">#000000</color>
+	
+	<color name="colorDivider">#80CBC4</color>
+	<color name="colorFontSection">#c8616161</color>
+	<color name="colorRecyclerBackground">#EFEBE9</color>
+	
+	<color name="colorConnectivitySnackBarConnected">#43A047</color>
+	<color name="colorConnectivitySnackBarConnecting">#FF9100</color>
+	<color name="colorConnectivitySnackBarDisconnected">#E53935</color>
+
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:baselineAligned="false"
+	android:gravity="center_vertical"
+	android:orientation="horizontal"
+	android:paddingBottom="@dimen/namePaddingBottom">
+	
+	<com.google.android.material.textfield.TextInputLayout
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:paddingStart="@dimen/nameFirstNamePaddingStart"
+		android:paddingEnd="@dimen/nameTextSpacing">
+		
+		<com.google.android.material.textfield.TextInputEditText
+			android:id="@+id/first_name_edit_text"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="@string/first_name"
+			android:inputType="textPersonName" />
+	
+	</com.google.android.material.textfield.TextInputLayout>
+	
+	<com.google.android.material.textfield.TextInputLayout
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:paddingEnd="@dimen/nameLastNamePaddingEnd"
+		android:paddingStart="@dimen/nameTextSpacing">
+		
+		<com.google.android.material.textfield.TextInputEditText
+			android:id="@+id/last_name_edit_text"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="@string/last_name"
+			android:inputType="textPersonName" />
+	
+	</com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

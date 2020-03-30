@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_margin="@dimen/sectionMargin"
+	android:clickable="true"
+	android:focusable="true"
+	android:foreground="?selectableItemBackground"
+	app:backgroundTint="@android:color/white"
+	app:cardCornerRadius="@dimen/sectionCardCornerRadius"
+	app:cardElevation="@dimen/sectionCardElevation">
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+		
+		<androidx.constraintlayout.widget.ConstraintLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<ImageView
+				android:id="@+id/section_image"
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:contentDescription="@string/cd_section_image"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintDimensionRatio="1:1"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				tools:src="@drawable/found_a_child" />
+		
+		</androidx.constraintlayout.widget.ConstraintLayout>
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/section_name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ellipsize="end"
+			android:fontFamily="sans-serif-condensed"
+			android:gravity="center"
+			android:maxLines="1"
+			android:paddingBottom="@dimen/sectionNamePaddingBottom"
+			android:paddingEnd="@dimen/sectionNamePaddingEnd"
+			android:paddingStart="@dimen/sectionNamePaddingStart"
+			android:paddingTop="@dimen/sectionNamePaddingTop"
+			android:scrollHorizontally="true"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/sectionNameTextSize"
+			android:textStyle="bold"
+			tools:text="@string/found_a_child" />
+	
+	</LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

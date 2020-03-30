@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:gravity="center_vertical"
+	android:orientation="horizontal"
+	android:paddingBottom="@dimen/genderPaddingBottom">
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingEnd="@dimen/genderLabelPaddingEnd"
+		android:paddingStart="@dimen/genderLabelPaddingStart"
+		android:textSize="@dimen/genderLabelTextSize"
+		android:text="@string/gender"
+		android:textColor="@android:color/black" />
+	
+	<RadioGroup
+		android:id="@+id/gender_radio_group"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:checkedButton="@id/male_radio_button"
+		android:orientation="horizontal">
+		
+		<com.google.android.material.radiobutton.MaterialRadioButton
+			android:id="@+id/male_radio_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/genderMarginEnd"
+			android:layout_marginStart="@dimen/genderSpacing"
+			android:text="@string/male"
+			android:textSize="@dimen/genderTextSize" />
+		
+		<com.google.android.material.radiobutton.MaterialRadioButton
+			android:id="@+id/female_radio_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/female"
+			android:textSize="@dimen/genderTextSize" />
+	
+	</RadioGroup>
+
+</LinearLayout>

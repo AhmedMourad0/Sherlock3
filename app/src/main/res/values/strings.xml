@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<string name="app_name">Sherlock</string>
+	
+	<string name="male">Male</string>
+	<string name="female">Female</string>
+	
+	<string name="not_available">Not Available</string>
+	
+	<string name="years_range">%1$s years old</string>
+	<string name="height_range">%1$s to %2$s</string>
+	
+	<string name="location">%1$s, %2$s</string>
+	
+	<string name="cd_section_image">Section image</string>
+	
+	<string name="search">Search</string>
+	<string name="found_a_child">Found a child</string>
+	<string name="coming_soon">Coming soon</string>
+	<string name="first_name">First name</string>
+	<string name="last_name">Last name</string>
+	<string name="point_location_on_map">Point coordinates on map</string>
+	<string name="age">Age:</string>
+	<string name="height">Height:</string>
+	<string name="gender">Gender:</string>
+	<string name="skin_color">Skin color:</string>
+	<string name="hair_color">Hair color:</string>
+	<string name="choose_a_picture">Choose a picture</string>
+	<string name="notes">Notes</string>
+	<string name="publish">Publish</string>
+	<string name="no_location_specified">No location specified…</string>
+	<string name="no_last_known_location_specified">No last known coordinates specified…</string>
+	
+	<string name="pick_a_folder">Pick a folder</string>
+	<string name="tap_to_select">Tap to select</string>
+	
+	<string name="image_directory" translatable="false">@string/app_name</string>
+	
+	<string name="picture">Picture</string>
+	<string name="description">Description</string>
+	<string name="details">Details</string>
+	
+	<string name="search_results">Search Results</string>
+	<string name="ahmed_mourad">Ahmed Mourad</string>
+	<string name="date">Yesterday at 05:24 AM</string>
+	<string name="child">Child</string>
+	<string name="location_label">Location:</string>
+	
+	<string name="widget_title">Sherlock - Last Search Results</string>
+	<string name="no_results_found">No results found</string>
+	
+	<string name="publishing">Publishing…</string>
+	<string name="publishing_child_data_with_name">Publishing %1$s\'s data…</string>
+	<string name="publishing_child_data">Publishing child\'s data…</string>
+	<string name="channel_name_background_context">Background context</string>
+	<string name="channel_description_background_context">Notifies the user with context of background operations, e.g., Publishing child data progress and completion</string>
+	<string name="published_successfully">Published Successfully!</string>
+	<string name="success">Success!</string>
+	<string name="published_child_data_successfully_with_name">Published %1$s\'s data successfully!</string>
+	<string name="published_child_data_successfully">Published child\'s data successfully!</string>
+	<string name="something_went_wrong">Something went wrong!</string>
+	<string name="click_to_retry_with_reason">%1$s\n\nClick to retry!</string>
+	<string name="publishing_failed_with_name">Publishing %1$s\'s data has failed!</string>
+	<string name="publishing_failed">Publishing failed!</string>
+	<string name="child_data_deleted">This child\'s data has been deleted!</string>
+	<string name="connecting">Connecting</string>
+	<string name="back_online">Connected</string>
+	<string name="no_connection">No connection</string>
+	<string name="sign_in">Sign in</string>
+	<string name="sign_out">Sign out</string>
+	<string name="forgot_my_password">Forgot my password</string>
+	<string name="or_sign_up">Or sign up</string>
+	<string name="sign_in_with">Sign in with</string>
+	<string name="sign_in_with_google">Sign in with Google</string>
+	<string name="sign_in_with_facebook">Sign in with Facebook</string>
+	<string name="sign_in_with_twitter">Sign in with Twitter</string>
+	<string name="email_address">Email address</string>
+	<string name="password">Password</string>
+	<string name="your_name">Your name</string>
+	<string name="confirm_password">Confirm password</string>
+	<string name="sign_up">Sign up</string>
+	<string name="or_sign_in">Or sign in</string>
+	<string name="sign_up_with">Sign up with</string>
+	<string name="sign_up_with_facebook">Sign up with Facebook</string>
+	<string name="sign_up_with_google">Sign up with Google</string>
+	<string name="sign_up_with_twitter">Sign up with Twitter</string>
+	<string name="phone_number">Phone number</string>
+	<string name="upload_profile_picture">Upload profile picture</string>
+	<string name="change_profile_picture">Change profile picture</string>
+	<string name="complete">Complete</string>
+	<string name="send_email">Send email</string>
+	<string name="joined_on">Joined on</string>
+	<string name="child_data_missing">This child\'s data doesn\'t exists or has been deleted!</string>
+	<string name="child_not_enough_details">Please provide more details about the child</string>
+	<string name="first_name_missing">A child cannot have a last name without a first name</string>
+	<string name="invalid_first_and_last_name">Please enter a valid first and last name</string>
+	<string name="invalid_name">Please enter a valid name</string>
+	<string name="invalid_age_range">Please specify a valid age range</string>
+	<string name="invalid_height_range">Please specify a valid height range</string>
+	<string name="invalid_picture">Please select a valid picture</string>
+	<string name="invalid_height">Please provide a valid height</string>
+	<string name="invalid_age">Please provide a valid age</string>
+	<string name="incomplete_child_appearance">Please complete the child\'s appearance details</string>
+	<string name="incomplete_child_query">Please complete the child\'s details</string>
+	<string name="few_appearance_details">Please provide more details about the child\'s appearance</string>
+	<string name="name_empty_or_blank">A name cannot be empty or whitespaces</string>
+	<string name="name_contains_white_spaces">A name cannot contain whitespaces</string>
+	<string name="name_too_short">A name cannot be shorter than %1$d letters</string>
+	<string name="name_too_long">A name cannot be longer than %1$d letters</string>
+	<string name="name_contains_numbers_or_symbols">A name cannot contain numbers or symbols</string>
+	<string name="age_min_exceeds_max">Minimum age cannot exceed maximum age</string>
+	<string name="height_min_exceeds_max">Minimum height cannot exceed maximum age</string>
+	<string name="age_out_of_range">Age must be between %1$d and %2$d</string>
+	<string name="height_out_of_range">Height must be between %1$d and %2$d</string>
+	<string name="blank_picture_path">Picture path cannot be empty or whitespaces</string>
+	<string name="file_doesnt_exists_at_path">No file exists at the given path</string>
+	<string name="path_not_a_file">This path does not point to a file</string>
+	<string name="path_not_a_picture">This path does not point to a valid picture</string>
+	<string name="gif_files_not_supported">Gif files are not supported</string>
+	<string name="unreadable_file">This file is not readable</string>
+	<string name="no_permission_to_read_file">You don\'t have permission to read this file</string>
+	<string name="invalid_last_known_location">Please select a valid last known location</string>
+	<string name="invalid_location">Please select a valid location</string>
+	<string name="invalid_latitude">Please select a valid latitude</string>
+	<string name="invalid_longitude">Please select a valid longitude</string>
+	<string name="invalid_coordinates">Please select valid coordinates</string>
+	<string name="gender_missing">Child\'s gender must be specified</string>
+	<string name="skin_color_missing">Child\'s skin color must be specified</string>
+	<string name="hair_color_missing">Child\'s hair color must be specified</string>
+	<string name="malformed_email">Please enter a valid email</string>
+	<string name="email_empty_or_blank">An email cannot be empty or whitespaces</string>
+	<string name="email_contains_whitespaces">An email cannot contain whitespaces</string>
+	<string name="invalid_user">Please provide valid details</string>
+	<string name="invalid_display_name">Please enter a valid display name</string>
+	<string name="display_name_empty_or_blank">A display name cannot be empty or whitespaces</string>
+	<string name="display_name_too_short">A display name cannot be shorter than %1$d letters</string>
+	<string name="display_name_too_long">A display name cannot be longer than %1$d letters</string>
+	<string name="display_name_contains_numbers_or_symbols">A display name cannot contain numbers or symbols</string>
+	<string name="invalid_country_code">Please select a valid country code</string>
+	<string name="invalid_phone_number">Please enter a valid phone number</string>
+	<string name="phone_number_contains_whitespaces">A phone number cannot contain whitespaces</string>
+	<string name="country_code_contains_whitespaces">A country code cannot contain whitespaces</string>
+	<string name="international_phone_number_too_short">Phone number is too short for an international phone number</string>
+	<string name="phone_number_too_short">Phone number is too short</string>
+	<string name="phone_number_too_long">Phone number is too long</string>
+	<string name="phone_number_with_country_code">%1$s%2$s</string>
+	<string name="password_empty_or_blank">Password cannot be empty or whitespaces</string>
+	<string name="phone_number_empty_or_blank">Phone number cannot be empty or whitespaces</string>
+	<string name="password_too_short">Password cannot be shorter than %1$d characters</string>
+	<string name="password_no_capital_letters">Password must contain at least one capital letter</string>
+	<string name="password_no_small_letters">Password must contain at least one small letter</string>
+	<string name="password_no_digits">Password must contain at least one digit</string>
+	<string name="password_no_symbols">Password must contain at least one symbol</string>
+	<string name="password_few_distinct_characters">Password must contain at least %1$d distinct characters</string>
+	<string name="email_used_as_password">You cannot use your email as a password</string>
+	<string name="display_name_used_as_password">You cannot use your display name as a password</string>
+	<string name="phone_number_used_as_password">You cannot use your phone number as a password</string>
+
+</resources>

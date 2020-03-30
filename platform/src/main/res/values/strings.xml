@@ -1,0 +1,14 @@
+<resources>
+	
+	<string name="white_skin">White skin</string>
+	<string name="wheatish_skin">Wheatish skin</string>
+	<string name="dark_skin">Dark skin</string>
+	
+	<string name="blonde_hair">Blonde hair</string>
+	<string name="dark_hair">Dark hair</string>
+	<string name="brown_hair">Brown hair</string>
+	
+	<string name="male">Male</string>
+	<string name="female">Female</string>
+
+</resources>

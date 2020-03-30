@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:paddingStart="@dimen/widgetResultPaddingStart"
+	android:paddingEnd="@dimen/widgetResultPaddingEnd"
+	android:paddingTop="@dimen/widgetResultPaddingTop"
+	android:paddingBottom="@dimen/widgetResultPaddingBottom"
+	android:clickable="true"
+	android:focusable="true"
+	android:foreground="?android:attr/selectableItemBackground"
+	android:orientation="vertical"
+	tools:ignore="UnusedAttribute">
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ellipsize="end"
+		android:gravity="center_vertical"
+		android:maxLines="1"
+		android:scrollHorizontally="true"
+		android:text="@string/ahmed_mourad"
+		android:textColor="@android:color/black"
+		android:textSize="@dimen/widgetResultUserTextSize"
+		android:textStyle="bold" />
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:id="@+id/widget_result_date"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ellipsize="end"
+		android:gravity="center_vertical"
+		android:maxLines="1"
+		android:paddingBottom="@dimen/widgetResultDatePaddingBottom"
+		android:scrollHorizontally="true"
+		tools:text="@string/date"
+		android:textSize="@dimen/widgetResultDateTextSize" />
+	
+	<ImageView
+		android:id="@+id/widget_result_picture"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/widgetResultPictureHeight"
+		android:scaleType="centerCrop"
+		android:contentDescription="@string/child"
+		tools:src="@drawable/placeholder" />
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:id="@+id/widget_result_notes"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ellipsize="end"
+		android:gravity="center_vertical"
+		android:lineSpacingMultiplier="1.2"
+		android:maxLines="2"
+		android:paddingTop="@dimen/widgetResultNotesPaddingTop"
+		android:scrollHorizontally="true"
+		android:textSize="@dimen/widgetResultNotesTextSize"
+		tools:text="Don't you think it's ridiculous that Firebase Realtime Database has so poor querying capabilities?\nI mean It's Google for god's sake!" />
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="@dimen/widgetResultLocationPaddingTop">
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/location_label"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/widgetResultLocationTextSize" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/widget_result_location"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ellipsize="end"
+			android:gravity="center_vertical"
+			android:maxLines="1"
+			android:paddingEnd="@dimen/widgetResultLocationPaddingEnd"
+			android:paddingStart="@dimen/widgetResultLocationSpacing"
+			android:scrollHorizontally="true"
+			android:textSize="@dimen/widgetResultLocationTextSize"
+			tools:text="Yasmeena Plaza, Tanta, Egypt" />
+	
+	</LinearLayout>
+
+</LinearLayout>

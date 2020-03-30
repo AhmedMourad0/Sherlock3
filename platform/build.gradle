@@ -1,0 +1,68 @@
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+apply plugin: "de.mannodermaus.android-junit5"
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+    sourceSets.each {
+        it.java.srcDirs += "src/$it.name/kotlin"
+    }
+    testOptions {
+        junitPlatform {
+            filters {
+                engines {
+                    include "spek2"
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    implementation "com.github.pwittchen:reactivenetwork-rx2:3.0.3"
+
+    implementation "com.louiscad.splitties:splitties-appctx:$splittiesVersion"
+
+    implementation "com.jakewharton.timber:timber-android:$timberVersion"
+
+    testImplementation "junit:junit:4.13"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test:core:1.2.0"
+    androidTestImplementation "androidx.test:rules:1.2.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+
+    implementation project(":domain")
+}

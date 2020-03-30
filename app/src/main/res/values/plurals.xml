@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<plurals name="height_meters">
+		<item quantity="one">one meter</item>
+		<item quantity="other">%1$d meters</item>
+	</plurals>
+	
+	<plurals name="height_centimeters">
+		<item quantity="one">one centimeter</item>
+		<item quantity="other">%1$d centimeters</item>
+	</plurals>
+
+</resources>

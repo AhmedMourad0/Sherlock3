@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<string-array name="age_marks">
+		<item>0</item>
+		<item>5</item>
+		<item>10</item>
+		<item>20</item>
+		<item>30</item>
+	</string-array>
+	
+	<string-array name="height_marks">
+		<item>40</item>
+		<item>80</item>
+		<item>120</item>
+		<item>160</item>
+		<item>200</item>
+	</string-array>
+
+</resources>

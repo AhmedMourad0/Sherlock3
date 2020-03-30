@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:gravity="center_vertical"
+	android:orientation="horizontal">
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingEnd="@dimen/hairLabelPaddingEnd"
+		android:paddingStart="@dimen/hairLabelPaddingStart"
+		android:textSize="@dimen/hairLabelTextSize"
+		android:text="@string/hair_color"
+		android:textColor="@android:color/black" />
+	
+	<View
+		android:id="@+id/hair_blonde"
+		android:layout_width="@dimen/hairColorWidth"
+		android:layout_height="@dimen/hairColorHeight"
+		android:layout_marginEnd="@dimen/hairColorSpacing"
+		android:layout_marginStart="@dimen/hairColorMarginStart" />
+	
+	<View
+		android:id="@+id/hair_brown"
+		android:layout_width="@dimen/hairColorWidth"
+		android:layout_height="@dimen/hairColorHeight"
+		android:layout_marginEnd="@dimen/hairColorSpacing"
+		android:layout_marginStart="@dimen/hairColorMarginStart" />
+	
+	<View
+		android:id="@+id/hair_dark"
+		android:layout_width="@dimen/hairColorWidth"
+		android:layout_height="@dimen/hairColorHeight" />
+
+</LinearLayout>

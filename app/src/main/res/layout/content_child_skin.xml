@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:gravity="center_vertical"
+	android:orientation="horizontal"
+	android:paddingBottom="@dimen/skinPaddingBottom">
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingEnd="@dimen/skinLabelPaddingEnd"
+		android:paddingStart="@dimen/skinLabelPaddingStart"
+		android:textSize="@dimen/skinLabelTextSize"
+		android:text="@string/skin_color"
+		android:textColor="@android:color/black" />
+	
+	<View
+		android:id="@+id/skin_white"
+		android:layout_width="@dimen/skinColorWidth"
+		android:layout_height="@dimen/skinColorHeight"
+		android:layout_marginEnd="@dimen/skinColorSpacing"
+		android:layout_marginStart="@dimen/skinColorMarginStart" />
+	
+	<View
+		android:id="@+id/skin_wheat"
+		android:layout_width="@dimen/skinColorWidth"
+		android:layout_height="@dimen/skinColorHeight"
+		android:layout_marginEnd="@dimen/skinColorSpacing"
+		android:layout_marginStart="@dimen/skinColorMarginStart" />
+	
+	<View
+		android:id="@+id/skin_dark"
+		android:layout_width="@dimen/skinColorWidth"
+		android:layout_height="@dimen/skinColorHeight" />
+
+</LinearLayout>

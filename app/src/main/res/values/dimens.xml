@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+	
+	<!-- It's a shame that something as simple as changing the snackbar padding would require such an ugly hack -->
+	<dimen name="design_snackbar_padding_vertical" tools:override="true">4dp</dimen>
+	
+	<dimen name="defaultAppBarElevation">4dp</dimen>
+	<dimen name="backdropTranslationY">36dp</dimen>
+	
+	<!-- HomeController -->
+	
+	<dimen name="homeRecyclerVerticalPadding">20dp</dimen>
+	<dimen name="homeRecyclerHorizontalPadding">8dp</dimen>
+	
+	<!-- AddChildController -->
+	
+	<dimen name="addChildPaddingBottom">40dp</dimen>
+	<dimen name="addChildPaddingEnd">12dp</dimen>
+	<dimen name="addChildPaddingStart">12dp</dimen>
+	<dimen name="addChildPaddingTop">16dp</dimen>
+	
+	<dimen name="addChildLocationPaddingTop">20dp</dimen>
+	<dimen name="addChildLocationTextPaddingEnd">4dp</dimen>
+	<dimen name="addChildLocationTextPaddingStart">0dp</dimen>
+	<dimen name="addChildLocationIconWidth">32dp</dimen>
+	<dimen name="addChildLocationIconHeight">32dp</dimen>
+	<dimen name="addChildLocationIconMarginEnd">8dp</dimen>
+	<dimen name="addChildLocationIconMarginStart">8dp</dimen>
+	
+	<dimen name="addChildButtonMarginEnd">32dp</dimen>
+	<dimen name="addChildButtonMarginStart">32dp</dimen>
+	<dimen name="addChildButtonMarginTop">32dp</dimen>
+	<dimen name="addChildButtonPadding">16dp</dimen>
+	
+	<dimen name="addChildLocationPaddingBottom">32dp</dimen>
+	
+	<dimen name="addChildHairPaddingBottom">32dp</dimen>
+	
+	<dimen name="addChildPicturePaddingBottom">24dp</dimen>
+	<dimen name="addChildPictureWidth">84dp</dimen>
+	<dimen name="addChildPictureHeight">84dp</dimen>
+	<dimen name="addChildPictureTextPadding">16dp</dimen>
+	<dimen name="addChildPictureTextSize">16sp</dimen>
+	
+	<dimen name="addChildLabelPaddingEnd">12dp</dimen>
+	<dimen name="addChildLabelPaddingStart">0dp</dimen>
+	<dimen name="addChildLabelTextSize">18sp</dimen>
+	
+	<dimen name="addChildSeekBarIndicatorHeight">32dp</dimen>
+	<dimen name="addChildSeekBarIndicatorPaddingLeft">8dp</dimen>
+	<dimen name="addChildSeekBarIndicatorPaddingRight">8dp</dimen>
+	<dimen name="addChildSeekBarIndicatorRadius">2dp</dimen>
+	
+	<!-- FindChildrenController -->
+	
+	<dimen name="findChildrenPaddingBottom">40dp</dimen>
+	<dimen name="findChildrenPaddingEnd">12dp</dimen>
+	<dimen name="findChildrenPaddingStart">12dp</dimen>
+	<dimen name="findChildrenPaddingTop">16dp</dimen>
+	
+	<dimen name="findChildrenLocationPaddingTop">20dp</dimen>
+	<dimen name="findChildrenLocationTextPaddingEnd">4dp</dimen>
+	<dimen name="findChildrenLocationTextPaddingStart">0dp</dimen>
+	<dimen name="findChildrenLocationIconWidth">32dp</dimen>
+	<dimen name="findChildrenLocationIconHeight">32dp</dimen>
+	<dimen name="findChildrenLocationIconMarginEnd">8dp</dimen>
+	<dimen name="findChildrenLocationIconMarginStart">8dp</dimen>
+	
+	<dimen name="findChildrenButtonMarginEnd">32dp</dimen>
+	<dimen name="findChildrenButtonMarginStart">32dp</dimen>
+	<dimen name="findChildrenButtonMarginTop">32dp</dimen>
+	<dimen name="findChildrenButtonPadding">16dp</dimen>
+	
+	<dimen name="findChildrenLabelPaddingEnd">12dp</dimen>
+	<dimen name="findChildrenLabelPaddingStart">0dp</dimen>
+	<dimen name="findChildrenLabelTextSize">18sp</dimen>
+	
+	<!-- DisplayChildController -->
+	
+	<dimen name="displayChildHeaderMarginStart">8dp</dimen>
+	<dimen name="displayChildHeaderMarginBottom">6dp</dimen>
+	
+	<dimen name="displayChildDetailPaddingEnd">8dp</dimen>
+	<dimen name="displayChildDetailPaddingStart">22dp</dimen>
+	
+	<dimen name="displayChildDetailMarginTop">12dp</dimen>
+	<dimen name="displayChildDetailMarginBottom">12dp</dimen>
+	
+	<dimen name="displayChildDetailDrawablePadding">22dp</dimen>
+	
+	<dimen name="displayChildCardMarginEnd">8dp</dimen>
+	<dimen name="displayChildCardMarginStart">8dp</dimen>
+	
+	<dimen name="displayChildPaddingTop">8dp</dimen>
+	<dimen name="displayChildMarginBottom">60dp</dimen>
+	
+	<dimen name="displayChildDescriptionLabelMarginTop">8dp</dimen>
+	<dimen name="displayChildDetailsLabelMarginTop">20dp</dimen>
+	<dimen name="displayChildCardPaddingTop">28dp</dimen>
+	<dimen name="displayChildCardPaddingBottom">20dp</dimen>
+	
+	<dimen name="displayChildDetailTextSize">15sp</dimen>
+	
+	<dimen name="displayChildLocationPaddingBottom">8dp</dimen>
+	
+	<dimen name="displayChildPickersPaddingBottom">8dp</dimen>
+	
+	<dimen name="displayChildAgePickerMarginEnd">44dp</dimen>
+	
+	<dimen name="displayChildCardCornerRadius">1dp</dimen>
+	<dimen name="displayChildCardElevation">2dp</dimen>
+	
+	<!-- SearchResultsController -->
+	
+	<dimen name="searchResultsRecyclerPaddingBottom">4dp</dimen>
+	<dimen name="searchResultsRecyclerPaddingTop">4dp</dimen>
+	
+	<!-- ResultItem -->
+	
+	<dimen name="resultMarginStart">8dp</dimen>
+	<dimen name="resultMarginEnd">8dp</dimen>
+	<dimen name="resultMarginTop">4dp</dimen>
+	<dimen name="resultMarginBottom">4dp</dimen>
+	
+	<dimen name="resultPaddingEnd">8dp</dimen>
+	<dimen name="resultPaddingStart">8dp</dimen>
+	
+	<dimen name="resultMetaPaddingBottom">16dp</dimen>
+	<dimen name="resultMetaPaddingTop">16dp</dimen>
+	
+	<dimen name="resultMetaUserPictureWidth">50dp</dimen>
+	<dimen name="resultMetaUserPictureHeight">50dp</dimen>
+	<dimen name="resultMetaUserTextPaddingStart">16dp</dimen>
+	<dimen name="resultMetaUserTextPaddingEnd">0dp</dimen>
+	
+	<dimen name="resultUserNameTextSize">16sp</dimen>
+	
+	<dimen name="resultDateTextSize">15sp</dimen>
+	
+	<dimen name="resultNotesPaddingStart">12dp</dimen>
+	<dimen name="resultNotesTextSize">15sp</dimen>
+	
+	<dimen name="resultLocationPaddingTop">12dp</dimen>
+	<dimen name="resultLocationPaddingBottom">16dp</dimen>
+	<dimen name="resultLocationTextSize">15sp</dimen>
+	<dimen name="resultLocationPaddingEnd">0dp</dimen>
+	<dimen name="resultLocationSpacing">4dp</dimen>
+	
+	<dimen name="resultCardCornerRadius">1dp</dimen>
+	<dimen name="resultCardElevation">2dp</dimen>
+	
+	<!-- SectionItem -->
+	
+	<dimen name="sectionMargin">4dp</dimen>
+	<dimen name="sectionNameTextSize">18sp</dimen>
+	
+	<dimen name="sectionNamePaddingStart">4dp</dimen>
+	<dimen name="sectionNamePaddingEnd">4dp</dimen>
+	<dimen name="sectionNamePaddingTop">8dp</dimen>
+	<dimen name="sectionNamePaddingBottom">12dp</dimen>
+	
+	<dimen name="sectionCardCornerRadius">1dp</dimen>
+	<dimen name="sectionCardElevation">2dp</dimen>
+	
+	<!-- AppWidget -->
+	
+	<dimen name="widgetToolbarHeight">48dp</dimen>
+	<dimen name="widgetToolbarPaddingEnd">12dp</dimen>
+	<dimen name="widgetToolbarPaddingStart">12dp</dimen>
+	
+	<dimen name="widgetLogoHeight">38dp</dimen>
+	<dimen name="widgetLogoPaddingBottom">8dp</dimen>
+	<dimen name="widgetLogoPaddingEnd">4dp</dimen>
+	<dimen name="widgetLogoPaddingStart">0dp</dimen>
+	<dimen name="widgetLogoPaddingTop">8dp</dimen>
+	
+	<dimen name="widgetTitleTextSize">16sp</dimen>
+	
+	<!-- WidgetResultItem -->
+	
+	<dimen name="widgetResultPaddingStart">8dp</dimen>
+	<dimen name="widgetResultPaddingEnd">8dp</dimen>
+	<dimen name="widgetResultPaddingTop">12dp</dimen>
+	<dimen name="widgetResultPaddingBottom">12dp</dimen>
+	
+	<dimen name="widgetResultUserTextSize">15sp</dimen>
+	
+	<dimen name="widgetResultDateTextSize">14sp</dimen>
+	<dimen name="widgetResultDatePaddingBottom">8dp</dimen>
+	
+	<dimen name="widgetResultPictureHeight">240dp</dimen>
+	
+	<dimen name="widgetResultNotesPaddingTop">12dp</dimen>
+	<dimen name="widgetResultNotesTextSize">15sp</dimen>
+	
+	<dimen name="widgetResultLocationPaddingTop">12dp</dimen>
+	<dimen name="widgetResultLocationTextSize">15sp</dimen>
+	<dimen name="widgetResultLocationSpacing">4dp</dimen>
+	<dimen name="widgetResultLocationPaddingEnd">0dp</dimen>
+	
+	<!-- GenderContent -->
+	
+	<dimen name="genderPaddingBottom">32dp</dimen>
+	<dimen name="genderTextSize">18sp</dimen>
+	<dimen name="genderMarginEnd">32dp</dimen>
+	<dimen name="genderSpacing">0dp</dimen>
+	
+	<dimen name="genderLabelPaddingStart">0dp</dimen>
+	<dimen name="genderLabelTextSize">18sp</dimen>
+	<dimen name="genderLabelPaddingEnd">12dp</dimen>
+	
+	<!-- SkinContent -->
+	
+	<dimen name="skinColorWidth">48dp</dimen>
+	<dimen name="skinColorHeight">48dp</dimen>
+	<dimen name="skinColorSpacing">20dp</dimen>
+	<dimen name="skinColorMarginStart">0dp</dimen>
+	
+	<dimen name="skinPaddingBottom">32dp</dimen>
+	
+	<dimen name="skinLabelPaddingStart">0dp</dimen>
+	<dimen name="skinLabelTextSize">18sp</dimen>
+	<dimen name="skinLabelPaddingEnd">24dp</dimen>
+	
+	<!-- HairContent -->
+	
+	<dimen name="hairColorWidth">48dp</dimen>
+	<dimen name="hairColorHeight">48dp</dimen>
+	<dimen name="hairColorSpacing">20dp</dimen>
+	<dimen name="hairColorMarginStart">0dp</dimen>
+	
+	<dimen name="hairLabelPaddingStart">0dp</dimen>
+	<dimen name="hairLabelTextSize">18sp</dimen>
+	<dimen name="hairLabelPaddingEnd">24dp</dimen>
+	
+	<!-- NameContent -->
+	
+	<dimen name="namePaddingBottom">12dp</dimen>
+	
+	<dimen name="nameTextSpacing">4dp</dimen>
+	
+	<dimen name="nameLastNamePaddingEnd">0dp</dimen>
+	<dimen name="nameFirstNamePaddingStart">0dp</dimen>
+	
+	<!-- DividerContent -->
+	
+	<dimen name="dividerMarginStart">67dp</dimen>
+	<dimen name="dividerMarginEnd">16dp</dimen>
+	<dimen name="dividerMarginBottom">8dp</dimen>
+	<dimen name="dividerMarginTop">8dp</dimen>
+	
+	<dimen name="dividerHeight">1dp</dimen>
+	<dimen name="main_content_corner_cut">32dp</dimen>
+	<dimen name="main_content_elevation">8dp</dimen>
+
+</resources>
