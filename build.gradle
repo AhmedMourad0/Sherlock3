@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.5.3"
+        classpath "com.android.tools.build:gradle:3.6.1"
         classpath "com.google.gms:google-services:4.3.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.4.2.0"
@@ -28,6 +28,7 @@ allprojects {
         timberVersion = "5.0.0-SNAPSHOT"
         spek_version = "2.0.1"
         arrow_version = "0.10.4"
+        nav_version = "2.3.0-alpha04"
     }
 }
 
