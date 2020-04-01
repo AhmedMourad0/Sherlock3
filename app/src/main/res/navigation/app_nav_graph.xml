@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/app_nav_graph"
+	app:startDestination="@id/homeFragment">
+	<fragment
+		android:id="@+id/homeFragment"
+		android:name="inc.ahmedmourad.sherlock.view.fragments.HomeFragment"
+		android:label="HomeFragment"
+		tools:layout="@layout/fragment_home">
+		<action
+			android:id="@+id/action_homeFragment_to_addChildFragment"
+			app:destination="@id/addChildFragment" />
+		<action
+			android:id="@+id/action_homeFragment_to_findChildrenFragment"
+			app:destination="@id/findChildrenFragment" />
+	</fragment>
+	<fragment
+		android:id="@+id/addChildFragment"
+		android:name="inc.ahmedmourad.sherlock.view.fragments.children.AddChildFragment"
+		android:label="AddChildFragment"
+		tools:layout="@layout/fragment_add_child">
+		<argument
+			android:name="child"
+			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper"
+			app:nullable="true" />
+		<action
+			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
+			app:destination="@id/childDetailsFragment"
+			app:popUpTo="@id/homeFragment" />
+	</fragment>
+	<fragment
+		android:id="@+id/findChildrenFragment"
+		android:name="inc.ahmedmourad.sherlock.view.fragments.children.FindChildrenFragment"
+		android:label="FindChildrenFragment"
+		tools:layout="@layout/fragment_find_children">
+		<action
+			android:id="@+id/action_findChildrenFragment_to_childrenSearchResultsFragment"
+			app:destination="@id/childrenSearchResultsFragment" />
+	</fragment>
+	<fragment
+		android:id="@+id/childrenSearchResultsFragment"
+		android:name="inc.ahmedmourad.sherlock.view.fragments.children.ChildrenSearchResultsFragment"
+		android:label="ChildrenSearchResultsFragment"
+		tools:layout="@layout/fragment_children_search_results">
+		<argument
+			android:name="query"
+			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper" />
+		<action
+			android:id="@+id/action_childrenSearchResultsFragment_to_childDetailsFragment"
+			app:destination="@id/childDetailsFragment" />
+	</fragment>
+	<fragment
+		android:id="@+id/childDetailsFragment"
+		android:name="inc.ahmedmourad.sherlock.view.fragments.children.ChildDetailsFragment"
+		android:label="ChildDetailsFragment"
+		tools:layout="@layout/fragment_child_details">
+		<argument
+			android:name="simpleChild"
+			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper" />
+	</fragment>
+</navigation>
