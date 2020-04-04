@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.children.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -6,7 +6,7 @@ import inc.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFa
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 
-import inc.ahmedmourad.sherlock.viewmodel.controllers.children.ChildrenSearchResultsViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildrenSearchResultsViewModel
 
 internal typealias ChildrenSearchResultsViewModelFactoryFactory =
         (@JvmSuppressWildcards ChildQuery) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory

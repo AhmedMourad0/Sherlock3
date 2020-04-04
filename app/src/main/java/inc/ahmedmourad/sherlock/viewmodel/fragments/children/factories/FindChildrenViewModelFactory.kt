@@ -1,9 +1,9 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.children.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
-import inc.ahmedmourad.sherlock.viewmodel.controllers.children.FindChildrenViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.FindChildrenViewModel
 
 internal class FindChildrenViewModelFactory(
         private val observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor

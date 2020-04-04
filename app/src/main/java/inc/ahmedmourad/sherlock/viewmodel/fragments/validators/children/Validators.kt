@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.validators.children
+package inc.ahmedmourad.sherlock.viewmodel.fragments.validators.children
 
 import arrow.core.Either
 import arrow.core.left

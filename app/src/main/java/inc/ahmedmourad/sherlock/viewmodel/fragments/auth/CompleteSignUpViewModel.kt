@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,10 +10,10 @@ import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.model.auth.AppCompletedUser
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth.validateAppCompletedUser
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth.validateDisplayName
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth.validateEmail
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth.validatePhoneNumber
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateAppCompletedUser
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateDisplayName
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateEmail
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validatePhoneNumber
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 

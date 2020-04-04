@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.validators.common
+package inc.ahmedmourad.sherlock.viewmodel.fragments.validators.common
 
 import arrow.core.Either
 import inc.ahmedmourad.sherlock.R

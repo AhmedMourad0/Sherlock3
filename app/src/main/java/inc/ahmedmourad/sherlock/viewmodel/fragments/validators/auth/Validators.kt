@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth
+package inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth
 
 import arrow.core.Either
 import arrow.core.left

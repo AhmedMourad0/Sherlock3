@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.ViewModel
 import arrow.core.Either

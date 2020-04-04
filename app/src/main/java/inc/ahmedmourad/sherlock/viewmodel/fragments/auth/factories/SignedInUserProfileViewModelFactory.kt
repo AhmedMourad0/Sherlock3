@@ -1,9 +1,9 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import inc.ahmedmourad.sherlock.domain.interactors.auth.FindSignedInUserInteractor
-import inc.ahmedmourad.sherlock.viewmodel.controllers.auth.SignedInUserProfileViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.SignedInUserProfileViewModel
 
 internal class SignedInUserProfileViewModelFactory(
         private val findSignedInUserInteractor: FindSignedInUserInteractor

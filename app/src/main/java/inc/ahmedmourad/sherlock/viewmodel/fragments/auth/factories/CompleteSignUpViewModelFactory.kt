@@ -1,10 +1,10 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import inc.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import inc.ahmedmourad.sherlock.viewmodel.controllers.auth.CompleteSignUpViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.CompleteSignUpViewModel
 
 internal typealias CompleteSignUpViewModelFactoryFactory =
         (@JvmSuppressWildcards IncompleteUser) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory

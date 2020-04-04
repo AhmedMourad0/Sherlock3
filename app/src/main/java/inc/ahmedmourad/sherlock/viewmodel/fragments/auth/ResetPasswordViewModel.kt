@@ -1,11 +1,11 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.orNull
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.auth.validateEmail
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateEmail
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 

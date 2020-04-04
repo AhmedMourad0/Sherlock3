@@ -1,11 +1,11 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.children.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 
-import inc.ahmedmourad.sherlock.viewmodel.controllers.children.ChildDetailsViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildDetailsViewModel
 
 internal typealias ChildDetailsViewModelFactoryFactory =
         (@JvmSuppressWildcards SimpleRetrievedChild) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory

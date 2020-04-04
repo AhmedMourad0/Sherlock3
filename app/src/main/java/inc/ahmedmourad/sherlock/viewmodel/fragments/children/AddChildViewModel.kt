@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.children
+package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +20,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnect
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.children.*
+import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.children.*
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

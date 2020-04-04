@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.viewmodel.controllers.auth.factories
+package inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -6,7 +6,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookIntera
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
-import inc.ahmedmourad.sherlock.viewmodel.controllers.auth.SignUpViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.SignUpViewModel
 
 internal class SignUpViewModelFactory(
         private val signUpInteractor: SignUpInteractor,
