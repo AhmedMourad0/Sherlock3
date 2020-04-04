@@ -4,18 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.textview.MaterialTextView
-import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.model.common.AppSection
-import inc.ahmedmourad.sherlock.model.common.TaggedController
 
 internal class AppSectionsRecyclerAdapter(
         private val sectionsList: List<AppSection>,
-        private val onSectionSelectedListener: (Lazy<out TaggedController>?) -> Unit
+        private val onSectionSelectedListener: (NavDirections?) -> Unit
 ) : RecyclerView.Adapter<AppSectionsRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): ViewHolder {
@@ -41,7 +40,7 @@ internal class AppSectionsRecyclerAdapter(
         internal fun bind(section: AppSection) {
             nameTextView.text = section.name
             imageView.setImageResource(section.imageDrawable)
-            itemView.setOnClickListener { onSectionSelectedListener(section.controller) }
+            itemView.setOnClickListener { onSectionSelectedListener(section.navDirectionFactory?.invoke()) }
         }
     }
 }
