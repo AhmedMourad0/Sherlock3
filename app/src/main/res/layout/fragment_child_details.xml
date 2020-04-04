@@ -22,7 +22,7 @@
 				app:layout_collapseMode="parallax">
 				
 				<ImageView
-					android:id="@+id/display_child_picture"
+					android:id="@+id/child_picture"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:adjustViewBounds="true"
@@ -41,7 +41,7 @@
 			</FrameLayout>
 			
 			<com.google.android.material.appbar.MaterialToolbar
-				android:id="@+id/display_child_toolbar"
+				android:id="@+id/toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="?actionBarSize"
 				app:layout_collapseMode="pin"
@@ -90,7 +90,7 @@
 					android:paddingBottom="@dimen/displayChildCardPaddingBottom">
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_name"
+						android:id="@+id/child_name"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -111,7 +111,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_age"
+						android:id="@+id/child_age"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -133,7 +133,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_gender"
+						android:id="@+id/child_gender"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -155,7 +155,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_height"
+						android:id="@+id/child_height"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -177,7 +177,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_skin"
+						android:id="@+id/child_skin"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -199,7 +199,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_hair"
+						android:id="@+id/child_hair"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -246,7 +246,7 @@
 					android:paddingBottom="@dimen/displayChildCardPaddingBottom">
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_location"
+						android:id="@+id/child_location"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
@@ -267,7 +267,7 @@
 						android:layout_height="wrap_content" />
 					
 					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/display_child_notes"
+						android:id="@+id/notes"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"

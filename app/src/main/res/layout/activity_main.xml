@@ -10,20 +10,20 @@
 	tools:context=".view.activity.MainActivity">
 	
 	<androidx.coordinatorlayout.widget.CoordinatorLayout
-		android:id="@+id/main_backdrop_root"
+		android:id="@+id/backdrop_root"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:clipToPadding="false">
 		
 		<com.google.android.material.appbar.AppBarLayout
-			android:id="@+id/main_appbar"
+			android:id="@+id/appbar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/colorPrimary"
 			app:elevation="0dp">
 			
 			<com.google.android.material.appbar.MaterialToolbar
-				android:id="@+id/main_toolbar"
+				android:id="@+id/toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="?attr/actionBarSize"
 				android:focusable="true"
@@ -37,22 +37,25 @@
 		</com.google.android.material.appbar.AppBarLayout>
 		
 		<androidx.core.widget.NestedScrollView
-			android:id="@+id/main_backdrop_scroll_view"
+			android:id="@+id/backdrop_scroll_view"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:translationY="@dimen/backdropTranslationY"
 			android:clipToPadding="false"
 			app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 			
-			<com.bluelinelabs.conductor.ChangeHandlerFrameLayout
-				android:id="@+id/main_backdrop_controllers_container"
+			<androidx.fragment.app.FragmentContainerView
+				android:id="@+id/auth_nav_host_fragment"
+				android:name="androidx.navigation.fragment.NavHostFragment"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
+				android:layout_height="wrap_content"
+				app:defaultNavHost="false"
+				app:navGraph="@navigation/auth_nav_graph" />
 		
 		</androidx.core.widget.NestedScrollView>
 		
 		<View
-			android:id="@+id/main_dummy_view"
+			android:id="@+id/dummy_view"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
 			android:focusable="true"
@@ -61,7 +64,7 @@
 	</androidx.coordinatorlayout.widget.CoordinatorLayout>
 	
 	<com.github.florent37.shapeofview.shapes.CutCornerView
-		android:id="@+id/main_content_root"
+		android:id="@+id/content_root"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_marginTop="?attr/actionBarSize"
@@ -69,14 +72,17 @@
 		android:focusableInTouchMode="true"
 		app:shape_cutCorner_topLeftSize="@dimen/main_content_corner_cut">
 		
-		<com.bluelinelabs.conductor.ChangeHandlerFrameLayout
-			android:id="@+id/main_content_controllers_container"
+		<androidx.fragment.app.FragmentContainerView
+			android:id="@+id/app_nav_host_fragment"
+			android:name="androidx.navigation.fragment.NavHostFragment"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			app:defaultNavHost="true"
+			app:navGraph="@navigation/app_nav_graph"
 			android:background="@android:color/white" />
 		
 		<View
-			android:id="@+id/main_content_overlay"
+			android:id="@+id/content_overlay"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:alpha="0"

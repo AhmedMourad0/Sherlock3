@@ -17,6 +17,7 @@
 		android:paddingBottom="@dimen/findChildrenPaddingBottom">
 		
 		<include
+			android:id="@+id/name"
 			layout="@layout/content_child_name"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
@@ -31,7 +32,7 @@
 			tools:ignore="UseCompoundDrawables">
 			
 			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/find_children_location_text_view"
+				android:id="@+id/location_text_view"
 				android:layout_width="0dp"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
@@ -41,7 +42,7 @@
 				android:text="@string/no_last_known_location_specified" />
 			
 			<ImageView
-				android:id="@+id/find_children_location_image_view"
+				android:id="@+id/location_image_view"
 				android:layout_width="@dimen/findChildrenLocationIconWidth"
 				android:layout_height="@dimen/findChildrenLocationIconHeight"
 				android:layout_marginStart="@dimen/findChildrenLocationIconMarginStart"
@@ -68,7 +69,7 @@
 				android:textSize="@dimen/findChildrenLabelTextSize" />
 			
 			<inc.ahmedmourad.sherlock.view.views.ProperNumberPicker
-				android:id="@+id/find_children_age_number_picker"
+				android:id="@+id/age_number_picker"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginEnd="@dimen/displayChildAgePickerMarginEnd"
@@ -86,7 +87,7 @@
 				android:textSize="@dimen/findChildrenLabelTextSize" />
 			
 			<inc.ahmedmourad.sherlock.view.views.ProperNumberPicker
-				android:id="@+id/find_children_height_number_picker"
+				android:id="@+id/height_number_picker"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				app:maxValue="200"
@@ -96,23 +97,26 @@
 		</LinearLayout>
 		
 		<include
+			android:id="@+id/gender"
 			layout="@layout/content_child_gender"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 		
 		<include
+			android:id="@+id/skin"
 			layout="@layout/content_child_skin"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 		
 		<include
+			android:id="@+id/hair"
 			layout="@layout/content_child_hair"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="8dp" />
 		
 		<com.google.android.material.button.MaterialButton
-			android:id="@+id/find_children_search_button"
+			android:id="@+id/search_button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="@dimen/findChildrenButtonMarginStart"
