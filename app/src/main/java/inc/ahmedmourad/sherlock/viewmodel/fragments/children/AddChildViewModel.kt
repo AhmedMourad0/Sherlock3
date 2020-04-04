@@ -20,7 +20,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnect
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
-import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.children.*
+import inc.ahmedmourad.sherlock.validators.children.*
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

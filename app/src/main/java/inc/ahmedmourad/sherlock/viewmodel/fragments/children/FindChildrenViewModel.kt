@@ -11,7 +11,7 @@ import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
-import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.children.*
+import inc.ahmedmourad.sherlock.validators.children.*
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 

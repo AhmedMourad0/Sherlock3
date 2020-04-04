@@ -6,8 +6,8 @@ import arrow.core.Either
 import arrow.core.extensions.fx
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.children.validateCoordinates
-import inc.ahmedmourad.sherlock.viewmodel.controllers.validators.children.validateLocation
+import inc.ahmedmourad.sherlock.validators.children.validateCoordinates
+import inc.ahmedmourad.sherlock.validators.children.validateLocation
 import splitties.init.appCtx
 import com.google.android.gms.location.places.ui.PlacePicker as DelegatePlacePicker
 

@@ -12,9 +12,9 @@ import inc.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInterac
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
-import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateEmail
-import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validatePassword
-import inc.ahmedmourad.sherlock.viewmodel.fragments.validators.auth.validateUserCredentials
+import inc.ahmedmourad.sherlock.validators.auth.validateEmail
+import inc.ahmedmourad.sherlock.validators.auth.validatePassword
+import inc.ahmedmourad.sherlock.validators.auth.validateUserCredentials
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
