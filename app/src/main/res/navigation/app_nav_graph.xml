@@ -23,12 +23,11 @@
 		tools:layout="@layout/fragment_add_child">
 		<argument
 			android:name="child"
-			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper"
+			app:argType="android.os.Bundle"
 			app:nullable="true" />
 		<action
 			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
-			app:destination="@id/childDetailsFragment"
-			app:popUpTo="@id/homeFragment" />
+			app:destination="@id/childDetailsFragment" />
 	</fragment>
 	<fragment
 		android:id="@+id/findChildrenFragment"
@@ -46,7 +45,7 @@
 		tools:layout="@layout/fragment_children_search_results">
 		<argument
 			android:name="query"
-			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper" />
+			app:argType="android.os.Bundle" />
 		<action
 			android:id="@+id/action_childrenSearchResultsFragment_to_childDetailsFragment"
 			app:destination="@id/childDetailsFragment" />
@@ -58,6 +57,6 @@
 		tools:layout="@layout/fragment_child_details">
 		<argument
 			android:name="simpleChild"
-			app:argType="inc.ahmedmourad.sherlock.model.common.ParcelableWrapper" />
+			app:argType="android.os.Bundle" />
 	</fragment>
 </navigation>
