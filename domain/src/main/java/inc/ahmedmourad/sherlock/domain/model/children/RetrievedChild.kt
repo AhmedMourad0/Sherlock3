@@ -1,16 +1,19 @@
 package inc.ahmedmourad.sherlock.domain.model.children
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
+import inc.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.Name
 import inc.ahmedmourad.sherlock.domain.model.common.Url
 import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
+import timber.log.Timber
+import timber.log.error
 
-//TODO: follow PublishedChild's rules
 //TODO: add user id
 class RetrievedChild private constructor(
         val id: ChildId,
@@ -22,7 +25,7 @@ class RetrievedChild private constructor(
         val pictureUrl: Url?
 ) {
 
-    fun simplify(): Either<SimpleRetrievedChild.Exception, SimpleRetrievedChild> {
+    fun simplify(): SimpleRetrievedChild {
         return SimpleRetrievedChild.of(
                 id,
                 publicationDate,
@@ -31,7 +34,10 @@ class RetrievedChild private constructor(
                 location?.name,
                 location?.address,
                 pictureUrl
-        )
+        ).getOrHandle {
+            Timber.error(ModelConversionException(it.toString()), it::toString)
+            null
+        }!!
     }
 
     fun component1() = id

@@ -9,7 +9,6 @@ import inc.ahmedmourad.sherlock.children.repository.dependencies.ChildrenRemoteR
 import inc.ahmedmourad.sherlock.domain.constants.BackgroundState
 import inc.ahmedmourad.sherlock.domain.constants.PublishingState
 import inc.ahmedmourad.sherlock.domain.data.ChildrenRepository
-import inc.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import inc.ahmedmourad.sherlock.domain.filter.Filter
 import inc.ahmedmourad.sherlock.domain.interactors.common.NotifyChildFindingStateChangeInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.common.NotifyChildPublishingStateChangeInteractor
@@ -23,8 +22,6 @@ import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import timber.log.error
 import java.util.*
 
 //TODO: if requireUserSignedIn doesn't fail and user is not signed in with FirebaseAuth
@@ -106,16 +103,11 @@ internal class SherlockChildrenRepository(
                                 .replaceAll(results)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(Schedulers.io())
-                                .map { _ ->
+                                .map {
                                     results.map { tuple ->
-                                        tuple.mapLeft { child ->
-                                            child.simplify().getOrHandle {
-                                                Timber.error(ModelConversionException(it.toString()), it::toString)
-                                                null
-                                            }
-                                        }
-                                    }.mapNotNull { tuple ->
-                                        tuple.a?.let { it toT tuple.b }
+                                        tuple.mapLeft(RetrievedChild::simplify)
+                                    }.map { tuple ->
+                                        tuple.a toT tuple.b
                                     }.right()
                                 }.toFlowable()
                     })
