@@ -10,13 +10,8 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import arrow.core.getOrHandle
 import inc.ahmedmourad.sherlock.R
-import inc.ahmedmourad.sherlock.dagger.SherlockComponent
-import inc.ahmedmourad.sherlock.dagger.modules.factories.AddChildControllerIntentFactory
-import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildDetailsControllerIntentFactory
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.AddChildControllerIntentQualifier
-import inc.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
+import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
@@ -37,18 +32,11 @@ internal class SherlockService : Service() {
     @Inject
     lateinit var addChildInteractor: AddChildInteractor
 
-    @Inject
-    @field:AddChildControllerIntentQualifier
-    lateinit var addChildControllerFactory: AddChildControllerIntentFactory
-
-    @Inject
-    lateinit var childDetailsControllerFactory: ChildDetailsControllerIntentFactory
-
     private var addChildDisposable by disposable()
 
     override fun onCreate() {
         super.onCreate()
-        SherlockComponent.Services.sherlockServiceComponent.get().inject(this)
+        appCtx.findAppComponent().plusSherlockServiceComponent().inject(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -88,12 +76,7 @@ internal class SherlockService : Service() {
                         Timber.error(it, it::toString)
                         showPublishingFailedNotification(it, appChild, true)
                     }, ifRight = { child ->
-                        this.showPublishedSuccessfullyNotification(
-                                child.simplify().getOrHandle {
-                                    Timber.error(ModelConversionException(it.toString()), it::toString)
-                                    null
-                                }
-                        )
+                        this.showPublishedSuccessfullyNotification(child.simplify())
                     })
                 }, {
                     Timber.error(it, it::toString)
@@ -216,7 +199,6 @@ internal class SherlockService : Service() {
 
     override fun onDestroy() {
         addChildDisposable?.dispose()
-        SherlockComponent.Services.sherlockServiceComponent.release()
         super.onDestroy()
     }
 
