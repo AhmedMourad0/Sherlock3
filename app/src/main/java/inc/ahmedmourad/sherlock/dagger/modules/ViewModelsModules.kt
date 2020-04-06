@@ -18,8 +18,28 @@ import inc.ahmedmourad.sherlock.domain.interactors.common.CheckInternetConnectiv
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.viewmodel.activity.factory.MainActivityViewModelFactory
-import inc.ahmedmourad.sherlock.viewmodel.controllers.auth.factories.*
-import inc.ahmedmourad.sherlock.viewmodel.controllers.children.factories.*
+import inc.ahmedmourad.sherlock.viewmodel.common.factories.GlobalViewModelFactory
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories.*
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories.*
+
+@Module
+internal object GlobalViewModelModule {
+    @Provides
+    @Reusable
+    @GlobalViewModelQualifier
+    @JvmStatic
+    fun provideMainActivityViewModel(
+            @ObserveInternetConnectivityInteractorQualifier observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
+            @ObserveUserAuthStateInteractorQualifier observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
+            @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
+    ): ViewModelProvider.NewInstanceFactory {
+        return GlobalViewModelFactory(
+                observeInternetConnectivityInteractor,
+                observeUserAuthStateInteractor,
+                observeSignedInUserInteractor
+        )
+    }
+}
 
 @Module
 internal object MainActivityViewModelModule {
@@ -28,17 +48,9 @@ internal object MainActivityViewModelModule {
     @MainActivityViewModelQualifier
     @JvmStatic
     fun provideMainActivityViewModel(
-            @ObserveInternetConnectivityInteractorQualifier observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
-            @ObserveUserAuthStateInteractorQualifier observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
-            @FindSignedInUserInteractorQualifier findSignedInUserInteractor: FindSignedInUserInteractor,
             signOutInteractor: SignOutInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return MainActivityViewModelFactory(
-                observeInternetConnectivityInteractor,
-                observeUserAuthStateInteractor,
-                findSignedInUserInteractor,
-                signOutInteractor
-        )
+        return MainActivityViewModelFactory(signOutInteractor)
     }
 }
 
@@ -104,10 +116,10 @@ internal object SignedInUserProfileViewModelModule {
     @SignedInUserProfileViewModelQualifier
     @JvmStatic
     fun provideSignedInUserProfileViewModel(
-            @FindSignedInUserInteractorQualifier findSignedInUserInteractor: FindSignedInUserInteractor
+            @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
     ): ViewModelProvider.NewInstanceFactory {
         return SignedInUserProfileViewModelFactory(
-                findSignedInUserInteractor
+                observeSignedInUserInteractor
         )
     }
 }
