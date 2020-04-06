@@ -34,7 +34,7 @@ internal class SherlockAuthManager(
                 .observeOn(Schedulers.io())
     }
 
-    override fun findSignedInUser(): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    override fun observeSignedInUser(): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
         return authenticator.get()
                 .getCurrentUser()
                 .subscribeOn(Schedulers.io())

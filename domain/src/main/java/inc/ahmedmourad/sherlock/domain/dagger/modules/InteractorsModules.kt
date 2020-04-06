@@ -142,13 +142,13 @@ internal object ObserveUserAuthStateInteractorModule {
 }
 
 @Module
-internal object FindSignedInUserInteractorModule {
+internal object ObserveSignedInUserInteractorModule {
     @Provides
     @Reusable
-    @FindSignedInUserInteractorQualifier
+    @ObserveSignedInUserInteractorQualifier
     @JvmStatic
-    fun provideFindSignedInUserInteractor(authManager: Lazy<AuthManager>): FindSignedInUserInteractor {
-        return ::findSignedInUser.partially1(authManager)
+    fun provideObserveSignedInUserInteractor(authManager: Lazy<AuthManager>): ObserveSignedInUserInteractor {
+        return ::observeSignedInUser.partially1(authManager)
     }
 }
 

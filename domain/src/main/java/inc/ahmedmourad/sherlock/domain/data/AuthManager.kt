@@ -14,7 +14,7 @@ interface AuthManager {
 
     fun observeUserAuthState(): Flowable<Boolean>
 
-    fun findSignedInUser(): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+    fun observeSignedInUser(): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
     fun signIn(credentials: UserCredentials): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 

@@ -22,7 +22,7 @@ annotation class NotifyChildrenFindingStateChangeInteractorQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-annotation class FindSignedInUserInteractorQualifier
+annotation class ObserveSignedInUserInteractorQualifier
 
 @Qualifier
 @Retention(RUNTIME)

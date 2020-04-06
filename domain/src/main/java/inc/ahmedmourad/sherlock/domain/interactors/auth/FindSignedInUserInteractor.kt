@@ -7,11 +7,11 @@ import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Flowable
 
-typealias FindSignedInUserInteractor =
+typealias ObserveSignedInUserInteractor =
         () -> @JvmSuppressWildcards Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun findSignedInUser(
+internal fun observeSignedInUser(
         authManager: Lazy<AuthManager>
 ): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().findSignedInUser()
+    return authManager.get().observeSignedInUser()
 }
