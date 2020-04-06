@@ -8,7 +8,7 @@ import android.widget.RemoteViewsService
 import arrow.core.Tuple2
 import arrow.core.toMap
 import arrow.core.toTuple2
-import inc.ahmedmourad.sherlock.dagger.SherlockComponent
+import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRemoteViewsFactoryFactory
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
@@ -26,7 +26,7 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
     override fun onCreate() {
         super.onCreate()
-        SherlockComponent.Widget.childrenRemoteViewsServiceComponent.get().inject(this)
+        findAppComponent().plusChildrenRemoteViewsServiceComponent().inject(this)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -47,11 +47,6 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
                 applicationContext,
                 children.zip(weights).map(Pair<SimpleRetrievedChild, Weight>::toTuple2)
         )
-    }
-
-    override fun onDestroy() {
-        SherlockComponent.Widget.childrenRemoteViewsServiceComponent.release()
-        super.onDestroy()
     }
 
     companion object {

@@ -1,11 +1,14 @@
 package inc.ahmedmourad.sherlock.application
 
 import androidx.multidex.MultiDexApplication
+import inc.ahmedmourad.sherlock.dagger.components.ApplicationComponent
+import inc.ahmedmourad.sherlock.dagger.components.DaggerApplicationComponent
 import timber.log.LogcatTree
 import timber.log.Timber
 
 @Suppress("unused")
 internal class SherlockApplication : MultiDexApplication() {
+    val appComponent: ApplicationComponent = DaggerApplicationComponent.create()
     override fun onCreate() {
         super.onCreate()
         Timber.plant(LogcatTree("Sherlock"))
@@ -27,8 +30,6 @@ internal class SherlockApplication : MultiDexApplication() {
 * replace exceptions with ADTs
 *
 * replace RxJava and Coroutines Flow with Monads and Functors for more abstraction
-*
-* The Fragments refactoring stage (Fragments, Navigation, DataBinding)
 *
 * The Dagger refactoring stage (Qualifier, Binding, SingleComponent, Kotlin initiative)
 *

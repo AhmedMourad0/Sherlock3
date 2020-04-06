@@ -6,12 +6,13 @@ import android.content.Context
 import android.widget.RemoteViews
 import arrow.core.Either
 import inc.ahmedmourad.sherlock.R
-import inc.ahmedmourad.sherlock.dagger.SherlockComponent
+import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRemoteViewsServiceIntentFactory
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
 import inc.ahmedmourad.sherlock.utils.DisposablesSparseArray
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -27,7 +28,7 @@ internal class AppWidget : AppWidgetProvider() {
     private val disposables = DisposablesSparseArray()
 
     init {
-        SherlockComponent.Widget.appWidgetComponent.get().inject(this)
+        appCtx.findAppComponent().plusAppWidgetComponent().inject(this)
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
