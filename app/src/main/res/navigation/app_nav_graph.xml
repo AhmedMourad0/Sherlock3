@@ -28,6 +28,9 @@
 		<action
 			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
 			app:destination="@id/childDetailsFragment" />
+		<deepLink
+			android:id="@+id/deepLink"
+			app:uri="https://www.ahmedmourad.dev/child/add/{child}" />
 	</fragment>
 	<fragment
 		android:id="@+id/findChildrenFragment"
