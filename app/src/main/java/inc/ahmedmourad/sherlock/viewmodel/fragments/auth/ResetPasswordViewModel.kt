@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.orNull
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
-import inc.ahmedmourad.sherlock.validators.auth.validateEmail
+import inc.ahmedmourad.sherlock.model.validators.auth.validateEmail
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 

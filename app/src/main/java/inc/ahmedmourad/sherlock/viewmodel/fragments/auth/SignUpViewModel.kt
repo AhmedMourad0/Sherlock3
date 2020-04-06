@@ -13,7 +13,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.model.auth.AppSignUpUser
-import inc.ahmedmourad.sherlock.validators.auth.*
+import inc.ahmedmourad.sherlock.model.validators.auth.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
