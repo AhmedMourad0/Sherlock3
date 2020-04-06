@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.validators.children
+package inc.ahmedmourad.sherlock.model.validators.children
 
 import arrow.core.Either
 import arrow.core.left

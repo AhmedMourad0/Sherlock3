@@ -1,4 +1,4 @@
-package inc.ahmedmourad.sherlock.validators.common
+package inc.ahmedmourad.sherlock.model.validators.common
 
 import arrow.core.Either
 import inc.ahmedmourad.sherlock.R
