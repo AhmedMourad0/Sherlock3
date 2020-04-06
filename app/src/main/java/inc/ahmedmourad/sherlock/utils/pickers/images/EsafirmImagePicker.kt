@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.esafirm.imagepicker.features.ReturnMode
 import inc.ahmedmourad.sherlock.R
-import inc.ahmedmourad.sherlock.validators.common.validatePicturePath
+import inc.ahmedmourad.sherlock.model.validators.common.validatePicturePath
 import splitties.init.appCtx
 import com.esafirm.imagepicker.features.ImagePicker as DelegateImagePicker
 
