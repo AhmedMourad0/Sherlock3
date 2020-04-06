@@ -44,7 +44,7 @@
 			android:clipToPadding="false"
 			app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 			
-			<androidx.fragment.app.FragmentContainerView
+			<fragment
 				android:id="@+id/auth_nav_host_fragment"
 				android:name="androidx.navigation.fragment.NavHostFragment"
 				android:layout_width="match_parent"
@@ -72,7 +72,7 @@
 		android:focusableInTouchMode="true"
 		app:shape_cutCorner_topLeftSize="@dimen/main_content_corner_cut">
 		
-		<androidx.fragment.app.FragmentContainerView
+		<fragment
 			android:id="@+id/app_nav_host_fragment"
 			android:name="androidx.navigation.fragment.NavHostFragment"
 			android:layout_width="match_parent"
