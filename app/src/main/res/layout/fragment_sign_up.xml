@@ -22,7 +22,7 @@
 			android:layout_marginBottom="20dp">
 			
 			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/sign_up_username_edit_Text"
+				android:id="@+id/display_name_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:autofillHints="personName"
@@ -43,7 +43,7 @@
 			android:layout_marginBottom="20dp">
 			
 			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/sign_up_email_edit_Text"
+				android:id="@+id/email_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:autofillHints="email"
@@ -65,7 +65,7 @@
 			app:passwordToggleEnabled="true">
 			
 			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/sign_up_password_edit_Text"
+				android:id="@+id/password_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:autofillHints="password"
@@ -87,7 +87,7 @@
 			app:passwordToggleEnabled="true">
 			
 			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/sign_up_confirm_password_edit_Text"
+				android:id="@+id/confirm_password_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:autofillHints="password"
@@ -108,7 +108,7 @@
 			android:layout_marginBottom="28dp">
 			
 			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/sign_up_phone_number_edit_Text"
+				android:id="@+id/phone_number_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:autofillHints="phoneNumber"
@@ -128,14 +128,14 @@
 			android:layout_marginBottom="20dp">
 			
 			<de.hdodenhof.circleimageview.CircleImageView
-				android:id="@+id/sign_up_picture_image_view"
+				android:id="@+id/picture_image_view"
 				android:layout_width="80dp"
 				android:layout_height="80dp"
 				android:layout_marginStart="36dp"
 				android:src="@drawable/placeholder" />
 			
 			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/sign_up_picture_text_view"
+				android:id="@+id/picture_text_view"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:gravity="center_vertical|start"
@@ -150,7 +150,7 @@
 		</LinearLayout>
 		
 		<com.google.android.material.button.MaterialButton
-			android:id="@+id/sign_up_sign_up_button"
+			android:id="@+id/sign_up_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="16dp"
@@ -164,7 +164,7 @@
 			android:textColor="@android:color/white" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/sign_up_sign_in_text_view"
+			android:id="@+id/sign_in_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="end"
@@ -198,7 +198,7 @@
 			android:orientation="horizontal">
 			
 			<ImageView
-				android:id="@+id/sign_up_sign_up_with_google_image_view"
+				android:id="@+id/sign_up_with_google_image_view"
 				android:layout_width="44dp"
 				android:layout_height="44dp"
 				android:contentDescription="@string/sign_up_with_google"
@@ -206,7 +206,7 @@
 				android:src="@mipmap/google_circular" />
 			
 			<ImageView
-				android:id="@+id/sign_up_sign_up_with_facebook_image_view"
+				android:id="@+id/sign_up_with_facebook_image_view"
 				android:layout_width="44dp"
 				android:layout_height="44dp"
 				android:layout_marginStart="16dp"
@@ -215,7 +215,7 @@
 				android:src="@mipmap/facebook_circular" />
 			
 			<ImageView
-				android:id="@+id/sign_up_sign_up_with_twitter_image_view"
+				android:id="@+id/sign_up_with_twitter_image_view"
 				android:layout_width="44dp"
 				android:layout_height="44dp"
 				android:layout_marginStart="16dp"

@@ -57,7 +57,7 @@
 					android:textStyle="bold" />
 				
 				<com.google.android.material.textview.MaterialTextView
-					android:id="@+id/result_date"
+					android:id="@+id/date_text_view"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:ellipsize="end"
@@ -72,7 +72,7 @@
 		</LinearLayout>
 		
 		<ImageView
-			android:id="@+id/result_picture"
+			android:id="@+id/picture_image_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:contentDescription="@string/child"
@@ -80,7 +80,7 @@
 			tools:src="@drawable/placeholder" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/result_notes"
+			android:id="@+id/notes_text_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:ellipsize="end"
@@ -111,7 +111,7 @@
 				android:textSize="@dimen/resultLocationTextSize" />
 			
 			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/result_location"
+				android:id="@+id/location_text_view"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:ellipsize="end"
