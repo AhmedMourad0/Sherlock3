@@ -18,25 +18,25 @@ internal interface ApplicationComponent {
 
     fun plusMainActivityComponent(): MainActivityComponent
 
-    fun plusHomeControllerComponent(): HomeComponent
+    fun plusHomeFragmentComponent(): HomeComponent
 
-    fun plusAddChildControllerComponent(): AddChildComponent
+    fun plusAddChildFragmentComponent(): AddChildComponent
 
-    fun plusChildDetailsControllerComponent(): ChildDetailsComponent
+    fun plusChildDetailsFragmentComponent(): ChildDetailsComponent
 
-    fun plusFindChildrenControllerComponent(): FindChildrenComponent
+    fun plusFindChildrenFragmentComponent(): FindChildrenComponent
 
-    fun plusChildrenSearchResultsControllerComponent(): ChildrenSearchResultsComponent
+    fun plusChildrenSearchResultsFragmentComponent(): ChildrenSearchResultsComponent
 
-    fun plusSignInControllerComponent(): SignInComponent
+    fun plusSignInFragmentComponent(): SignInComponent
 
-    fun plusSignUpControllerComponent(): SignUpComponent
+    fun plusSignUpFragmentComponent(): SignUpComponent
 
-    fun plusCompleteSignUpControllerComponent(): CompleteSignUpComponent
+    fun plusCompleteSignUpFragmentComponent(): CompleteSignUpComponent
 
-    fun plusResetPasswordControllerComponent(): ResetPasswordComponent
+    fun plusResetPasswordFragmentComponent(): ResetPasswordComponent
 
-    fun plusSignedInUserProfileControllerComponent(): SignedInUserProfileComponent
+    fun plusSignedInUserProfileFragmentComponent(): SignedInUserProfileComponent
 
     fun plusSherlockServiceComponent(): SherlockServiceComponent
 
