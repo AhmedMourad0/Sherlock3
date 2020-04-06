@@ -32,6 +32,7 @@ allprojects {
         timberVersion = "5.0.0-SNAPSHOT"
         spek_version = "2.0.1"
         arrow_version = "0.10.4"
+        lifecycle_version = "2.2.0"
     }
 }
 
