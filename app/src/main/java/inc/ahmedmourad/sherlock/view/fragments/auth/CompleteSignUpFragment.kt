@@ -7,14 +7,15 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
+import arrow.core.identity
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.databinding.FragmentCompleteSignUpBinding
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
@@ -37,7 +38,9 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
-    private lateinit var viewModel: CompleteSignUpViewModel
+    private val viewModel: CompleteSignUpViewModel by viewModels {
+        viewModelFactoryFactory(args.incompleteUser.unbundle(IncompleteUser.serializer()))
+    }
 
     private var completeSignUpDisposable by disposable()
 
@@ -53,10 +56,6 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCompleteSignUpBinding.bind(view)
-
-        viewModel = ViewModelProvider(this,
-                viewModelFactoryFactory(args.incompleteUser.unbundle(IncompleteUser.serializer()))
-        )[CompleteSignUpViewModel::class.java]
 
         initializeEditTexts()
         initializePictureImageView()
@@ -133,17 +132,12 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         resultEither.fold(ifLeft = {
             Timber.error(it, it::toString)
             Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        }, ifRight = {
-            findNavController().navigate(
-                    CompleteSignUpFragmentDirections
-                            .actionCompleteSignUpFragmentToSignedInUserProfileFragment()
-            )
-        })
+        }, ifRight = ::identity)
     }
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(checkNotNull(activity)) {
+        imagePicker.get().start(requireActivity()) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }

@@ -4,18 +4,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import arrow.core.identity
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignedInUserProfileViewModelQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentSignedInUserProfileBinding
-import inc.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
-import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import inc.ahmedmourad.sherlock.domain.model.common.disposable
 import inc.ahmedmourad.sherlock.domain.platform.DateManager
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import splitties.init.appCtx
@@ -32,54 +31,27 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     @field:SignedInUserProfileViewModelQualifier
     internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
-    private lateinit var viewModel: SignedInUserProfileViewModel
-
-    private var findSignedInUserDisposable by disposable()
+    private val viewModel: SignedInUserProfileViewModel by viewModels { viewModelFactory }
 
     private var binding: FragmentSignedInUserProfileBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusSignedInUserProfileFragmentComponent().inject(this)
+
+        viewModel.signedInUser.observe(viewLifecycleOwner, Observer { resultEither ->
+            resultEither.fold(ifLeft = {
+                Timber.error(it, it::toString)
+                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+            }, ifRight = { userEither ->
+                userEither.fold(ifLeft = ::identity, ifRight = this::populateUi)
+            })
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignedInUserProfileBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SignedInUserProfileViewModel::class.java]
-    }
-
-    override fun onStart() {
-        super.onStart()
-        findSignedInUserDisposable = viewModel.signedInUserSingle.subscribe({ resultEither ->
-            resultEither.fold(ifLeft = {
-                Timber.error(it, it::toString)
-                if (it is NoSignedInUserException) {
-                    findNavController().navigate(
-                            SignedInUserProfileFragmentDirections
-                                    .actionSignedInUserProfileFragmentToSignInFragment()
-                    )
-                } else {
-                    Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-                }
-            }, ifRight = { userEither ->
-                userEither.fold(ifLeft = {
-                    findNavController().navigate(
-                            SignedInUserProfileFragmentDirections.actionSignedInUserProfileFragmentToCompleteSignUpFragment(
-                                    it.bundle(IncompleteUser.serializer())
-                            )
-                    )
-                }, ifRight = this@SignedInUserProfileFragment::populateUi)
-            })
-        }, {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        })
-    }
-
-    override fun onStop() {
-        findSignedInUserDisposable?.dispose()
-        super.onStop()
     }
 
     private fun populateUi(user: SignedInUser) {

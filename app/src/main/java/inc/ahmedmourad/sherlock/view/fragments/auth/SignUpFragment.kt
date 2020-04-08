@@ -7,10 +7,12 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
+import arrow.core.identity
 import arrow.core.right
 import com.bumptech.glide.Glide
 import dagger.Lazy
@@ -38,7 +40,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
-    private lateinit var viewModel: SignUpViewModel
+    private val viewModel: SignUpViewModel by viewModels { viewModelFactory }
 
     private var signUpDisposable by disposable()
 
@@ -52,14 +54,13 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignUpBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SignUpViewModel::class.java]
         initializeEditTexts()
         initializePictureImageView()
         binding?.let { b ->
             arrayOf(b.pictureImageView,
                     b.pictureTextView,
                     b.signUpButton,
-                    b.signInTextView,
+                    b.orSignInTextView,
                     b.signUpWithGoogleImageView,
                     b.signUpWithFacebookImageView,
                     b.signUpWithTwitterImageView
@@ -150,24 +151,12 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         resultEither.fold(ifLeft = {
             Timber.error(it, it::toString)
             Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        }, ifRight = { either ->
-            either.fold(ifLeft = {
-                findNavController().navigate(
-                        SignUpFragmentDirections
-                                .actionSignUpFragmentToCompleteSignUpFragment(it.bundle(IncompleteUser.serializer()))
-                )
-            }, ifRight = {
-                findNavController().navigate(
-                        SignUpFragmentDirections
-                                .actionSignUpFragmentToSignedInUserProfileFragment()
-                )
-            })
-        })
+        }, ifRight = ::identity)
     }
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(checkNotNull(activity)) {
+        imagePicker.get().start(requireActivity()) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }
@@ -212,7 +201,6 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     }
 
     override fun onClick(v: View) {
-
         when (v.id) {
 
             R.id.sign_up_button -> signUp()
@@ -225,7 +213,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
             R.id.picture_text_view, R.id.picture_image_view -> startImagePicker()
 
-            R.id.sign_in_text_view -> {
+            R.id.or_sign_in_text_view -> {
                 findNavController().popBackStack()
             }
         }

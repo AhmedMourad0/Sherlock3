@@ -5,9 +5,11 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
+import arrow.core.identity
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignInViewModelQualifier
@@ -28,7 +30,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
     @field:SignInViewModelQualifier
     internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
-    private lateinit var viewModel: SignInViewModel
+    private val viewModel: SignInViewModel by viewModels { viewModelFactory }
 
     private var signInDisposable by disposable()
 
@@ -42,12 +44,11 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignInBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[SignInViewModel::class.java]
         initializeEditTexts()
         binding?.let { b ->
             arrayOf(b.signInButton,
                     b.forgotPasswordTextView,
-                    b.signUpTextView,
+                    b.orSignUpTextView,
                     b.signInWithGoogleImageView,
                     b.signInWithFacebookImageView,
                     b.signInWithTwitterImageView
@@ -105,19 +106,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         resultEither.fold(ifLeft = {
             Timber.error(it, it::toString)
             Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        }, ifRight = { either ->
-            either.fold(ifLeft = {
-                findNavController().navigate(
-                        SignInFragmentDirections
-                                .actionSignInFragmentToCompleteSignUpFragment(it.bundle(IncompleteUser.serializer()))
-                )
-            }, ifRight = {
-                findNavController().navigate(
-                        SignInFragmentDirections
-                                .actionSignInFragmentToSignedInUserProfileFragment()
-                )
-            })
-        })
+        }, ifRight = ::identity)
     }
 
     override fun onStop() {
@@ -142,7 +131,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
 
             R.id.sign_in_with_twitter_image_view -> signInWithTwitter()
 
-            R.id.sign_up_text_view -> {
+            R.id.or_sign_up_text_view -> {
                 findNavController().navigate(
                         SignInFragmentDirections
                                 .actionSignInControllerToSignUpFragment()
