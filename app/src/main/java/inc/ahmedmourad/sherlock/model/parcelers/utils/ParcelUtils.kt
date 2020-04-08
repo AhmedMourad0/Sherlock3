@@ -4,6 +4,7 @@ import android.os.Parcel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import kotlinx.android.parcel.Parceler
 
 internal fun <T> Parceler<T>.writeNullable(value: T?, parcel: Parcel, flags: Int) {
@@ -45,7 +46,7 @@ internal fun <L, R> Parcel.writeEither(either: Either<L, R>, writeLeft: (L) -> U
             writeBooleanCompat(true)
             writeRight(either.b)
         }
-    }
+    }.exhaust()
 }
 
 internal fun <L, R> Parcel.readEither(readLeft: () -> L, readRight: () -> R): Either<L, R> {

@@ -5,10 +5,14 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import arrow.core.Either
+import arrow.core.Tuple2
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRemoteViewsServiceIntentFactory
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
+import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
+import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.utils.DisposablesSparseArray
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -48,7 +52,7 @@ internal class AppWidget : AppWidgetProvider() {
         return interactor()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ either ->
+                .subscribe({ either: Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>> ->
 
                     val views = RemoteViews(context.packageName, R.layout.app_widget)
 
@@ -57,17 +61,15 @@ internal class AppWidget : AppWidgetProvider() {
                     views.setEmptyView(R.id.widget_list_view, R.id.widget_empty_view)
 
                     when (either) {
-
                         is Either.Left -> {
                             Timber.error(either.a, either.a::toString)
                         }
-
                         is Either.Right -> {
                             views.setRemoteAdapter(R.id.widget_list_view,
                                     childrenRemoteViewsServiceFactory(appWidgetId, either.b)
                             ) //TODO: show retry view
                         }
-                    }
+                    }.exhaust()
 
                     appWidgetManager.updateAppWidget(appWidgetId, views)
 
