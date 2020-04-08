@@ -8,16 +8,11 @@ import arrow.core.orNull
 import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
-import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.model.validators.children.*
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
 
-internal class FindChildrenViewModel(
-        observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor
-) : ViewModel() {
+internal class FindChildrenViewModel : ViewModel() {
 
     val firstName by lazy { MutableLiveData<String?>("") }
     val lastName by lazy { MutableLiveData<String?>("") }
@@ -39,10 +34,6 @@ internal class FindChildrenViewModel(
     val hairError by lazy { MutableLiveData<String?>() }
     val appearanceError by lazy { MutableLiveData<String?>() }
     val queryError by lazy { MutableLiveData<String?>() }
-
-    val internetConnectivityFlowable: Flowable<Boolean> = observeInternetConnectivityInteractor()
-            .retry()
-            .observeOn(AndroidSchedulers.mainThread())
 
     fun toChildQuery(): ChildQuery? {
         return Either.fx<Unit, ChildQuery> {
