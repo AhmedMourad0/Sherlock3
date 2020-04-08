@@ -61,10 +61,10 @@ internal class SherlockChildrenRepository(
     }
 
     override fun find(
-            child: SimpleRetrievedChild
+            childId: ChildId
     ): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
         return childrenRemoteRepository.get()
-                .find(child.id)
+                .find(childId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { childEither ->
