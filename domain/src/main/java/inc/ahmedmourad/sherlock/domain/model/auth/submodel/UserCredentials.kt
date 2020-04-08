@@ -3,7 +3,9 @@ package inc.ahmedmourad.sherlock.domain.model.auth.submodel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 
+@Serializable
 class UserCredentials private constructor(
         val email: Email,
         val password: Password

@@ -6,7 +6,9 @@ import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
+import kotlinx.serialization.Serializable
 
+@Serializable
 class SignUpUser private constructor(
         val credentials: UserCredentials,
         val displayName: DisplayName,

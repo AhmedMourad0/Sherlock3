@@ -3,7 +3,9 @@ package inc.ahmedmourad.sherlock.domain.model.children.submodel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Coordinates private constructor(val latitude: Double, val longitude: Double) {
 
     fun component1() = latitude

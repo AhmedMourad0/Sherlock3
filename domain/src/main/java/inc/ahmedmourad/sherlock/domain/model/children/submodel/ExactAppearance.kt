@@ -6,7 +6,9 @@ import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
+import kotlinx.serialization.Serializable
 
+@Serializable
 class ExactAppearance private constructor(
         val gender: Gender,
         val skin: Skin,

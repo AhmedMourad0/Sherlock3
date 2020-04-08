@@ -4,7 +4,9 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.model.common.Name
+import kotlinx.serialization.Serializable
 
+@Serializable
 class FullName private constructor(val first: Name, val last: Name) {
 
     fun component1() = first

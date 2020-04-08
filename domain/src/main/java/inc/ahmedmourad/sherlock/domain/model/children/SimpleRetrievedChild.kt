@@ -3,17 +3,20 @@ package inc.ahmedmourad.sherlock.domain.model.children
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import inc.ahmedmourad.sherlock.domain.model.EitherSerializer
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import inc.ahmedmourad.sherlock.domain.model.common.Name
 import inc.ahmedmourad.sherlock.domain.model.common.Url
 import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
+import kotlinx.serialization.Serializable
 
 //TODO: follow PublishedChild's rules
 //TODO: add user id
+@Serializable
 class SimpleRetrievedChild private constructor(
         val id: ChildId,
         val publicationDate: Long,
-        val name: Either<Name, FullName>?,
+        val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val locationName: String?,
         val locationAddress: String?,

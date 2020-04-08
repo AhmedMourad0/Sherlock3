@@ -5,20 +5,23 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
+import inc.ahmedmourad.sherlock.domain.model.EitherSerializer
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.Name
 import inc.ahmedmourad.sherlock.domain.model.common.Url
 import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
+import kotlinx.serialization.Serializable
 import timber.log.Timber
 import timber.log.error
 
 //TODO: make the rules a little stricter
 //TODO: add finding date
 //TODO: add user id
+@Serializable
 class PublishedChild private constructor(
-        val name: Either<Name, FullName>?,
+        val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val location: Location?,
         val appearance: ApproximateAppearance,

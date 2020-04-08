@@ -3,7 +3,9 @@ package inc.ahmedmourad.sherlock.domain.model.children.submodel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Location private constructor(
         val id: String,
         val name: String,

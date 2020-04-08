@@ -9,7 +9,9 @@ import inc.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.Username
 import inc.ahmedmourad.sherlock.domain.model.common.Url
 import inc.ahmedmourad.sherlock.domain.model.ids.UserId
+import kotlinx.serialization.Serializable
 
+@Serializable
 class User private constructor(
         val id: UserId,
         val registrationDate: Long,

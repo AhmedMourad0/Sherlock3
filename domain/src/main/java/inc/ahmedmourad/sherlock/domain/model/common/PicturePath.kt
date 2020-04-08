@@ -3,9 +3,11 @@ package inc.ahmedmourad.sherlock.domain.model.common
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 import java.io.File
 import java.util.*
 
+@Serializable
 class PicturePath private constructor(val value: String) {
 
     fun component1() = value

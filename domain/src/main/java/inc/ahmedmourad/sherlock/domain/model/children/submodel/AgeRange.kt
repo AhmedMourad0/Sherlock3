@@ -3,7 +3,9 @@ package inc.ahmedmourad.sherlock.domain.model.children.submodel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 
+@Serializable
 class AgeRange private constructor(val min: Age, val max: Age) {
 
     fun component1() = min

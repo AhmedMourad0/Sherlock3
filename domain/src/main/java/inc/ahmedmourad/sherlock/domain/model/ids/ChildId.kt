@@ -1,3 +1,6 @@
 package inc.ahmedmourad.sherlock.domain.model.ids
 
-inline class ChildId(val value: String)
+import kotlinx.serialization.Serializable
+
+@Serializable
+class ChildId(val value: String)

@@ -3,7 +3,9 @@ package inc.ahmedmourad.sherlock.domain.model.common
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Name private constructor(val value: String) {
 
     fun component1() = value

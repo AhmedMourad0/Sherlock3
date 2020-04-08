@@ -8,7 +8,9 @@ import inc.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import inc.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import inc.ahmedmourad.sherlock.domain.model.common.Url
 import inc.ahmedmourad.sherlock.domain.model.ids.UserId
+import kotlinx.serialization.Serializable
 
+@Serializable
 class IncompleteUser private constructor(
         val id: UserId,
         val email: Email?,

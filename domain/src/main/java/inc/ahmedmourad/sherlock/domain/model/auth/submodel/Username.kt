@@ -5,10 +5,12 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
+import kotlinx.serialization.Serializable
 import timber.log.Timber
 import timber.log.error
 import kotlin.math.pow
 
+@Serializable
 class Username private constructor(val value: String) {
 
     fun component1() = value

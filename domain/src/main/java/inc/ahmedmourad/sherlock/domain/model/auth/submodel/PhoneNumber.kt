@@ -5,7 +5,9 @@ import arrow.core.left
 import arrow.core.right
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import kotlinx.serialization.Serializable
 
+@Serializable
 class PhoneNumber private constructor(val number: String, val countryCode: String) {
 
     fun component1() = number

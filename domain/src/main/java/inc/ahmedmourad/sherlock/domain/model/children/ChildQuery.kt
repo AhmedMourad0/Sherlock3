@@ -6,9 +6,11 @@ import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.ExactAppearance
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
+import kotlinx.serialization.Serializable
 
 //TODO: add picture and lost date
 //TODO: add user id
+@Serializable
 class ChildQuery private constructor(
         val fullName: FullName,
         val location: Location,
