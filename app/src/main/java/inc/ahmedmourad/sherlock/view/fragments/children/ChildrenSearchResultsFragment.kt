@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,13 +14,14 @@ import arrow.core.Tuple2
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.adapters.DynamicRecyclerAdapter
+import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRecyclerAdapterFactory
 import inc.ahmedmourad.sherlock.databinding.FragmentChildrenSearchResultsBinding
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
-import inc.ahmedmourad.sherlock.domain.model.common.disposable
 import inc.ahmedmourad.sherlock.domain.platform.DateManager
 import inc.ahmedmourad.sherlock.utils.formatter.Formatter
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildrenSearchResultsViewModel
@@ -45,9 +47,9 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
 
     private lateinit var adapter: DynamicRecyclerAdapter<List<Tuple2<SimpleRetrievedChild, Weight>>, *>
 
-    private lateinit var viewModel: ChildrenSearchResultsViewModel
-
-    private var findAllResultsDisposable by disposable()
+    private val viewModel: ChildrenSearchResultsViewModel by viewModels {
+        viewModelFactoryFactory(args.query.unbundle(ChildQuery.serializer()))
+    }
 
     private val args: ChildrenSearchResultsFragmentArgs by navArgs()
     private var binding: FragmentChildrenSearchResultsBinding? = null
@@ -55,35 +57,21 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusChildrenSearchResultsFragmentComponent().inject(this)
+
+        //TODO: either give the option to update or not, or onPublish new values to the bottom
+        //TODO: paginate
+        viewModel.searchResults.observe(viewLifecycleOwner, Observer { resultsEither ->
+            resultsEither.fold(ifLeft = {
+                Timber.error(it, it::toString)
+                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+            }, ifRight = adapter::update)
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChildrenSearchResultsBinding.bind(view)
         initializeRecyclerView()
-        viewModel = ViewModelProvider(this,
-                viewModelFactoryFactory(args.query.unbundle(ChildQuery.serializer()))
-        )[ChildrenSearchResultsViewModel::class.java]
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //TODO: either give the option to update or not, or onPublish new values to the bottom
-        //TODO: paginate
-        findAllResultsDisposable = viewModel.searchResultsFlowable.subscribe({ resultsEither ->
-            resultsEither.fold(ifLeft = {
-                Timber.error(it, it::toString)
-                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-            }, ifRight = adapter::update)
-        }, {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        })
-    }
-
-    override fun onStop() {
-        findAllResultsDisposable?.dispose()
-        super.onStop()
     }
 
     private fun initializeRecyclerView() {
@@ -92,7 +80,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
             adapter = adapterFactory {
                 findNavController().navigate(
                         ChildrenSearchResultsFragmentDirections
-                                .actionChildrenSearchResultsFragmentToChildDetailsFragment(it.a.bundle(ChildQuery.serializer()))
+                                .actionChildrenSearchResultsFragmentToChildDetailsFragment(it.a.bundle(SimpleRetrievedChild.serializer()))
                 )
             }
 

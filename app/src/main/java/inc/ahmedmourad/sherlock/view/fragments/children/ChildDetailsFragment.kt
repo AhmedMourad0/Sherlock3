@@ -5,7 +5,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -13,12 +14,13 @@ import arrow.core.Tuple2
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.databinding.FragmentChildDetailsBinding
 import inc.ahmedmourad.sherlock.domain.model.children.RetrievedChild
-import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
-import inc.ahmedmourad.sherlock.domain.model.common.disposable
+import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.utils.formatter.Formatter
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildDetailsViewModel
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories.ChildDetailsViewModelFactoryFactory
@@ -35,9 +37,9 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     @Inject
     internal lateinit var viewModelFactoryFactory: ChildDetailsViewModelFactoryFactory
 
-    private lateinit var viewModel: ChildDetailsViewModel
-
-    private var findChildDisposable by disposable()
+    private val viewModel: ChildDetailsViewModel by viewModels {
+        viewModelFactoryFactory(args.childId.unbundle(ChildId.serializer()))
+    }
 
     private val args: ChildDetailsFragmentArgs by navArgs()
     private var binding: FragmentChildDetailsBinding? = null
@@ -45,39 +47,26 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusChildDetailsFragmentComponent().inject(this)
+
+        //TODO: notify the user when the data is updated or deleted
+        viewModel.result.observe(viewLifecycleOwner, Observer { resultEither ->
+            when (resultEither) {
+                is Either.Left -> {
+                    Toast.makeText(context, resultEither.a.localizedMessage, Toast.LENGTH_LONG).show()
+                    findNavController().popBackStack()
+                    Timber.error(resultEither.a, resultEither.a::toString)
+                }
+                is Either.Right -> {
+                    populateUi(resultEither.b)
+                }
+            }.exhaust()
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChildDetailsBinding.bind(view)
-
         (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
-
-        viewModel = ViewModelProvider(this,
-                viewModelFactoryFactory(args.simpleChild.unbundle(SimpleRetrievedChild.serializer()))
-        )[ChildDetailsViewModel::class.java]
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //TODO: notify the user when the data is updated or deleted
-        findChildDisposable = viewModel.result.subscribe({ resultEither ->
-            when (resultEither) {
-
-                is Either.Left -> {
-                    Timber.error(resultEither.a, resultEither.a::toString)
-                    Toast.makeText(context, resultEither.a.localizedMessage, Toast.LENGTH_LONG).show()
-                    findNavController().popBackStack()
-                }
-
-                is Either.Right -> {
-                    populateUi(resultEither.b)
-                }
-            }
-        }, {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        })
     }
 
     private fun populateUi(result: Tuple2<RetrievedChild, Weight?>?) {
@@ -117,11 +106,6 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
 
             it.notes.text = formatter.get().formatNotes(result.a.notes)
         }
-    }
-
-    override fun onStop() {
-        findChildDisposable?.dispose()
-        super.onStop()
     }
 
     override fun onDestroyView() {

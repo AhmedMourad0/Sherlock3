@@ -7,11 +7,15 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import arrow.core.Either
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
+import inc.ahmedmourad.sherlock.bundlizer.bundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.FindChildrenViewModelQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentFindChildrenBinding
@@ -20,10 +24,11 @@ import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
-import inc.ahmedmourad.sherlock.domain.model.common.disposable
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.colors.ColorSelector
 import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
+import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.FindChildrenViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -42,21 +47,31 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     private lateinit var skinColorSelector: ColorSelector<Skin>
     private lateinit var hairColorSelector: ColorSelector<Hair>
 
-    private lateinit var viewModel: FindChildrenViewModel
-
-    private var internetConnectionDisposable by disposable()
+    private val globalViewModel: GlobalViewModel by activityViewModels()
+    private val viewModel: FindChildrenViewModel by viewModels { viewModelFactory }
 
     private var binding: FragmentFindChildrenBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusFindChildrenFragmentComponent().inject(this)
+
+        globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
+            when (either) {
+                is Either.Left -> {
+                    setInternetDependantViewsEnables(false)
+                    Timber.error(either.a, either.a::toString)
+                }
+                is Either.Right -> {
+                    setInternetDependantViewsEnables(either.b)
+                }
+            }.exhaust()
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFindChildrenBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[FindChildrenViewModel::class.java]
 
         arrayOf(::createSkinColorViews,
                 ::createHairColorViews,
@@ -78,16 +93,8 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        internetConnectionDisposable = viewModel.internetConnectivityFlowable
-                .subscribe(this::handleConnectionStatusChange) {
-                    Timber.error(it, it::toString)
-                }
-    }
-
-    private fun handleConnectionStatusChange(connected: Boolean) {
-        setLocationEnabled(connected)
+    private fun setInternetDependantViewsEnables(enabled: Boolean) {
+        setLocationEnabled(enabled)
     }
 
     private fun createSkinColorViews() {
@@ -184,7 +191,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
     private fun startPlacePicker() {
         setLocationEnabled(false)
-        placePicker.get().start(checkNotNull(activity)) {
+        placePicker.get().start(requireActivity()) {
             setLocationEnabled(true)
             Timber.error(it, it::toString)
         }
@@ -216,11 +223,6 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         }
 
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onStop() {
-        internetConnectionDisposable?.dispose()
-        super.onStop()
     }
 
     override fun onDestroyView() {

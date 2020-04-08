@@ -7,14 +7,20 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import arrow.core.Either
+import arrow.core.orNull
 import com.bumptech.glide.Glide
 import com.jaygoo.widget.RangeSeekBar
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
+import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.AddChildViewModelQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentAddChildBinding
@@ -25,13 +31,14 @@ import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
-import inc.ahmedmourad.sherlock.domain.model.common.disposable
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultOnRangeChangedListener
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.colors.ColorSelector
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
 import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
+import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.AddChildViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -55,31 +62,50 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private lateinit var skinColorSelector: ColorSelector<Skin>
     private lateinit var hairColorSelector: ColorSelector<Hair>
 
-    private lateinit var viewModel: AddChildViewModel
+    private val globalViewModel: GlobalViewModel by activityViewModels()
+    private val viewModel: AddChildViewModel by viewModels { viewModelFactory }
 
     private val args: AddChildFragmentArgs by navArgs()
     private var binding: FragmentAddChildBinding? = null
 
-    private var publishingDisposable by disposable()
-    private var internetConnectionDisposable by disposable()
-    private var internetConnectivitySingleDisposable by disposable()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusAddChildFragmentComponent().inject(this)
+
+        globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
+            when (either) {
+                is Either.Left -> {
+                    Timber.error(either.a, either.a::toString)
+                    setInternetDependantViewsEnabled(false)
+                }
+                is Either.Right -> {
+                    handlePublishingStateValue(viewModel.publishingState.value?.orNull())
+                }
+            }.exhaust()
+        })
+
+        viewModel.publishingState.observe(viewLifecycleOwner, Observer { either ->
+            when (either) {
+                is Either.Left -> {
+                    Timber.error(either.a, either.a::toString)
+                }
+                is Either.Right -> {
+                    handlePublishingStateValue(either.b)
+                }
+            }.exhaust()
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddChildBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[AddChildViewModel::class.java]
 
-        val navigationChild = args.child.unbundle(AppPublishedChild.serializer())
+        val navigationChild = args.child?.unbundle(AppPublishedChild.serializer())
 
         if (navigationChild != null) {
             handleExternalNavigation(navigationChild)
         } else {
-            setEnabledAndIdle(true)
+            setUserInteractionsEnabled(true)
         }
 
         arrayOf(::createSkinColorViews,
@@ -107,56 +133,28 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        // we only handle connection (enabling and disabling internet-dependant
-        // views) if publishing isn't underway
-        internetConnectionDisposable = viewModel.internetConnectivityFlowable
-                .subscribe({ (isConnected, publishingState) ->
-                    if (publishingState == null) {
-                        setEnabledAndIdle(true)
-                        handleConnectionStateChange(isConnected)
-                    } else {
-                        handlePublishingStateValue(publishingState)
-                    }
-                }, {
-                    Timber.error(it, it::toString)
-                })
-    }
-
     private fun publish() {
-
-        publishingDisposable = viewModel.publishingStateFlowable
-                .skip(1)
-                .subscribe(this::handlePublishingStateValue) {
-                    Timber.error(it, it::toString)
-                }
-
-        setEnabledAndIdle(false)
+        setUserInteractionsEnabled(false)
         viewModel.onPublish()
     }
 
     private fun handleExternalNavigation(navigationChild: AppPublishedChild) {
-
         viewModel.take(navigationChild)
-
-        publishingDisposable = viewModel.publishingStateFlowable
-                .subscribe(this::handlePublishingStateValue) {
-                    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-                    Timber.error(it, it::toString)
-                }
     }
 
-    private fun handlePublishingStateValue(value: PublishingState) {
+    private fun handlePublishingStateValue(value: PublishingState?) {
         when (value) {
-            is PublishingState.Success -> onPublishedSuccessfully(value.child)
-            is PublishingState.Failure -> onPublishingFailed()
-            is PublishingState.Ongoing -> onPublishingOngoing()
+            is PublishingState.Success -> moveToChildDetailsFragment(value.child)
+            is PublishingState.Ongoing -> setUserInteractionsEnabled(false)
+            is PublishingState.Failure, null -> {
+                setUserInteractionsEnabled(true)
+                setInternetDependantViewsEnabled(globalViewModel.internetConnectivity.value?.orNull()
+                        ?: false)
+            }
         }
     }
 
-    private fun onPublishedSuccessfully(child: RetrievedChild) {
-        publishingDisposable?.dispose()
+    private fun moveToChildDetailsFragment(child: RetrievedChild) {
         findNavController().apply {
             popBackStack()
             navigate(AddChildFragmentDirections.actionAddChildFragmentToChildDetailsFragment(
@@ -165,16 +163,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         }
     }
 
-    private fun onPublishingFailed() {
-        publishingDisposable?.dispose()
-        setEnabledAndIdle(true)
-    }
-
-    private fun onPublishingOngoing() {
-        setEnabledAndIdle(false)
-    }
-
-    private fun setEnabledAndIdle(enabled: Boolean) {
+    private fun setUserInteractionsEnabled(enabled: Boolean) {
 
         //TODO: start loading when false and stop when true
         binding?.let { b ->
@@ -197,21 +186,11 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     b.publishButton
             ).forEach { it.isEnabled = enabled }
         }
-
-        // we disable internet-dependant views if no longer publishing and there's no internet connection
-        internetConnectivitySingleDisposable = viewModel.internetConnectivitySingle
-                .map { enabled && !it }
-                .filter { it }
-                .subscribe({
-                    handleConnectionStateChange(false)
-                }, {
-                    Timber.error(it, it::toString)
-                })
     }
 
-    private fun handleConnectionStateChange(connected: Boolean) {
-        setLocationEnabled(connected)
-        binding?.publishButton?.isEnabled = connected
+    private fun setInternetDependantViewsEnabled(enabled: Boolean) {
+        setLocationEnabled(enabled)
+        binding?.publishButton?.isEnabled = enabled
     }
 
     private fun createSkinColorViews() {
@@ -338,7 +317,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(checkNotNull(activity)) {
+        imagePicker.get().start(requireActivity()) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }
@@ -347,7 +326,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     //TODO: should only start when connected to the internet, not the only one though
     private fun startPlacePicker() {
         setLocationEnabled(false)
-        placePicker.get().start(checkNotNull(activity)) {
+        placePicker.get().start(requireActivity()) {
             setLocationEnabled(true)
             Timber.error(it, it::toString)
         }
@@ -393,13 +372,6 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             b.locationImageView.isEnabled = enabled
             b.locationTextView.isEnabled = enabled
         }
-    }
-
-    override fun onStop() {
-        publishingDisposable?.dispose()
-        internetConnectionDisposable?.dispose()
-        internetConnectivitySingleDisposable?.dispose()
-        super.onStop()
     }
 
     override fun onDestroyView() {
