@@ -28,9 +28,6 @@
 		<action
 			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
 			app:destination="@id/childDetailsFragment" />
-		<deepLink
-			android:id="@+id/deepLink"
-			app:uri="https://www.ahmedmourad.dev/child/add/{child}" />
 	</fragment>
 	<fragment
 		android:id="@+id/findChildrenFragment"
@@ -59,7 +56,7 @@
 		android:label="ChildDetailsFragment"
 		tools:layout="@layout/fragment_child_details">
 		<argument
-			android:name="simpleChild"
+			android:name="childId"
 			app:argType="android.os.Bundle" />
 	</fragment>
 </navigation>
