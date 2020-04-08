@@ -1,37 +1,32 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
-import arrow.core.Tuple2
 import arrow.core.extensions.fx
+import arrow.core.left
 import arrow.core.orNull
-import arrow.core.toT
+import arrow.core.right
 import inc.ahmedmourad.sherlock.dagger.modules.factories.SherlockServiceIntentFactory
 import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.PublishingState
 import inc.ahmedmourad.sherlock.domain.constants.Skin
-import inc.ahmedmourad.sherlock.domain.interactors.common.CheckChildPublishingStateInteractor
-import inc.ahmedmourad.sherlock.domain.interactors.common.CheckInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
-import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
+import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.model.validators.children.*
-import io.reactivex.Flowable
-import io.reactivex.Single
+import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import splitties.init.appCtx
 
 internal class AddChildViewModel(
         private val serviceFactory: SherlockServiceIntentFactory,
-        observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
-        checkInternetConnectivityInteractor: CheckInternetConnectivityInteractor,
-        observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor,
-        checkChildPublishingStateInteractor: CheckChildPublishingStateInteractor
+        observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
 ) : ViewModel() {
 
     val firstName by lazy { MutableLiveData<String?>("") }
@@ -59,22 +54,12 @@ internal class AddChildViewModel(
     val appearanceError by lazy { MutableLiveData<String?>() }
     val childError by lazy { MutableLiveData<String?>() }
 
-    val internetConnectivityFlowable: Flowable<Tuple2<Boolean, PublishingState?>> =
-            observeInternetConnectivityInteractor()
-                    .retry()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .flatMapSingle { isConnected ->
-                        checkChildPublishingStateInteractor()
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .map { isConnected toT it.orNull() }
-                    }
-
-    val internetConnectivitySingle: Single<Boolean> = checkInternetConnectivityInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
-
-    val publishingStateFlowable: Flowable<PublishingState> = observeChildPublishingStateInteractor()
+    val publishingState: LiveData<Either<Throwable, PublishingState>> = observeChildPublishingStateInteractor()
             .retry()
+            .map<Either<Throwable, PublishingState>> { it.right() }
+            .onErrorReturn { it.left() }
             .observeOn(AndroidSchedulers.mainThread())
+            .toLiveData()
 
     fun onPublish() {
         toPublishedChild()?.let {
@@ -96,11 +81,11 @@ internal class AddChildViewModel(
                 lastName.value = name.b.last.value
             }
 
-            else -> {
+            null -> {
                 firstName.value = null
                 lastName.value = null
             }
-        }
+        }.exhaust()
 
         skin.value = child.appearance.skin
         hair.value = child.appearance.hair
