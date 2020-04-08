@@ -1,7 +1,6 @@
 package inc.ahmedmourad.sherlock.view.activity
 
 import android.animation.ValueAnimator
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -9,151 +8,139 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
-import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.toT
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.Unbinder
-import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
-import com.bluelinelabs.conductor.Conductor
-import com.bluelinelabs.conductor.Router
-import com.bluelinelabs.conductor.RouterTransaction
-import com.github.florent37.shapeofview.shapes.CutCornerView
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.MaterialToolbar
+import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
-import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
-import inc.ahmedmourad.sherlock.dagger.SherlockComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.HomeControllerQualifier
+import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.dagger.findAppComponent
+import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.GlobalViewModelQualifier
 import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.MainActivityViewModelQualifier
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignInControllerQualifier
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignedInUserProfileControllerQualifier
+import inc.ahmedmourad.sherlock.databinding.ActivityMainBinding
 import inc.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
 import inc.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
 import inc.ahmedmourad.sherlock.model.common.Connectivity
-import inc.ahmedmourad.sherlock.model.common.TaggedController
+import inc.ahmedmourad.sherlock.utils.findNavController
 import inc.ahmedmourad.sherlock.utils.hideSoftKeyboard
+import inc.ahmedmourad.sherlock.utils.singleTop
 import inc.ahmedmourad.sherlock.viewmodel.activity.MainActivityViewModel
-import splitties.init.appCtx
+import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
 
-//TODO: use DataBinding instead of ButterKnife
 internal class MainActivity : AppCompatActivity() {
-
-    @BindView(R.id.main_content_root)
-    internal lateinit var contentRoot: CutCornerView
-
-    @BindView(R.id.main_content_controllers_container)
-    internal lateinit var contentControllersContainer: ChangeHandlerFrameLayout
-
-    @BindView(R.id.main_content_overlay)
-    internal lateinit var contentOverlay: View
-
-    @BindView(R.id.main_backdrop_controllers_container)
-    internal lateinit var backdropControllersContainer: ChangeHandlerFrameLayout
-
-    @BindView(R.id.main_backdrop_scroll_view)
-    internal lateinit var backdropScrollView: NestedScrollView
-
-    @BindView(R.id.main_toolbar)
-    internal lateinit var toolbar: MaterialToolbar
-
-    @BindView(R.id.main_appbar)
-    internal lateinit var appbar: AppBarLayout
-
-    @BindView(R.id.main_dummy_view)
-    internal lateinit var dummyView: View
 
     @Inject
     @field:MainActivityViewModelQualifier
     lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     @Inject
-    @field:HomeControllerQualifier
-    lateinit var homeController: Lazy<TaggedController>
-
-    @Inject
-    @field:SignInControllerQualifier
-    lateinit var signInController: Lazy<TaggedController>
-
-    @Inject
-    @field:SignedInUserProfileControllerQualifier
-    lateinit var signedInUserProfileController: Lazy<TaggedController>
+    @field:GlobalViewModelQualifier
+    lateinit var globalViewModelFactory: ViewModelProvider.NewInstanceFactory
 
     private var isContentShown = true
 
     private val foregroundAnimator by lazy(::createForegroundAnimator)
 
-    private var userAuthenticationState: Tuple2<Boolean, Either<Throwable, Either<IncompleteUser, SignedInUser>>>? = null
-        set(value) {
-            field = value
-            invalidateOptionsMenu()
-        }
+    private lateinit var appNavHostFragment: Fragment
+    private lateinit var authNavHostFragment: Fragment
 
-    private lateinit var viewModel: MainActivityViewModel
+    private val viewModel: MainActivityViewModel by viewModels { viewModelFactory }
+    private val globalViewModel: GlobalViewModel by viewModels { globalViewModelFactory }
 
-    private var internetConnectivityDisposable by disposable()
-    private var isUserSignedInDisposable by disposable()
     private var signOutDisposable by disposable()
 
-    private lateinit var foregroundRouter: Router
-
-    private lateinit var backdropRouter: Router
-
-    private lateinit var unbinder: Unbinder
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        findAppComponent().plusMainActivityComponent().inject(this)
 
-        SherlockComponent.Activities.mainComponent.get().inject(this)
+        setSupportActionBar(binding.toolbar)
 
-        unbinder = ButterKnife.bind(this)
-
-        setSupportActionBar(toolbar)
-
-        viewModel = ViewModelProvider(this, viewModelFactory)[MainActivityViewModel::class.java]
-
-        foregroundRouter = Conductor.attachRouter(this, contentControllersContainer, savedInstanceState)
-
-        if (!foregroundRouter.hasRootController()) {
-            foregroundRouter.setRoot(RouterTransaction.with(homeController.get().controller).tag(homeController.get().tag))
-        }
-
-        backdropRouter = Conductor.attachRouter(this, backdropControllersContainer, savedInstanceState)
-
-        dummyView.setOnFocusChangeListener { v, hasFocus ->
+        binding.dummyView.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
                 v.post(this@MainActivity::hideSoftKeyboard)
             }
         }
 
-        dummyView.requestFocusFromTouch()
+        binding.dummyView.requestFocusFromTouch()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            backdropControllersContainer.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-                Toast.makeText(this, scrollY.toString(), Toast.LENGTH_LONG).show()
+        binding.backdropScrollView.post {
+            binding.backdropScrollView.updatePadding(bottom = binding.contentRoot.height / CONTENT_COLLAPSE_FACTOR.toInt())
+        }
+
+        appNavHostFragment = supportFragmentManager.findFragmentById(R.id.app_nav_host_fragment)!!
+        authNavHostFragment = supportFragmentManager.findFragmentById(R.id.auth_nav_host_fragment)!!
+
+        addOnBackPressedCallback()
+
+        binding.root.post {
+            showConnectivitySnackBar(Connectivity.CONNECTING)
+        }
+        globalViewModel.internetConnectivity.observe(this, Observer { either ->
+            either.fold(ifLeft = {
+                Timber.error(it, it::toString)
+            }, ifRight = {
+                showConnectivitySnackBar(getConnectivity(it))
+            })
+        })
+
+        globalViewModel.userAuthState.observe(this, Observer { either ->
+            either.fold(ifLeft = {
+                Timber.error(it, it::toString)
+            }, ifRight = {
+                invalidateOptionsMenu()
+                updateBackdropFragment()
+            })
+        })
+
+        globalViewModel.signedInUser.observe(this, Observer { either ->
+            either.fold(ifLeft = {
+                Timber.error(it, it::toString)
+            }, ifRight = {
+                invalidateOptionsMenu()
+                updateBackdropFragment()
+            })
+        })
+    }
+
+    private fun getConnectivity(isConnected: Boolean): Connectivity {
+        return if (isConnected) Connectivity.CONNECTED else Connectivity.DISCONNECTED
+    }
+
+    private fun addOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+
+                if (foregroundAnimator.isRunning)
+                    return
+
+                if (isContentShown) {
+                    if (!findNavController(R.id.app_nav_host_fragment).popBackStack()) {
+                        finish()
+                    }
+                } else {
+                    if (!findNavController(R.id.auth_nav_host_fragment).popBackStack()) {
+                        toggleBackdrop()
+                    }
+                }
             }
-        }
-
-        backdropScrollView.post {
-            backdropScrollView.updatePadding(bottom = contentRoot.height / CONTENT_COLLAPSE_FACTOR.toInt())
-        }
+        })
     }
 
     override fun onStart() {
@@ -163,44 +150,25 @@ internal class MainActivity : AppCompatActivity() {
 
             val animatedValue = it.animatedValue as Float
 
-            contentRoot.translationY =
-                    animatedValue * (contentRoot.height - contentRoot.height / CONTENT_COLLAPSE_FACTOR)
+            binding.contentRoot.translationY =
+                    animatedValue * (binding.contentRoot.height - binding.contentRoot.height / CONTENT_COLLAPSE_FACTOR)
 
-            appbar.elevation =
+            binding.appbar.elevation =
                     animatedValue * resources.getDimensionPixelSize(R.dimen.defaultAppBarElevation).toFloat()
 
-            backdropScrollView.translationY =
+            binding.backdropScrollView.translationY =
                     (1 - animatedValue) * resources.getDimensionPixelSize(R.dimen.backdropTranslationY).toFloat()
 
-            contentOverlay.alpha =
+            binding.contentOverlay.alpha =
                     animatedValue * 0.4f
         }
 
         foregroundAnimator.doOnEnd {
             invalidateOptionsMenu()
-            contentOverlay.visibility = if (isContentShown) View.GONE else View.VISIBLE
-            contentControllersContainer.isEnabled = isContentShown
+            binding.contentOverlay.visibility = if (isContentShown) View.GONE else View.VISIBLE
         }
 
-        dummyView.requestFocusFromTouch()
-
-        internetConnectivityDisposable = viewModel.internetConnectivityFlowable
-                .doOnSubscribe { showConnectivitySnackBar(Connectivity.CONNECTING) }
-                .subscribe(this::showConnectivitySnackBar) {
-                    Timber.error(it, it::toString)
-                }
-
-        isUserSignedInDisposable = viewModel.isUserSignedInSingle
-                .flatMap { isSignedIn ->
-                    viewModel.findSignedInUserSingle.map { isSignedIn toT it }
-                }.subscribe({
-                    if (userAuthenticationState == null) {
-                        setInitialBackdropController(it)
-                    }
-                    userAuthenticationState = it
-                }, {
-                    Timber.error(it, it::toString)
-                })
+        binding.dummyView.requestFocusFromTouch()
     }
 
     private fun showConnectivitySnackBar(connectivity: Connectivity) {
@@ -211,7 +179,7 @@ internal class MainActivity : AppCompatActivity() {
             Snackbar.LENGTH_SHORT
         }
 
-        Snackbar.make(contentControllersContainer, connectivity.message, duration).apply {
+        Snackbar.make(binding.root, connectivity.message, duration).apply {
 
             val snackBarView = view.apply {
                 setBackgroundColor(ContextCompat.getColor(this@MainActivity, connectivity.color))
@@ -237,42 +205,38 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setInitialBackdropController(
-            userState: Tuple2<Boolean, Either<Throwable, Either<IncompleteUser, SignedInUser>>>
-    ) {
+    private fun updateBackdropFragment() {
 
-        if (backdropRouter.hasRootController()) {
-            return
-        }
+        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false } ?: return
+        val userEither = globalViewModel.signedInUser.value ?: return
 
-        val (isSignedIn, resultEither) = userState
+        val authNavController = findNavController(R.id.auth_nav_host_fragment)
 
-        val taggedController = if (isSignedIn) {
+        if (isUserSignedIn) {
 
-            resultEither.fold(ifLeft = {
+            userEither.fold(ifLeft = {
 
                 if (it is NoSignedInUserException) {
-                    signInController.get()
+                    authNavController.navigate(R.id.signInFragment, null, singleTop())
                 } else {
+                    authNavController.navigate(R.id.signInFragment, null, singleTop())
                     TODO("retry or sign out controller")
                 }
 
-            }, ifRight = { userEither ->
-                userEither.fold(ifLeft = {
-                    //It's safer to force sign out the user, if he was at this stage for more than one session
-                    signOut()
+            }, ifRight = { either ->
+                either.fold(ifLeft = {
+                    val args = Bundle(1).apply {
+                        putBundle("incompleteUser", it.bundle(IncompleteUser.serializer()))
+                    }
+                    authNavController.navigate(R.id.completeSignUpFragment, args, singleTop())
                     null
                 }, ifRight = {
-                    signedInUserProfileController.get()
+                    authNavController.navigate(R.id.signedInUserProfileFragment, null, singleTop())
                 })
             })
 
         } else {
-            signInController.get()
-        }
-
-        if (taggedController != null) {
-            backdropRouter.setRoot(RouterTransaction.with(taggedController.controller).tag(taggedController.tag))
+            authNavController.navigate(R.id.signInFragment, null, singleTop())
         }
     }
 
@@ -284,21 +248,21 @@ internal class MainActivity : AppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
         val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
-        val state = userAuthenticationState
+        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
+        val userEither = globalViewModel.signedInUser.value
+        val isStateLoaded = isUserSignedIn != null && userEither != null
 
-        item?.isEnabled = state != null
-        if (state == null) {
+        item?.isEnabled = isStateLoaded
+        if (!isStateLoaded) {
             item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // loading icon
             return super.onPrepareOptionsMenu(menu)
         }
 
-        val (isSignedIn, resultEither) = state
-
         if (isContentShown) {
 
-            item?.icon = if (isSignedIn) {
+            item?.icon = if (isUserSignedIn!!) {
 
-                resultEither.fold(ifLeft = {
+                userEither!!.fold(ifLeft = {
 
                     when (it) {
                         is NoInternetConnectionException -> {
@@ -314,8 +278,8 @@ internal class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                }, ifRight = { userEither ->
-                    userEither.fold(ifLeft = {
+                }, ifRight = { either ->
+                    either.fold(ifLeft = {
                         ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
                     }, ifRight = {
                         ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
@@ -330,7 +294,7 @@ internal class MainActivity : AppCompatActivity() {
             ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
         }
 
-        menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isSignedIn
+        menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn!!
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -338,7 +302,7 @@ internal class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.main_menu_show_or_hide_backdrop -> {
-                showOrHideBackdrop()
+                toggleBackdrop()
                 true
             }
             R.id.main_menu_sign_out -> {
@@ -349,16 +313,24 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showOrHideBackdrop() {
+    private fun toggleBackdrop() {
         isContentShown = !isContentShown
         invalidateOptionsMenu()
-        contentControllersContainer.isEnabled = false
-        contentOverlay.visibility = View.VISIBLE
-        dummyView.requestFocusFromTouch()
+        binding.contentOverlay.visibility = View.VISIBLE
+        binding.dummyView.requestFocusFromTouch()
         when {
             foregroundAnimator.isStarted -> foregroundAnimator.reverse()
             isContentShown -> foregroundAnimator.reverse()
             else -> foregroundAnimator.start()
+        }
+        if (isContentShown) {
+            supportFragmentManager.beginTransaction()
+                    .setPrimaryNavigationFragment(appNavHostFragment)
+                    .commit()
+        } else {
+            supportFragmentManager.beginTransaction()
+                    .setPrimaryNavigationFragment(authNavHostFragment)
+                    .commit()
         }
     }
 
@@ -367,11 +339,7 @@ internal class MainActivity : AppCompatActivity() {
             resultEither.fold(ifLeft = {
                 Timber.error(it, it::toString)
             }, ifRight = {
-                invalidateOptionsMenu()
-                backdropRouter.setRoot(
-                        RouterTransaction.with(signInController.get().controller)
-                                .tag(signInController.get().tag)
-                )
+
             })
         }, {
             Timber.error(it, it::toString)
@@ -384,47 +352,10 @@ internal class MainActivity : AppCompatActivity() {
         }
         foregroundAnimator.removeAllUpdateListeners()
         foregroundAnimator.removeAllListeners()
-        internetConnectivityDisposable?.dispose()
-        isUserSignedInDisposable?.dispose()
         super.onStop()
     }
 
-    override fun onBackPressed() {
-
-        if (foregroundAnimator.isRunning)
-            return
-
-        if (isContentShown) {
-            if (!foregroundRouter.handleBack()) {
-                super.onBackPressed()
-            }
-        } else {
-            if (!backdropRouter.handleBack()) {
-                showOrHideBackdrop()
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        SherlockComponent.Activities.mainComponent.release()
-        foregroundAnimator.cancel()
-        internetConnectivityDisposable?.dispose()
-        isUserSignedInDisposable?.dispose()
-        unbinder.unbind()
-        super.onDestroy()
-    }
-
     companion object {
-
-        const val EXTRA_DESTINATION_ID = "inc.ahmedmourad.sherlock.view.activities.extra.DESTINATION_ID"
-        const val INVALID_DESTINATION = -1
         private const val CONTENT_COLLAPSE_FACTOR = 6f
-
-        fun createIntent(destinationId: Int): Intent {
-            return Intent(appCtx, MainActivity::class.java).apply {
-                putExtra(EXTRA_DESTINATION_ID, destinationId)
-                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
-        }
     }
 }
