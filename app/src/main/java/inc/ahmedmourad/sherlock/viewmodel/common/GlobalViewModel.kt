@@ -10,7 +10,6 @@ import inc.ahmedmourad.sherlock.domain.interactors.auth.ObserveUserAuthStateInte
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import inc.ahmedmourad.sherlock.model.common.Connectivity
 import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 
@@ -20,11 +19,10 @@ internal class GlobalViewModel(
         observeSignedInUserInteractor: ObserveSignedInUserInteractor
 ) : ViewModel() {
 
-    val internetConnectivity: LiveData<Either<Throwable, Connectivity>> =
+    val internetConnectivity: LiveData<Either<Throwable, Boolean>> =
             observeInternetConnectivityInteractor()
-                    .map(this::getConnectivity)
                     .retry()
-                    .map<Either<Throwable, Connectivity>> { it.right() }
+                    .map<Either<Throwable, Boolean>> { it.right() }
                     .onErrorReturn { it.left() }
                     .observeOn(AndroidSchedulers.mainThread())
                     .toLiveData()
@@ -40,8 +38,4 @@ internal class GlobalViewModel(
                     .onErrorReturn { it.left() }
                     .observeOn(AndroidSchedulers.mainThread())
                     .toLiveData()
-
-    private fun getConnectivity(isConnected: Boolean): Connectivity {
-        return if (isConnected) Connectivity.CONNECTED else Connectivity.DISCONNECTED
-    }
 }
