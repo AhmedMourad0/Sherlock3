@@ -164,7 +164,7 @@
 			android:textColor="@android:color/white" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/sign_in_text_view"
+			android:id="@+id/or_sign_in_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="end"
