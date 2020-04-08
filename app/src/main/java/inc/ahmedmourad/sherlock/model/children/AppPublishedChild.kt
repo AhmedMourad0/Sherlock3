@@ -5,6 +5,7 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
+import inc.ahmedmourad.sherlock.domain.model.EitherSerializer
 import inc.ahmedmourad.sherlock.domain.model.children.PublishedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.FullName
@@ -12,11 +13,13 @@ import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.model.common.Name
 import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.utils.getImageBytes
+import kotlinx.serialization.Serializable
 import timber.log.Timber
 import timber.log.error
 
+@Serializable
 internal class AppPublishedChild private constructor(
-        val name: Either<Name, FullName>?,
+        val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val location: Location?,
         val appearance: ApproximateAppearance,
