@@ -16,43 +16,17 @@
 		<action
 			android:id="@+id/action_signInFragment_to_resetPasswordFragment"
 			app:destination="@id/resetPasswordFragment" />
-		<action
-			android:id="@+id/action_signInFragment_to_completeSignUpFragment"
-			app:destination="@id/completeSignUpFragment"
-			app:popUpTo="@id/signInFragment"
-			app:popUpToInclusive="true" />
-		<action
-			android:id="@+id/action_signInFragment_to_signedInUserProfileFragment"
-			app:destination="@id/signedInUserProfileFragment"
-			app:popUpTo="@id/signInFragment"
-			app:popUpToInclusive="true" />
 	</fragment>
 	<fragment
 		android:id="@+id/signUpFragment"
 		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignUpFragment"
 		android:label="SignUpFragment"
-		tools:layout="@layout/fragment_sign_up">
-		<action
-			android:id="@+id/action_signUpFragment_to_signedInUserProfileFragment"
-			app:destination="@id/signedInUserProfileFragment"
-			app:popUpTo="@id/signUpFragment"
-			app:popUpToInclusive="true" />
-		<action
-			android:id="@+id/action_signUpFragment_to_completeSignUpFragment"
-			app:destination="@id/completeSignUpFragment"
-			app:popUpTo="@id/signUpFragment"
-			app:popUpToInclusive="true" />
-	</fragment>
+		tools:layout="@layout/fragment_sign_up" />
 	<fragment
 		android:id="@+id/completeSignUpFragment"
 		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.CompleteSignUpFragment"
 		android:label="CompleteSignUpFragment"
 		tools:layout="@layout/fragment_complete_sign_up">
-		<action
-			android:id="@+id/action_completeSignUpFragment_to_signedInUserProfileFragment"
-			app:destination="@id/signedInUserProfileFragment"
-			app:popUpTo="@id/completeSignUpFragment"
-			app:popUpToInclusive="true" />
 		<argument
 			android:name="incompleteUser"
 			app:argType="android.os.Bundle" />
@@ -66,16 +40,5 @@
 		android:id="@+id/signedInUserProfileFragment"
 		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignedInUserProfileFragment"
 		android:label="SignedInUserProfileFragment"
-		tools:layout="@layout/fragment_signed_in_user_profile">
-		<action
-			android:id="@+id/action_signedInUserProfileFragment_to_completeSignUpFragment"
-			app:destination="@id/completeSignUpFragment"
-			app:popUpTo="@id/signedInUserProfileFragment"
-			app:popUpToInclusive="true" />
-		<action
-			android:id="@+id/action_signedInUserProfileFragment_to_signInFragment"
-			app:destination="@id/signInFragment"
-			app:popUpTo="@id/signedInUserProfileFragment"
-			app:popUpToInclusive="true" />
-	</fragment>
+		tools:layout="@layout/fragment_signed_in_user_profile" />
 </navigation>
