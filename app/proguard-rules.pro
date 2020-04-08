@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class inc.ahmedmourad.sherlock.domain.model.**$$serializer { *; }
+-keep,includedescriptorclasses class inc.ahmedmourad.sherlock.model.**$$serializer { *; }
+-keepclassmembers class inc.ahmedmourad.sherlock.domain.model.** {
+    *** Companion;
+}
+-keepclassmembers class inc.ahmedmourad.sherlock.model.** {
+    *** Companion;
+}
+-keepclasseswithmembers class inc.ahmedmourad.sherlock.domain.model.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keepclasseswithmembers class inc.ahmedmourad.sherlock.model.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
