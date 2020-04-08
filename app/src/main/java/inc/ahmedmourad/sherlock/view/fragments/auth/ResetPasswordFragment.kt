@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
@@ -26,7 +27,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     @field:ResetPasswordViewModelQualifier
     internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
-    private lateinit var viewModel: ResetPasswordViewModel
+    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory }
 
     private var sendEmailDisposable by disposable()
 
@@ -40,7 +41,6 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentResetPasswordBinding.bind(view)
-        viewModel = ViewModelProvider(this, viewModelFactory)[ResetPasswordViewModel::class.java]
         initializeEditTexts()
         binding?.let { b ->
             arrayOf(b.sendEmailButton).forEach { it.setOnClickListener(this) }
