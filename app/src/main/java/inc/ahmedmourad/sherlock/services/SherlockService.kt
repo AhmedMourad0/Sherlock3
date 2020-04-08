@@ -6,19 +6,24 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavDeepLinkBuilder
 import inc.ahmedmourad.sherlock.R
+import inc.ahmedmourad.sherlock.bundlizer.bundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
+import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.model.common.ParcelableWrapper
 import inc.ahmedmourad.sherlock.model.common.parcelize
 import inc.ahmedmourad.sherlock.utils.backgroundContextChannelId
+import inc.ahmedmourad.sherlock.view.activity.MainActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
@@ -86,9 +91,16 @@ internal class SherlockService : Service() {
 
     private fun createPublishingNotification(child: AppPublishedChild): Notification {
 
-        val pendingIntent = addChildControllerFactory(child).let {
-            PendingIntent.getActivity(applicationContext, REQUEST_CODE_PUBLISH_CHILD, it, PendingIntent.FLAG_UPDATE_CURRENT)
+        val args = Bundle(1).apply {
+            putBundle("child", child.bundle(AppPublishedChild.serializer()))
         }
+
+        val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                .setGraph(R.navigation.app_nav_graph)
+                .setDestination(R.id.addChildFragment)
+                .setComponentName(MainActivity::class.java)
+                .setArguments(args)
+                .createPendingIntent()
 
         val name = child.name
         val contentText = name?.fold(
@@ -113,13 +125,18 @@ internal class SherlockService : Service() {
 
     private fun showPublishedSuccessfullyNotification(child: SimpleRetrievedChild?) {
 
-        val pendingIntent = child?.let { childDetailsControllerFactory(it) }?.let {
-            PendingIntent.getActivity(
-                    applicationContext,
-                    REQUEST_CODE_PUBLISHED_SUCCESSFULLY,
-                    it,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            )
+        val pendingIntent = child?.let {
+
+            val args = Bundle(1).apply {
+                putBundle("childId", it.id.bundle(ChildId.serializer()))
+            }
+
+            NavDeepLinkBuilder(applicationContext)
+                    .setGraph(R.navigation.app_nav_graph)
+                    .setDestination(R.id.childDetailsFragment)
+                    .setComponentName(MainActivity::class.java)
+                    .setArguments(args)
+                    .createPendingIntent()
         }
 
         val name = child?.name
@@ -206,8 +223,6 @@ internal class SherlockService : Service() {
 
         const val ACTION_PUBLISH_CHILD = "inc.ahmedmourad.sherlock.services.action.PUBLISH_CHILd"
         const val EXTRA_CHILD = "inc.ahmedmourad.sherlock.services.extra.CHILD"
-        const val REQUEST_CODE_PUBLISH_CHILD = 4278
-        const val REQUEST_CODE_PUBLISHED_SUCCESSFULLY = 5778
         const val REQUEST_CODE_PUBLISHING_FAILED = 2427
         const val NOTIFICATION_ID_PUBLISH_CHILD = 7542
         const val NOTIFICATION_ID_PUBLISHED_SUCCESSFULLY = 1427
