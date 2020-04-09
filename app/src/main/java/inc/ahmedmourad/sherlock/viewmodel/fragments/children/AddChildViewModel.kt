@@ -16,12 +16,12 @@ import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.PublishingState
 import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
-import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.model.validators.children.*
 import inc.ahmedmourad.sherlock.model.validators.common.validatePicturePath
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
+import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import splitties.init.appCtx
@@ -36,7 +36,7 @@ internal class AddChildViewModel(
     val skin by lazy { MutableLiveData<Skin?>() }
     val hair by lazy { MutableLiveData<Hair?>() }
     val gender by lazy { MutableLiveData<Gender?>() }
-    val location by lazy { MutableLiveData<Location?>() }
+    val location by lazy { MutableLiveData<PlacePicker.Location?>() }
     val minAge by lazy { MutableLiveData<Int?>() }
     val maxAge by lazy { MutableLiveData<Int?>() }
     val minHeight by lazy { MutableLiveData<Int?>() }
@@ -49,6 +49,7 @@ internal class AddChildViewModel(
     val nameError by lazy { MutableLiveData<String?>() }
     val minAgeError by lazy { MutableLiveData<String?>() }
     val maxAgeError by lazy { MutableLiveData<String?>() }
+    val locationError by lazy { MutableLiveData<String?>() }
     val ageError by lazy { MutableLiveData<String?>() }
     val minHeightError by lazy { MutableLiveData<String?>() }
     val maxHeightError by lazy { MutableLiveData<String?>() }
@@ -93,7 +94,6 @@ internal class AddChildViewModel(
         skin.value = child.appearance.skin
         hair.value = child.appearance.hair
         gender.value = child.appearance.gender
-        location.value = child.location
         minAge.value = child.appearance.ageRange?.min?.value
         maxAge.value = child.appearance.ageRange?.max?.value
         minHeight.value = child.appearance.heightRange?.min?.value
@@ -101,6 +101,15 @@ internal class AddChildViewModel(
         notes.value = child.notes
         notes.value = child.notes
         picturePath.value = child.picturePath?.value?.let(ImagePicker::PicturePath)
+        location.value = child.location?.let {
+            PlacePicker.Location(
+                    it.id,
+                    it.name,
+                    it.address,
+                    it.coordinates.latitude,
+                    it.coordinates.longitude
+            )
+        }
     }
 
     private fun toPublishedChild(): AppPublishedChild? {
@@ -132,6 +141,21 @@ internal class AddChildViewModel(
                     hair.value
             ).mapLeft(appearanceError::setValue)
 
+            val coordinates = location.value?.let {
+                validateCoordinates(it.latitude, it.longitude).mapLeft(locationError::setValue).bind()
+            }
+
+            val location = coordinates?.let { c ->
+                location.value?.let {
+                    validateLocation(
+                            it.id,
+                            it.name,
+                            it.address,
+                            c
+                    ).mapLeft(locationError::setValue).bind()
+                }
+            }
+
             val (picturePath) = picturePath.value?.let {
                 validatePicturePath(it.value).mapLeft(picturePathError::setValue)
             } ?: null.right()
@@ -139,7 +163,7 @@ internal class AddChildViewModel(
             validateAppPublishedChild(
                     name,
                     notes.value,
-                    location.value,
+                    location,
                     appearance,
                     picturePath
             ).mapLeft(childError::setValue).bind()

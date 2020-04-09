@@ -30,7 +30,6 @@ import inc.ahmedmourad.sherlock.domain.constants.PublishingState
 import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
-import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultOnRangeChangedListener
@@ -306,7 +305,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     }
 
     private fun initializeLocationTextView() {
-        viewModel.location.observe(viewLifecycleOwner, Observer { location: Location? ->
+        viewModel.location.observe(viewLifecycleOwner, Observer { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.locationTextView?.text = location.name
             } else {
@@ -352,12 +351,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             "Parameter data is null!"
         }
 
-        placePicker.get().handleActivityResult(requestCode, data) { locationEither ->
-            locationEither.fold(ifLeft = {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            }, ifRight = viewModel.location::setValue)
-        }
-
+        placePicker.get().handleActivityResult(requestCode, data, viewModel.location::setValue)
         imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
 
         super.onActivityResult(requestCode, resultCode, data)

@@ -10,8 +10,8 @@ import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.model.validators.children.*
+import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 
 internal class FindChildrenViewModel : ViewModel() {
 
@@ -20,7 +20,7 @@ internal class FindChildrenViewModel : ViewModel() {
     val skin by lazy { MutableLiveData<Skin?>(Skin.WHITE) }
     val hair by lazy { MutableLiveData<Hair?>(Hair.BLONDE) }
     val gender by lazy { MutableLiveData<Gender?>(Gender.MALE) }
-    val location by lazy { MutableLiveData<Location?>() }
+    val location by lazy { MutableLiveData<PlacePicker.Location?>() }
     val age by lazy { MutableLiveData<Int?>(15) }
     val height by lazy { MutableLiveData<Int?>(120) }
 
@@ -63,7 +63,22 @@ internal class FindChildrenViewModel : ViewModel() {
                     hair
             ).mapLeft(appearanceError::setValue)
 
-            val (location) = validateLocation(location.value).mapLeft(locationError::setValue)
+            val coordinates = location.value?.let {
+                validateCoordinates(it.latitude, it.longitude).mapLeft(locationError::setValue).bind()
+            }
+
+            val tempLocation = coordinates?.let { c ->
+                location.value?.let {
+                    validateLocation(
+                            it.id,
+                            it.name,
+                            it.address,
+                            c
+                    ).mapLeft(locationError::setValue).bind()
+                }
+            }
+
+            val (location) = validateLocation(tempLocation).mapLeft(locationError::setValue)
 
             validateChildQuery(
                     fullName,

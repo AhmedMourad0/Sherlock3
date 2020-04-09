@@ -23,7 +23,6 @@ import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import inc.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.colors.ColorSelector
@@ -171,7 +170,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     }
 
     private fun initializeLocationTextView() {
-        viewModel.location.observe(viewLifecycleOwner, Observer { location: Location? ->
+        viewModel.location.observe(viewLifecycleOwner, Observer { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.locationTextView?.text = location.name
             } else {
@@ -216,11 +215,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             "Parameter data is null!"
         }
 
-        placePicker.get().handleActivityResult(requestCode, data) { locationEither ->
-            locationEither.fold(ifLeft = {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            }, ifRight = viewModel.location::setValue)
-        }
+        placePicker.get().handleActivityResult(requestCode, data, viewModel.location::setValue)
 
         super.onActivityResult(requestCode, resultCode, data)
     }
