@@ -358,11 +358,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             }, ifRight = viewModel.location::setValue)
         }
 
-        imagePicker.get().handleActivityResult(requestCode, data) { pictureEither ->
-            pictureEither.fold(ifLeft = {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            }, ifRight = viewModel.picturePath::setValue)
-        }
+        imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
 
         super.onActivityResult(requestCode, resultCode, data)
     }
