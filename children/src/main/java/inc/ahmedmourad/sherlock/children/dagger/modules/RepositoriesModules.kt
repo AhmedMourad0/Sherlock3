@@ -34,7 +34,7 @@ internal object ChildrenRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenRepository(
+    fun provide(
             childrenLocalRepository: Lazy<ChildrenLocalRepository>,
             childrenRemoteRepository: Lazy<ChildrenRemoteRepository>,
             childrenImageRepository: Lazy<ChildrenImageRepository>,
@@ -60,7 +60,7 @@ internal object ChildrenRemoteRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenRemoteRepository(
+    fun provide(
             @ChildrenFirebaseFirestoreQualifier db: Lazy<FirebaseFirestore>,
             authManager: Lazy<AuthManager>,
             connectivityManager: Lazy<ConnectivityManager>
@@ -78,7 +78,7 @@ internal object ChildrenImageRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenImageRepository(
+    fun provide(
             connectivityManager: Lazy<ConnectivityManager>,
             authManager: Lazy<AuthManager>,
             @ChildrenFirebaseStorageQualifier storage: Lazy<FirebaseStorage>
@@ -96,5 +96,5 @@ internal object ChildrenLocalRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenLocalRepository(db: Lazy<SherlockDatabase>): ChildrenLocalRepository = ChildrenRoomLocalRepository(db)
+    fun provide(db: Lazy<SherlockDatabase>): ChildrenLocalRepository = ChildrenRoomLocalRepository(db)
 }

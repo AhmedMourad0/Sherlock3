@@ -15,7 +15,7 @@ internal object FirebaseFirestoreModule {
     @Reusable
     @AuthFirebaseFirestoreQualifier
     @JvmStatic
-    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provide(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }
 
 @Module
@@ -24,7 +24,7 @@ internal object FirebaseStorageModule {
     @Reusable
     @AuthFirebaseStorageQualifier
     @JvmStatic
-    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+    fun provide(): FirebaseStorage = FirebaseStorage.getInstance()
 }
 
 @Module
@@ -32,5 +32,5 @@ internal object FirebaseAuthModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provide(): FirebaseAuth = FirebaseAuth.getInstance()
 }

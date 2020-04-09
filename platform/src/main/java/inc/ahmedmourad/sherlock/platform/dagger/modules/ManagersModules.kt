@@ -17,7 +17,7 @@ internal object DateManagerModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideDateManager(): DateManager = AndroidDateManager()
+    fun provide(): DateManager = AndroidDateManager()
 }
 
 @Module
@@ -25,7 +25,7 @@ internal object LocationManagerModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideLocationManager(): LocationManager = AndroidLocationManager()
+    fun provide(): LocationManager = AndroidLocationManager()
 }
 
 @Module
@@ -33,7 +33,7 @@ internal object TextManagerModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideTextManager(): TextManager = AndroidTextManager()
+    fun provide(): TextManager = AndroidTextManager()
 }
 
 @Module
@@ -41,5 +41,5 @@ internal object ConnectivityManagerModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideConnectivityManager(): ConnectivityManager = AndroidConnectivityManager()
+    fun provide(): ConnectivityManager = AndroidConnectivityManager()
 }

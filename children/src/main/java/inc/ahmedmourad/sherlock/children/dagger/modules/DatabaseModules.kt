@@ -14,7 +14,7 @@ internal object SherlockDatabaseModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideSherlockDatabase(): SherlockDatabase = SherlockDatabase.getInstance()
+    fun provide(): SherlockDatabase = SherlockDatabase.getInstance()
 }
 
 @Module
@@ -23,7 +23,7 @@ internal object FirebaseFirestoreModule {
     @Reusable
     @ChildrenFirebaseFirestoreQualifier
     @JvmStatic
-    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provide(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }
 
 @Module
@@ -32,5 +32,5 @@ internal object FirebaseStorageModule {
     @Reusable
     @ChildrenFirebaseStorageQualifier
     @JvmStatic
-    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+    fun provide(): FirebaseStorage = FirebaseStorage.getInstance()
 }

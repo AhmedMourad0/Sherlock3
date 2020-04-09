@@ -18,7 +18,7 @@ internal object ChildrenRemoteViewsServiceModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenRemoteViewsService(): ChildrenRemoteViewsServiceIntentFactory {
+    fun provide(): ChildrenRemoteViewsServiceIntentFactory {
         return ::childrenRemoteViewsServiceIntentFactory
     }
 }
@@ -30,7 +30,7 @@ internal object ChildrenRemoteViewsFactoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenRemoteViewsFactory(
+    fun provide(
             formatter: Lazy<Formatter>,
             dateManager: Lazy<DateManager>
     ): ChildrenRemoteViewsFactoryFactory {

@@ -11,5 +11,5 @@ internal object BusModule {
     @Provides
     @Singleton
     @JvmStatic
-    fun provideBus(): Bus = RxBus()
+    fun provide(): Bus = RxBus()
 }

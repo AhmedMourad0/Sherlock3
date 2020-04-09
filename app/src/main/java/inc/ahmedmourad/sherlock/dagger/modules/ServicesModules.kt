@@ -13,7 +13,7 @@ internal object SherlockServiceModule {
     @Reusable
     @SherlockServiceIntentQualifier
     @JvmStatic
-    fun provideSherlockServiceIntent(): SherlockServiceIntentFactory {
+    fun provide(): SherlockServiceIntentFactory {
         return ::sherlockServiceIntentFactory
     }
 }

@@ -15,14 +15,14 @@ import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 internal object PlacePickerModule {
     @Provides
     @JvmStatic
-    fun providePlacePicker(): PlacePicker = GooglePlacePicker()
+    fun provide(): PlacePicker = GooglePlacePicker()
 }
 
 @Module
 internal object ImagePickerModule {
     @Provides
     @JvmStatic
-    fun provideImagePicker(): ImagePicker = EsafirmImagePicker()
+    fun provide(): ImagePicker = EsafirmImagePicker()
 }
 
 @Module
@@ -30,5 +30,5 @@ internal object TextFormatterModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideTextFormatter(textManager: TextManager): Formatter = TextFormatter(textManager)
+    fun provide(textManager: TextManager): Formatter = TextFormatter(textManager)
 }

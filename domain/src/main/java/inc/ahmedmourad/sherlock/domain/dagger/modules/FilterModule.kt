@@ -16,7 +16,7 @@ internal object CriteriaModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideCriteria(locationManager: Lazy<LocationManager>): ChildrenCriteriaFactory {
+    fun provide(locationManager: Lazy<LocationManager>): ChildrenCriteriaFactory {
         return ::childrenLooseCriteriaFactory.partially1(locationManager)
     }
 }
@@ -26,7 +26,7 @@ internal object FilterModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideFilter(criteriaFactory: ChildrenCriteriaFactory): ChildrenFilterFactory {
+    fun provide(criteriaFactory: ChildrenCriteriaFactory): ChildrenFilterFactory {
         return ::childrenFilterFactory.partially1(criteriaFactory)
     }
 }

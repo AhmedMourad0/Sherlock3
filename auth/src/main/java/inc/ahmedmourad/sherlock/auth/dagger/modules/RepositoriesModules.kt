@@ -30,7 +30,7 @@ internal object AuthManagerModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAuthManager(
+    fun provide(
             authenticator: Lazy<AuthAuthenticator>,
             usersRepository: Lazy<AuthRemoteRepository>,
             imageRepository: Lazy<AuthImageRepository>
@@ -49,7 +49,7 @@ internal object IsUserSignedInModule {
     @Reusable
     @IsUserSignedInQualifier
     @JvmStatic
-    fun provideIsUserSignedIn(
+    fun provide(
             manager: Lazy<AuthManager>
     ): ObserveUserAuthState {
         return manager.get()::observeUserAuthState
@@ -61,7 +61,7 @@ internal object AuthAuthenticatorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAuthAuthenticator(
+    fun provide(
             auth: Lazy<FirebaseAuth>,
             connectivityManager: Lazy<ConnectivityManager>
     ): AuthAuthenticator {
@@ -78,7 +78,7 @@ internal object AuthRemoteRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAuthRemoteRepository(
+    fun provide(
             @AuthFirebaseFirestoreQualifier db: Lazy<FirebaseFirestore>,
             connectivityManager: Lazy<ConnectivityManager>,
             @IsUserSignedInQualifier observeUserAuthState: ObserveUserAuthState
@@ -99,7 +99,7 @@ internal object AuthImageRepositoryModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAuthImageRepository(
+    fun provide(
             connectivityManager: Lazy<ConnectivityManager>,
             @IsUserSignedInQualifier observeUserAuthState: ObserveUserAuthState,
             @AuthFirebaseStorageQualifier storage: Lazy<FirebaseStorage>

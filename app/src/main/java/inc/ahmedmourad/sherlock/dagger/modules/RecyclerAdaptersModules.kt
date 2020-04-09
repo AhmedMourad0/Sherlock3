@@ -19,7 +19,7 @@ internal object ChildrenRecyclerAdapterModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenRecyclerAdapter(
+    fun provide(
             dateManager: Lazy<DateManager>,
             formatter: Lazy<Formatter>
     ): ChildrenRecyclerAdapterFactory {
@@ -32,7 +32,7 @@ internal object AppSectionsRecyclerAdapterModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAppSectionsRecyclerAdapter(): AppSectionsRecyclerAdapterFactory {
+    fun provide(): AppSectionsRecyclerAdapterFactory {
         return ::appSectionsRecyclerAdapterFactory
     }
 }

@@ -19,7 +19,7 @@ internal object AddChildInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideAddChildInteractor(childrenRepository: Lazy<ChildrenRepository>): AddChildInteractor {
+    fun provide(childrenRepository: Lazy<ChildrenRepository>): AddChildInteractor {
         return ::addChild.partially1(childrenRepository)
     }
 }
@@ -29,7 +29,7 @@ internal object FindChildrenInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideFindChildrenInteractor(childrenRepository: Lazy<ChildrenRepository>): FindChildrenInteractor {
+    fun provide(childrenRepository: Lazy<ChildrenRepository>): FindChildrenInteractor {
         return ::findChildren.partially1(childrenRepository)
     }
 }
@@ -39,7 +39,7 @@ internal object FindChildInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideFindChildInteractor(childrenRepository: Lazy<ChildrenRepository>): FindChildInteractor {
+    fun provide(childrenRepository: Lazy<ChildrenRepository>): FindChildInteractor {
         return ::findChild.partially1(childrenRepository)
     }
 }
@@ -49,7 +49,7 @@ internal object FindLastSearchResultsInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideFindLastSearchResultsInteractor(childrenRepository: Lazy<ChildrenRepository>): FindLastSearchResultsInteractor {
+    fun provide(childrenRepository: Lazy<ChildrenRepository>): FindLastSearchResultsInteractor {
         return ::findLastSearchResults.partially1(childrenRepository)
     }
 }
@@ -60,7 +60,7 @@ internal object ObserveInternetConnectivityInteractorModule {
     @Reusable
     @ObserveInternetConnectivityInteractorQualifier
     @JvmStatic
-    fun provideObserveInternetConnectivityInteractor(
+    fun provide(
             connectivityManager: Lazy<ConnectivityManager>
     ): ObserveInternetConnectivityInteractor {
         return ::observeInternetConnectivity.partially1(connectivityManager)
@@ -73,7 +73,7 @@ internal object CheckInternetConnectivityInteractorModule {
     @Reusable
     @CheckInternetConnectivityInteractorQualifier
     @JvmStatic
-    fun provideCheckInternetConnectivityInteractor(connectivityManager: Lazy<ConnectivityManager>): CheckInternetConnectivityInteractor {
+    fun provide(connectivityManager: Lazy<ConnectivityManager>): CheckInternetConnectivityInteractor {
         return ::checkInternetConnectivity.partially1(connectivityManager)
     }
 }
@@ -83,7 +83,7 @@ internal object ObserveChildPublishingStateInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideObserveChildPublishingStateInteractor(bus: Lazy<Bus>): ObserveChildPublishingStateInteractor {
+    fun provide(bus: Lazy<Bus>): ObserveChildPublishingStateInteractor {
         return ::observeChildPublishingState.partially1(bus)
     }
 }
@@ -93,7 +93,7 @@ internal object CheckChildPublishingStateInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideCheckChildPublishingStateInteractor(bus: Lazy<Bus>): CheckChildPublishingStateInteractor {
+    fun provide(bus: Lazy<Bus>): CheckChildPublishingStateInteractor {
         return ::checkChildPublishingState.partially1(bus)
     }
 }
@@ -103,7 +103,7 @@ internal object NotifyChildPublishingStateChangeInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideNotifyChildPublishingStateChangeInteractor(bus: Lazy<Bus>): NotifyChildPublishingStateChangeInteractor {
+    fun provide(bus: Lazy<Bus>): NotifyChildPublishingStateChangeInteractor {
         return ::notifyChildPublishingStateChange.partially1(bus)
     }
 }
@@ -114,7 +114,7 @@ internal object NotifyChildFindingStateChangeInteractorModule {
     @Reusable
     @NotifyChildFindingStateChangeInteractorQualifier
     @JvmStatic
-    fun provideNotifyChildFindingStateChangeInteractor(bus: Lazy<Bus>): NotifyChildFindingStateChangeInteractor {
+    fun provide(bus: Lazy<Bus>): NotifyChildFindingStateChangeInteractor {
         return ::notifyChildFindingStateChange.partially1(bus)
     }
 }
@@ -125,7 +125,7 @@ internal object NotifyChildrenFindingStateChangeInteractorModule {
     @Reusable
     @NotifyChildrenFindingStateChangeInteractorQualifier
     @JvmStatic
-    fun provideNotifyChildrenFindingStateChangeInteractor(bus: Lazy<Bus>): NotifyChildrenFindingStateChangeInteractor {
+    fun provide(bus: Lazy<Bus>): NotifyChildrenFindingStateChangeInteractor {
         return ::notifyChildrenFindingStateChange.partially1(bus)
     }
 }
@@ -136,7 +136,7 @@ internal object ObserveUserAuthStateInteractorModule {
     @Reusable
     @ObserveUserAuthStateInteractorQualifier
     @JvmStatic
-    fun provideObserveUserAuthStateInteractor(authManager: Lazy<AuthManager>): ObserveUserAuthStateInteractor {
+    fun provide(authManager: Lazy<AuthManager>): ObserveUserAuthStateInteractor {
         return ::observeUserAuthState.partially1(authManager)
     }
 }
@@ -147,7 +147,7 @@ internal object ObserveSignedInUserInteractorModule {
     @Reusable
     @ObserveSignedInUserInteractorQualifier
     @JvmStatic
-    fun provideObserveSignedInUserInteractor(authManager: Lazy<AuthManager>): ObserveSignedInUserInteractor {
+    fun provide(authManager: Lazy<AuthManager>): ObserveSignedInUserInteractor {
         return ::observeSignedInUser.partially1(authManager)
     }
 }
@@ -157,7 +157,7 @@ internal object SendPasswordResetEmailInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideSendPasswordResetEmailInteractor(authManager: Lazy<AuthManager>): SendPasswordResetEmailInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SendPasswordResetEmailInteractor {
         return ::sendPasswordResetEmail.partially1(authManager)
     }
 }
@@ -167,7 +167,7 @@ internal object SignInInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideSignInInteractor(authManager: Lazy<AuthManager>): SignInInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignInInteractor {
         return ::signIn.partially1(authManager)
     }
 }
@@ -178,7 +178,7 @@ internal object SignInWithFacebookInteractorModule {
     @Reusable
     @SignInWithFacebookInteractorQualifier
     @JvmStatic
-    fun provideSignInWithFacebookInteractor(authManager: Lazy<AuthManager>): SignInWithFacebookInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignInWithFacebookInteractor {
         return ::signInWithFacebook.partially1(authManager)
     }
 }
@@ -189,7 +189,7 @@ internal object SignInWithGoogleInteractorModule {
     @Reusable
     @SignInWithGoogleInteractorQualifier
     @JvmStatic
-    fun provideSignInWithGoogleInteractor(authManager: Lazy<AuthManager>): SignInWithGoogleInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignInWithGoogleInteractor {
         return ::signInWithGoogle.partially1(authManager)
     }
 }
@@ -200,7 +200,7 @@ internal object SignInWithTwitterInteractorModule {
     @Reusable
     @SignInWithTwitterInteractorQualifier
     @JvmStatic
-    fun provideSignInWithTwitterInteractor(authManager: Lazy<AuthManager>): SignInWithTwitterInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignInWithTwitterInteractor {
         return ::signInWithTwitter.partially1(authManager)
     }
 }
@@ -210,7 +210,7 @@ internal object SignOutInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideSignOutInteractor(authManager: Lazy<AuthManager>): SignOutInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignOutInteractor {
         return ::signOut.partially1(authManager)
     }
 }
@@ -220,7 +220,7 @@ internal object SignUpInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideSignUpInteractor(authManager: Lazy<AuthManager>): SignUpInteractor {
+    fun provide(authManager: Lazy<AuthManager>): SignUpInteractor {
         return ::signUp.partially1(authManager)
     }
 }
@@ -230,7 +230,7 @@ internal object CompleteSignUpInteractorModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideCompleteSignUpInteractor(authManager: Lazy<AuthManager>): CompleteSignUpInteractor {
+    fun provide(authManager: Lazy<AuthManager>): CompleteSignUpInteractor {
         return ::completeSignUp.partially1(authManager)
     }
 }
