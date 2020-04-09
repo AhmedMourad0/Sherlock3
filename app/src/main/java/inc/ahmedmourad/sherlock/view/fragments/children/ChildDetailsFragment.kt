@@ -23,7 +23,7 @@ import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.utils.formatter.Formatter
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildDetailsViewModel
-import inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories.ChildDetailsViewModelFactoryFactory
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildDetailsViewModelFactoryFactory
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error

@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.left
@@ -31,4 +32,18 @@ internal class ChildrenSearchResultsViewModel(
                     .toLiveData()
 
     fun onRefresh() = refreshSubject.onNext(Unit)
+
+    class Factory(
+            private val interactor: FindChildrenInteractor,
+            private val filterFactory: ChildrenFilterFactory,
+            private val query: ChildQuery
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ChildrenSearchResultsViewModel(interactor, filterFactory, query) as T
+        }
+    }
 }
+
+internal typealias ChildrenSearchResultsViewModelFactoryFactory =
+        (@JvmSuppressWildcards ChildQuery) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory

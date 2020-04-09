@@ -25,7 +25,7 @@ import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import inc.ahmedmourad.sherlock.domain.platform.DateManager
 import inc.ahmedmourad.sherlock.utils.formatter.Formatter
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildrenSearchResultsViewModel
-import inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories.ChildrenSearchResultsViewModelFactoryFactory
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.ChildrenSearchResultsViewModelFactoryFactory
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error

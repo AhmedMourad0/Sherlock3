@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
@@ -71,5 +72,12 @@ internal class FindChildrenViewModel : ViewModel() {
             ).mapLeft(queryError::setValue).bind()
 
         }.orNull()
+    }
+
+    class Factory : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return FindChildrenViewModel() as T
+        }
     }
 }

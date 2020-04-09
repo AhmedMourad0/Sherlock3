@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
@@ -61,4 +62,21 @@ internal class CompleteSignUpViewModel(
 
         }.orNull()
     }
+
+    class Factory(
+            private val incompleteUser: IncompleteUser,
+            private val completeSignUpInteractor: CompleteSignUpInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return CompleteSignUpViewModel(
+                    incompleteUser,
+                    completeSignUpInteractor
+            ) as T
+        }
+    }
 }
+
+internal typealias CompleteSignUpViewModelFactoryFactory =
+        (@JvmSuppressWildcards IncompleteUser) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory
+

@@ -24,7 +24,7 @@ import inc.ahmedmourad.sherlock.domain.model.common.disposable
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.CompleteSignUpViewModel
-import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories.CompleteSignUpViewModelFactoryFactory
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.CompleteSignUpViewModelFactoryFactory
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error

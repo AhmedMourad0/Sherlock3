@@ -2,7 +2,7 @@ package inc.ahmedmourad.sherlock.dagger.modules
 
 import androidx.lifecycle.ViewModelProvider
 import arrow.syntax.function.curried
-import arrow.syntax.function.partially1
+import arrow.syntax.function.partially2
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -15,10 +15,10 @@ import inc.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
-import inc.ahmedmourad.sherlock.viewmodel.activity.factory.MainActivityViewModelFactory
-import inc.ahmedmourad.sherlock.viewmodel.common.factories.GlobalViewModelFactory
-import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.factories.*
-import inc.ahmedmourad.sherlock.viewmodel.fragments.children.factories.*
+import inc.ahmedmourad.sherlock.viewmodel.activity.MainActivityViewModel
+import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.*
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.*
 
 @Module
 internal object GlobalViewModelModule {
@@ -26,12 +26,12 @@ internal object GlobalViewModelModule {
     @Reusable
     @GlobalViewModelQualifier
     @JvmStatic
-    fun provideMainActivityViewModel(
+    fun provide(
             @ObserveInternetConnectivityInteractorQualifier observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
             @ObserveUserAuthStateInteractorQualifier observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
             @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return GlobalViewModelFactory(
+        return GlobalViewModel.Factory(
                 observeInternetConnectivityInteractor,
                 observeUserAuthStateInteractor,
                 observeSignedInUserInteractor
@@ -45,10 +45,10 @@ internal object MainActivityViewModelModule {
     @Reusable
     @MainActivityViewModelQualifier
     @JvmStatic
-    fun provideMainActivityViewModel(
+    fun provide(
             signOutInteractor: SignOutInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return MainActivityViewModelFactory(signOutInteractor)
+        return MainActivityViewModel.Factory(signOutInteractor)
     }
 }
 
@@ -60,11 +60,11 @@ internal object AddChildViewModelModule {
     @Reusable
     @AddChildViewModelQualifier
     @JvmStatic
-    fun provideAddChildViewModel(
+    fun provide(
             @SherlockServiceIntentQualifier serviceFactory: SherlockServiceIntentFactory,
             observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return AddChildViewModelFactory(
+        return AddChildViewModel.Factory(
                 serviceFactory,
                 observeChildPublishingStateInteractor
         )
@@ -77,8 +77,8 @@ internal object FindChildrenViewModelModule {
     @Reusable
     @FindChildrenViewModelQualifier
     @JvmStatic
-    fun provideFindChildrenViewModel(): ViewModelProvider.NewInstanceFactory {
-        return FindChildrenViewModelFactory()
+    fun provide(): ViewModelProvider.NewInstanceFactory {
+        return FindChildrenViewModel.Factory()
     }
 }
 
@@ -88,10 +88,10 @@ internal object ResetPasswordViewModelModule {
     @Reusable
     @ResetPasswordViewModelQualifier
     @JvmStatic
-    fun provideResetPasswordViewModel(
+    fun provide(
             sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return ResetPasswordViewModelFactory(
+        return ResetPasswordViewModel.Factory(
                 sendPasswordResetEmailInteractor
         )
     }
@@ -103,10 +103,10 @@ internal object SignedInUserProfileViewModelModule {
     @Reusable
     @SignedInUserProfileViewModelQualifier
     @JvmStatic
-    fun provideSignedInUserProfileViewModel(
+    fun provide(
             @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return SignedInUserProfileViewModelFactory(
+        return SignedInUserProfileViewModel.Factory(
                 observeSignedInUserInteractor
         )
     }
@@ -118,13 +118,13 @@ internal object SignInViewModelModule {
     @Reusable
     @SignInViewModelQualifier
     @JvmStatic
-    fun provideSignInViewModel(
+    fun provide(
             signInInteractor: SignInInteractor,
             @SignInWithGoogleInteractorQualifier signInWithGoogleInteractor: SignInWithGoogleInteractor,
             @SignInWithFacebookInteractorQualifier signInWithFacebookInteractor: SignInWithFacebookInteractor,
             @SignInWithTwitterInteractorQualifier signInWithTwitterInteractor: SignInWithTwitterInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return SignInViewModelFactory(
+        return SignInViewModel.Factory(
                 signInInteractor,
                 signInWithGoogleInteractor,
                 signInWithFacebookInteractor,
@@ -139,13 +139,13 @@ internal object SignUpViewModelModule {
     @Reusable
     @SignUpViewModelQualifier
     @JvmStatic
-    fun provideSignUpViewModel(
+    fun provide(
             signUpInteractor: SignUpInteractor,
             @SignInWithGoogleInteractorQualifier signUpWithGoogleInteractor: SignInWithGoogleInteractor,
             @SignInWithFacebookInteractorQualifier signUpWithFacebookInteractor: SignInWithFacebookInteractor,
             @SignInWithTwitterInteractorQualifier signUpWithTwitterInteractor: SignInWithTwitterInteractor
     ): ViewModelProvider.NewInstanceFactory {
-        return SignUpViewModelFactory(
+        return SignUpViewModel.Factory(
                 signUpInteractor,
                 signUpWithGoogleInteractor,
                 signUpWithFacebookInteractor,
@@ -159,10 +159,10 @@ internal object CompleteSignUpViewModelModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideCompleteSignUpViewModel(
+    fun provide(
             completeSignUpInteractor: CompleteSignUpInteractor
     ): CompleteSignUpViewModelFactoryFactory {
-        return ::completeSignUpViewModelFactoryFactory.partially1(completeSignUpInteractor)
+        return CompleteSignUpViewModel::Factory.partially2(completeSignUpInteractor)
     }
 }
 
@@ -171,11 +171,11 @@ internal object ChildrenSearchResultsViewModelModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildrenSearchResultViewModel(
+    fun provide(
             interactor: FindChildrenInteractor,
             filterFactory: ChildrenFilterFactory
     ): ChildrenSearchResultsViewModelFactoryFactory {
-        return ::childrenSearchResultsViewModelFactoryFactory.curried()(interactor)(filterFactory)
+        return ChildrenSearchResultsViewModel::Factory.curried()(interactor)(filterFactory)
     }
 }
 
@@ -184,9 +184,9 @@ internal object ChildDetailsViewModelModule {
     @Provides
     @Reusable
     @JvmStatic
-    fun provideChildDetailsViewModel(
+    fun provide(
             interactor: FindChildInteractor
     ): ChildDetailsViewModelFactoryFactory {
-        return ::childDetailsViewModelFactoryFactory.partially1(interactor)
+        return ChildDetailsViewModel::Factory.partially2(interactor)
     }
 }

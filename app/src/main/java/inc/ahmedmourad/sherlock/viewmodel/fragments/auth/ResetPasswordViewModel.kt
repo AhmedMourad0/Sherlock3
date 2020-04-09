@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.orNull
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
@@ -25,5 +26,16 @@ internal class ResetPasswordViewModel(
                             .observeOn(AndroidSchedulers.mainThread())
                 }
         ).orNull()
+    }
+
+    class Factory(
+            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ResetPasswordViewModel(
+                    sendPasswordResetEmailInteractor
+            ) as T
+        }
     }
 }

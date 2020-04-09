@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.left
@@ -84,5 +85,22 @@ internal class SignUpViewModel(
             ).mapLeft(userError::setValue).bind()
 
         }.orNull()
+    }
+
+    class Factory(
+            private val signUpInteractor: SignUpInteractor,
+            private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
+            private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
+            private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return SignUpViewModel(
+                    signUpInteractor,
+                    signUpWithGoogleInteractor,
+                    signUpWithFacebookInteractor,
+                    signUpWithTwitterInteractor
+            ) as T
+        }
     }
 }

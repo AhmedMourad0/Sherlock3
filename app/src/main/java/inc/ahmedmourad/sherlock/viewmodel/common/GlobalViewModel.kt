@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -38,4 +39,19 @@ internal class GlobalViewModel(
                     .onErrorReturn { it.left() }
                     .observeOn(AndroidSchedulers.mainThread())
                     .toLiveData()
+
+    class Factory(
+            private val observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
+            private val observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
+            private val observeSignedInUserInteractor: ObserveSignedInUserInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return GlobalViewModel(
+                    observeInternetConnectivityInteractor,
+                    observeUserAuthStateInteractor,
+                    observeSignedInUserInteractor
+            ) as T
+        }
+    }
 }

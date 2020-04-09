@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.left
@@ -25,4 +26,17 @@ internal class ChildDetailsViewModel(childId: ChildId, interactor: FindChildInte
             .toLiveData()
 
     fun onRefresh() = refreshSubject.onNext(Unit)
+
+    internal class Factory(
+            private val childId: ChildId,
+            private val interactor: FindChildInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ChildDetailsViewModel(childId, interactor) as T
+        }
+    }
 }
+
+internal typealias ChildDetailsViewModelFactoryFactory =
+        (@JvmSuppressWildcards ChildId) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory

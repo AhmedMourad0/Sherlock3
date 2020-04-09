@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
@@ -60,5 +61,22 @@ internal class SignInViewModel(
             ).mapLeft(credentailsError::setValue).bind()
 
         }.orNull()
+    }
+
+    class Factory(
+            private val signInInteractor: SignInInteractor,
+            private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
+            private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
+            private val signInWithTwitterInteractor: SignInWithTwitterInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return SignInViewModel(
+                    signInInteractor,
+                    signInWithGoogleInteractor,
+                    signInWithFacebookInteractor,
+                    signInWithTwitterInteractor
+            ) as T
+        }
     }
 }

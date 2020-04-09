@@ -4,6 +4,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.left
@@ -138,5 +139,18 @@ internal class AddChildViewModel(
             ).mapLeft(childError::setValue).bind()
 
         }.orNull()
+    }
+
+    class Factory(
+            private val serviceFactory: SherlockServiceIntentFactory,
+            private val observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
+    ) : ViewModelProvider.NewInstanceFactory() {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return AddChildViewModel(
+                    serviceFactory,
+                    observeChildPublishingStateInteractor
+            ) as T
+        }
     }
 }
