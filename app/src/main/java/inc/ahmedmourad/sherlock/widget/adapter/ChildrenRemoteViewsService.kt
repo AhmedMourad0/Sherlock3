@@ -5,9 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViewsService
-import arrow.core.Tuple2
-import arrow.core.toMap
-import arrow.core.toTuple2
 import inc.ahmedmourad.sherlock.bundlizer.bundle
 import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
@@ -31,15 +28,13 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
 
-        val hackBundle = requireNotNull(intent.getBundleExtra(EXTRA_HACK_BUNDLE))
-
         val children = requireNotNull(
-                hackBundle.getBundle(EXTRA_CHILDREN_RESULTS)
+                intent.getBundleExtra(EXTRA_HACK_BUNDLE)?.getBundle(EXTRA_CHILDREN_RESULTS)
         ).unbundle(MapSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
 
         return childrenRemoteViewsFactoryFactory(
                 applicationContext,
-                children.map(Map.Entry<SimpleRetrievedChild, Weight>::toTuple2)
+                children
         )
     }
 
@@ -49,9 +44,9 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
         const val EXTRA_HACK_BUNDLE = "inc.ahmedmourad.sherlock.external.adapter.extra.HACK_BUNDLE"
         const val EXTRA_CHILDREN_RESULTS = "inc.ahmedmourad.sherlock.external.adapter.extra.CHILDREN_RESULTS"
 
-        fun create(appWidgetId: Int, results: List<Tuple2<SimpleRetrievedChild, Weight>>): Intent {
+        fun create(appWidgetId: Int, results: Map<SimpleRetrievedChild, Weight>): Intent {
 
-            val resultsMap = results.toMap()
+            val resultsMap = results
             val hackBundle = Bundle(1).apply {
                 putBundle(
                         EXTRA_CHILDREN_RESULTS,
