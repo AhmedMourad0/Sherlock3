@@ -128,7 +128,7 @@ internal data class RoomChildEntity(
         }
     }
 
-    fun simplify(): Either<Throwable, Tuple2<SimpleRetrievedChild, Weight?>> {
+    fun simplify(): Tuple2<SimpleRetrievedChild, Weight?>? {
 
         val name = extractName().getOrHandle {
             Timber.error(it, it::toString)
@@ -160,7 +160,10 @@ internal data class RoomChildEntity(
         ).bimap(
                 leftOperation = { ModelConversionException(it.toString()) },
                 rightOperation = { it toT weight }
-        )
+        ).getOrHandle {
+            Timber.error(it, it::toString)
+            null
+        }
     }
 
     private fun extractName(): Either<Throwable, Either<Name, FullName>?> {
