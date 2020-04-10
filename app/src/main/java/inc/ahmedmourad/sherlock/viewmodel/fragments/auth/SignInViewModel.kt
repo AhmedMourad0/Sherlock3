@@ -26,8 +26,8 @@ internal class SignInViewModel(
         private val signInWithTwitterInteractor: SignInWithTwitterInteractor
 ) : ViewModel() {
 
-    val email by lazy { MutableLiveData<String?>("") }
-    val password by lazy { MutableLiveData<String?>("") }
+    val email by lazy { MutableLiveData<String?>() }
+    val password by lazy { MutableLiveData<String?>() }
 
     val emailError by lazy { MutableLiveData<String?>() }
     val passwordError by lazy { MutableLiveData<String?>() }

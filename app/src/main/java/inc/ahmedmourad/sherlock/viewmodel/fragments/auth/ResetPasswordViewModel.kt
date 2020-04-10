@@ -14,7 +14,7 @@ internal class ResetPasswordViewModel(
         private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
 ) : ViewModel() {
 
-    val email by lazy { MutableLiveData<String?>("") }
+    val email by lazy { MutableLiveData<String?>() }
 
     val emailError by lazy { MutableLiveData<String?>() }
 

@@ -15,14 +15,14 @@ import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 
 internal class FindChildrenViewModel : ViewModel() {
 
-    val firstName by lazy { MutableLiveData<String?>("") }
-    val lastName by lazy { MutableLiveData<String?>("") }
-    val skin by lazy { MutableLiveData<Skin?>(Skin.WHITE) }
-    val hair by lazy { MutableLiveData<Hair?>(Hair.BLONDE) }
-    val gender by lazy { MutableLiveData<Gender?>(Gender.MALE) }
+    val firstName by lazy { MutableLiveData<String?>() }
+    val lastName by lazy { MutableLiveData<String?>() }
+    val skin by lazy { MutableLiveData<Skin?>() }
+    val hair by lazy { MutableLiveData<Hair?>() }
+    val gender by lazy { MutableLiveData<Gender?>() }
     val location by lazy { MutableLiveData<PlacePicker.Location?>() }
-    val age by lazy { MutableLiveData<Int?>(15) }
-    val height by lazy { MutableLiveData<Int?>(120) }
+    val age by lazy { MutableLiveData<Int?>() }
+    val height by lazy { MutableLiveData<Int?>() }
 
     val firstNameError by lazy { MutableLiveData<String?>() }
     val lastNameError by lazy { MutableLiveData<String?>() }
