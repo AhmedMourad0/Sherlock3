@@ -7,7 +7,7 @@ import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import kotlinx.serialization.*
 
 @Serializer(forClass = Either::class)
-class EitherSerializer<A, B>(
+class EitherSerializer<A : Any, B : Any>(
         private val leftSerializer: KSerializer<A?>,
         private val rightSerializer: KSerializer<B?>
 ) : KSerializer<Either<A?, B?>> {
@@ -24,12 +24,12 @@ class EitherSerializer<A, B>(
             encodeBooleanElement(descriptor, 0, value.isRight())
             when (value) {
                 is Either.Left -> {
-                    encodeNullableSerializableElement(descriptor, 1, leftSerializer, value.a)
-                    encodeNullableSerializableElement(descriptor, 2, rightSerializer, null)
+                    encodeNullableSerializableElement<A>(descriptor, 1, leftSerializer, value.a)
+                    encodeNullableSerializableElement<B>(descriptor, 2, rightSerializer, null)
                 }
                 is Either.Right -> {
-                    encodeNullableSerializableElement(descriptor, 1, leftSerializer, null)
-                    encodeNullableSerializableElement(descriptor, 2, rightSerializer, value.b)
+                    encodeNullableSerializableElement<A>(descriptor, 1, leftSerializer, null)
+                    encodeNullableSerializableElement<B>(descriptor, 2, rightSerializer, value.b)
                 }
             }.exhaust()
         }
@@ -44,8 +44,8 @@ class EitherSerializer<A, B>(
                 when (val i = decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> isRight = decodeBooleanElement(descriptor, i)
-                    1 -> a = decodeNullableSerializableElement(descriptor, i, leftSerializer)
-                    2 -> b = decodeNullableSerializableElement(descriptor, i, rightSerializer)
+                    1 -> a = decodeNullableSerializableElement<A>(descriptor, i, leftSerializer)
+                    2 -> b = decodeNullableSerializableElement<B>(descriptor, i, rightSerializer)
                     else -> throw SerializationException("Unknown index: $i")
                 }
             }
