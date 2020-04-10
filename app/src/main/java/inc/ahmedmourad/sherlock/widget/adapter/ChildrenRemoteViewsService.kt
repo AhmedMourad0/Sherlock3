@@ -8,16 +8,16 @@ import android.widget.RemoteViewsService
 import arrow.core.Tuple2
 import arrow.core.toMap
 import arrow.core.toTuple2
+import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRemoteViewsFactoryFactory
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.submodel.Weight
-import inc.ahmedmourad.sherlock.model.common.ParcelableWrapper
-import inc.ahmedmourad.sherlock.model.common.parcelize
+import kotlinx.serialization.builtins.MapSerializer
 import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
@@ -34,18 +34,12 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
         val hackBundle = requireNotNull(intent.getBundleExtra(EXTRA_HACK_BUNDLE))
 
         val children = requireNotNull(
-                hackBundle.getParcelableArrayList<ParcelableWrapper<SimpleRetrievedChild>>(EXTRA_CHILDREN)
-        ).map(ParcelableWrapper<SimpleRetrievedChild>::value)
-
-        val weights = requireNotNull(
-                hackBundle.getParcelableArrayList<ParcelableWrapper<Weight>>(EXTRA_WEIGHT)
-        ).map(ParcelableWrapper<Weight>::value)
-
-        require(children.size == weights.size)
+                hackBundle.getBundle(EXTRA_CHILDREN_RESULTS)
+        ).unbundle(MapSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
 
         return childrenRemoteViewsFactoryFactory(
                 applicationContext,
-                children.zip(weights).map(Pair<SimpleRetrievedChild, Weight>::toTuple2)
+                children.map(Map.Entry<SimpleRetrievedChild, Weight>::toTuple2)
         )
     }
 
@@ -53,15 +47,16 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
         /** This's as ridiculous as it looks, but it's the only way this works */
         const val EXTRA_HACK_BUNDLE = "inc.ahmedmourad.sherlock.external.adapter.extra.HACK_BUNDLE"
-        const val EXTRA_CHILDREN = "inc.ahmedmourad.sherlock.external.adapter.extra.CHILDREN"
-        const val EXTRA_WEIGHT = "inc.ahmedmourad.sherlock.external.adapter.extra.WEIGHT"
+        const val EXTRA_CHILDREN_RESULTS = "inc.ahmedmourad.sherlock.external.adapter.extra.CHILDREN_RESULTS"
 
         fun create(appWidgetId: Int, results: List<Tuple2<SimpleRetrievedChild, Weight>>): Intent {
 
             val resultsMap = results.toMap()
-            val hackBundle = Bundle(2).apply {
-                putParcelableArrayList(EXTRA_CHILDREN, ArrayList(resultsMap.keys.map(SimpleRetrievedChild::parcelize)))
-                putParcelableArrayList(EXTRA_WEIGHT, ArrayList(resultsMap.values.map(Weight::parcelize)))
+            val hackBundle = Bundle(1).apply {
+                putBundle(
+                        EXTRA_CHILDREN_RESULTS,
+                        resultsMap.bundle(MapSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
+                )
             }
 
             return Intent(appCtx, ChildrenRemoteViewsService::class.java).also { intent ->

@@ -14,14 +14,13 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavDeepLinkBuilder
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
 import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
-import inc.ahmedmourad.sherlock.model.common.ParcelableWrapper
-import inc.ahmedmourad.sherlock.model.common.parcelize
 import inc.ahmedmourad.sherlock.utils.backgroundContextChannelId
 import inc.ahmedmourad.sherlock.view.activity.MainActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -52,8 +51,8 @@ internal class SherlockService : Service() {
         when (intent.action) {
             ACTION_PUBLISH_CHILD -> handleActionPublishFound(
                     requireNotNull(
-                            intent.getParcelableExtra<ParcelableWrapper<AppPublishedChild>>(EXTRA_CHILD)
-                    ).value
+                            intent.getBundleExtra(EXTRA_CHILD)
+                    ).unbundle(AppPublishedChild.serializer())
             )
         }
 
@@ -230,7 +229,7 @@ internal class SherlockService : Service() {
 
         fun createIntent(child: AppPublishedChild) = Intent(appCtx, SherlockService::class.java).apply {
             action = ACTION_PUBLISH_CHILD
-            putExtra(EXTRA_CHILD, child.parcelize())
+            putExtra(EXTRA_CHILD, child.bundle(AppPublishedChild.serializer()))
         }
     }
 }
