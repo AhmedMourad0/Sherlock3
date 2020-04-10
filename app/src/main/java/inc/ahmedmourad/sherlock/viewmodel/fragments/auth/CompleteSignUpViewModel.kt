@@ -6,15 +6,17 @@ import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import inc.ahmedmourad.sherlock.domain.model.common.PicturePath
 import inc.ahmedmourad.sherlock.model.auth.AppCompletedUser
 import inc.ahmedmourad.sherlock.model.validators.auth.validateAppCompletedUser
 import inc.ahmedmourad.sherlock.model.validators.auth.validateDisplayName
 import inc.ahmedmourad.sherlock.model.validators.auth.validateEmail
 import inc.ahmedmourad.sherlock.model.validators.auth.validatePhoneNumber
+import inc.ahmedmourad.sherlock.model.validators.common.validatePicturePath
+import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
@@ -27,11 +29,12 @@ internal class CompleteSignUpViewModel(
     val displayName by lazy { MutableLiveData<String?>(incompleteUser.displayName?.value) }
     val phoneNumberCountryCode by lazy { MutableLiveData<String?>(incompleteUser.phoneNumber?.countryCode) }
     val phoneNumber by lazy { MutableLiveData<String?>(incompleteUser.phoneNumber?.number) }
-    val picturePath by lazy { MutableLiveData<PicturePath?>() }
+    val picturePath by lazy { MutableLiveData<ImagePicker.PicturePath?>() }
 
     val emailError by lazy { MutableLiveData<String?>() }
     val displayNameError by lazy { MutableLiveData<String?>() }
     val phoneNumberError by lazy { MutableLiveData<String?>() }
+    val picturePathError by lazy { MutableLiveData<String?>() }
     val userError by lazy { MutableLiveData<String?>() }
 
     fun onCompleteSignUp(): Single<Either<Throwable, SignedInUser>>? {
@@ -52,12 +55,16 @@ internal class CompleteSignUpViewModel(
                     phoneNumber.value
             ).mapLeft(phoneNumberError::setValue)
 
+            val (picturePath) = picturePath.value?.let {
+                validatePicturePath(it.value).mapLeft(picturePathError::setValue)
+            } ?: null.right()
+
             validateAppCompletedUser(
                     incompleteUser.id,
                     email,
                     displayName,
                     phoneNumber,
-                    picturePath.value
+                    picturePath
             ).mapLeft(userError::setValue).bind()
 
         }.orNull()

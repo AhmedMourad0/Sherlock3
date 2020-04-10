@@ -162,11 +162,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             "Parameter data is null!"
         }
 
-        imagePicker.get().handleActivityResult(requestCode, data) { pictureEither ->
-            pictureEither.fold(ifLeft = {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            }, ifRight = viewModel.picturePath::setValue)
-        }
+        imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
 
         super.onActivityResult(requestCode, resultCode, data)
     }
