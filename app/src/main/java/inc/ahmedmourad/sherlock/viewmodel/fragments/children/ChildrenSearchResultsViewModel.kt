@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import arrow.core.Either
-import arrow.core.Tuple2
 import arrow.core.left
 import inc.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactory
 import inc.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
@@ -24,7 +23,7 @@ internal class ChildrenSearchResultsViewModel(
 
     private val refreshSubject = PublishSubject.create<Unit>()
 
-    val searchResults: LiveData<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>> =
+    val searchResults: LiveData<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> =
             interactor(query, filterFactory(query))
                     .retryWhen { refreshSubject.toFlowable(BackpressureStrategy.LATEST) }
                     .onErrorReturn { it.left() }

@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import arrow.core.Either
-import arrow.core.Tuple2
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
 import inc.ahmedmourad.sherlock.dagger.modules.factories.ChildrenRemoteViewsServiceIntentFactory
@@ -52,7 +51,7 @@ internal class AppWidget : AppWidgetProvider() {
         return interactor()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ either: Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>> ->
+                .subscribe({ either: Either<Throwable, Map<SimpleRetrievedChild, Weight>> ->
 
                     val views = RemoteViews(context.packageName, R.layout.app_widget)
 

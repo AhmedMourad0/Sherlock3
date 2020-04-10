@@ -23,9 +23,9 @@ interface ChildrenRepository {
     fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>>
+    ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
-    fun findLastSearchResults(): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>>
+    fun findLastSearchResults(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
     fun test(): Tester
 

@@ -1,7 +1,6 @@
 package inc.ahmedmourad.sherlock.children.repository.dependencies
 
 import arrow.core.Either
-import arrow.core.Tuple2
 import inc.ahmedmourad.sherlock.domain.filter.Filter
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.model.children.PublishedChild
@@ -27,7 +26,7 @@ internal interface ChildrenRemoteRepository {
     fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, List<Tuple2<RetrievedChild, Weight>>>>
+    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>>
 
     fun clear(): Single<Either<Throwable, Unit>>
 }

@@ -17,13 +17,13 @@ private typealias OnChildClickListener = (Tuple2<SimpleRetrievedChild, Weight>) 
 
 internal typealias ChildrenRecyclerAdapterFactory =
         (@JvmSuppressWildcards OnChildClickListener) ->
-        @JvmSuppressWildcards DynamicRecyclerAdapter<List<Tuple2<SimpleRetrievedChild, Weight>>, *>
+        @JvmSuppressWildcards DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
 
 internal fun childrenRecyclerAdapterFactory(
         dateManager: Lazy<DateManager>,
         formatter: Lazy<Formatter>,
         onResultSelectedListener: (Tuple2<SimpleRetrievedChild, Weight>) -> Unit
-): DynamicRecyclerAdapter<List<Tuple2<SimpleRetrievedChild, Weight>>, *> {
+): DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *> {
     return ChildrenRecyclerAdapter(dateManager, formatter, onResultSelectedListener)
 }
 

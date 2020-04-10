@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import arrow.core.Tuple2
+import arrow.core.toT
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
@@ -19,10 +19,14 @@ import timber.log.error
 
 internal class ChildrenRemoteViewsFactory(
         private val context: Context,
-        private val results: List<Tuple2<SimpleRetrievedChild, Weight>>,
+        results: Map<SimpleRetrievedChild, Weight>,
         private val formatter: Lazy<Formatter>,
         private val dateManager: Lazy<DateManager>
 ) : RemoteViewsService.RemoteViewsFactory {
+
+    private val results = results.entries
+            .sortedByDescending { it.value.value }
+            .map { it.key toT it.value }
 
     override fun onCreate() {
 

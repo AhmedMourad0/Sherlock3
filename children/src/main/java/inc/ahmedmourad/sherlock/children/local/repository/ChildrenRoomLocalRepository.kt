@@ -14,8 +14,6 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import timber.log.error
 
 internal class ChildrenRoomLocalRepository(private val db: Lazy<SherlockDatabase>) : ChildrenLocalRepository {
 
@@ -30,7 +28,7 @@ internal class ChildrenRoomLocalRepository(private val db: Lazy<SherlockDatabase
                 .map(RoomChildEntity::toRetrievedChild)
     }
 
-    override fun findAllWithWeight(): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>> {
+    override fun findAllWithWeight(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
         return db.get()
                 .resultsDao()
                 .findAllWithWeight()
@@ -38,32 +36,25 @@ internal class ChildrenRoomLocalRepository(private val db: Lazy<SherlockDatabase
                 .observeOn(Schedulers.io())
                 .distinctUntilChanged()
                 .map { list ->
-                    list.mapNotNull { child ->
-                        child.simplify().getOrHandle {
-                            Timber.error(it, it::toString)
-                            null
-                        }
-                    }.mapNotNull { tuple ->
-                        tuple.b?.let { tuple.a toT it }
-                    }.right()
+                    list.mapNotNull(RoomChildEntity::simplify)
+                            .mapNotNull { tuple ->
+                                tuple.b?.let { tuple.a toT it }
+                            }.toMap().right()
                 }
     }
 
     override fun replaceAll(
-            results: List<Tuple2<RetrievedChild, Weight>>
-    ): Single<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight?>>>> {
+            results: Map<RetrievedChild, Weight>
+    ): Single<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
         return db.get()
                 .resultsDao()
-                .replaceAll(results.map(Tuple2<RetrievedChild, Weight>::toRoomChildEntity))
+                .replaceAll(results.map { (it.key toT it.value).toRoomChildEntity() })
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .toSingleDefault(results)
                 .map { newValues ->
-                    newValues.mapNotNull { (child, weight) ->
-                        child.toRoomChildEntity(weight).simplify().getOrHandle {
-                            Timber.error(it, it::toString)
-                            null
-                        }
+                    newValues.mapKeys { (child, _) ->
+                        child.simplify()
                     }.right()
                 }
     }

@@ -1,7 +1,6 @@
 package inc.ahmedmourad.sherlock.children.repository
 
 import arrow.core.*
-import arrow.core.extensions.tuple2.bifunctor.mapLeft
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.children.repository.dependencies.ChildrenImageRepository
 import inc.ahmedmourad.sherlock.children.repository.dependencies.ChildrenLocalRepository
@@ -90,7 +89,7 @@ internal class SherlockChildrenRepository(
     override fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>> {
+    ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
         return childrenRemoteRepository.get()
                 .findAll(query, filter)
                 .subscribeOn(Schedulers.io())
@@ -104,11 +103,8 @@ internal class SherlockChildrenRepository(
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(Schedulers.io())
                                 .map {
-                                    results.map { tuple ->
-                                        tuple.mapLeft(RetrievedChild::simplify)
-                                    }.map { tuple ->
-                                        tuple.a toT tuple.b
-                                    }.right()
+                                    results.mapKeys { (child, _) -> child.simplify() }
+                                            .right()
                                 }.toFlowable()
                     })
                 }.doOnSubscribe { notifyChildrenFindingStateChangeInteractor(BackgroundState.ONGOING) }
@@ -116,7 +112,7 @@ internal class SherlockChildrenRepository(
                 .doOnError { notifyChildrenFindingStateChangeInteractor(BackgroundState.FAILURE) }
     }
 
-    override fun findLastSearchResults(): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>> {
+    override fun findLastSearchResults(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
         return childrenLocalRepository.get()
                 .findAllWithWeight()
                 .subscribeOn(Schedulers.io())

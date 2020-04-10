@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import arrow.core.Tuple2
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.adapters.DynamicRecyclerAdapter
@@ -45,7 +44,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     @Inject
     internal lateinit var viewModelFactoryFactory: ChildrenSearchResultsViewModelFactoryFactory
 
-    private lateinit var adapter: DynamicRecyclerAdapter<List<Tuple2<SimpleRetrievedChild, Weight>>, *>
+    private lateinit var adapter: DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
 
     private val viewModel: ChildrenSearchResultsViewModel by viewModels {
         viewModelFactoryFactory(args.query.unbundle(ChildQuery.serializer()))

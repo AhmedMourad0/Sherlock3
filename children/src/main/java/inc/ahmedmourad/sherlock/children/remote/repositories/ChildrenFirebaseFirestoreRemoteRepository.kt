@@ -1,8 +1,11 @@
 package inc.ahmedmourad.sherlock.children.remote.repositories
 
 import androidx.annotation.VisibleForTesting
-import arrow.core.*
+import arrow.core.Either
 import arrow.core.extensions.fx
+import arrow.core.getOrHandle
+import arrow.core.left
+import arrow.core.right
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
@@ -167,7 +170,7 @@ internal class ChildrenFirebaseFirestoreRemoteRepository(
     override fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, List<Tuple2<RetrievedChild, Weight>>>> {
+    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>> {
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
@@ -193,9 +196,9 @@ internal class ChildrenFirebaseFirestoreRemoteRepository(
 
     private fun createFindAllFlowable(
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, List<Tuple2<RetrievedChild, Weight>>>> {
+    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>> {
 
-        return Flowable.create<Either<Throwable, List<Tuple2<RetrievedChild, Weight>>>>({ emitter ->
+        return Flowable.create<Either<Throwable, Map<RetrievedChild, Weight>>>({ emitter ->
 
             val snapshotListener = { snapshot: QuerySnapshot?, exception: FirebaseFirestoreException? ->
 

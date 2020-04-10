@@ -16,11 +16,11 @@ internal interface ChildrenLocalRepository {
             child: RetrievedChild
     ): Maybe<Either<Throwable, Tuple2<RetrievedChild, Weight?>>>
 
-    fun findAllWithWeight(): Flowable<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight>>>>
+    fun findAllWithWeight(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
     fun replaceAll(
-            results: List<Tuple2<RetrievedChild, Weight>>
-    ): Single<Either<Throwable, List<Tuple2<SimpleRetrievedChild, Weight?>>>>
+            results: Map<RetrievedChild, Weight>
+    ): Single<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
     fun clear(): Completable
 }

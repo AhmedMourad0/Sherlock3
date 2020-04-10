@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Tuple2
+import arrow.core.toT
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import dagger.Lazy
@@ -21,7 +22,7 @@ internal class ChildrenRecyclerAdapter(
         private val dateManager: Lazy<DateManager>,
         private val formatter: Lazy<Formatter>,
         private val onResultSelectedListener: (Tuple2<SimpleRetrievedChild, Weight>) -> Unit
-) : DynamicRecyclerAdapter<List<Tuple2<SimpleRetrievedChild, Weight>>, ChildrenRecyclerAdapter.ViewHolder>() {
+) : DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, ChildrenRecyclerAdapter.ViewHolder>() {
 
     private val resultsList = ArrayList<Tuple2<SimpleRetrievedChild, Weight>>()
 
@@ -33,9 +34,9 @@ internal class ChildrenRecyclerAdapter(
 
     override fun getItemCount() = resultsList.size
 
-    override fun update(items: List<Tuple2<SimpleRetrievedChild, Weight>>) {
+    override fun update(items: Map<SimpleRetrievedChild, Weight>) {
         resultsList.clear()
-        resultsList.addAll(items)
+        resultsList.addAll(items.entries.sortedByDescending { it.value.value }.map { it.key toT it.value })
         notifyDataSetChanged()
     }
 
