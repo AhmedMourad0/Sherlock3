@@ -1,20 +1,19 @@
 package inc.ahmedmourad.sherlock.view.fragments.auth
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.ResetPasswordViewModelQualifier
+import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.ResetPasswordViewModelFactoryFactoryQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentResetPasswordBinding
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
-import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.ResetPasswordViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -24,10 +23,10 @@ import javax.inject.Inject
 internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password), View.OnClickListener {
 
     @Inject
-    @field:ResetPasswordViewModelQualifier
-    internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    @field:ResetPasswordViewModelFactoryFactoryQualifier
+    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
-    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory }
+    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this, null) }
 
     private var sendEmailDisposable by disposable()
 
@@ -50,11 +49,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     private fun initializeEditTexts() {
         binding?.let { b ->
             b.emailEditText.setText(viewModel.email.value)
-            b.emailEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.email.value = s.toString()
-                }
-            })
+            b.emailEditText.doOnTextChanged { text, _, _, _ -> viewModel.onEmailInputChanged(text.toString()) }
         }
     }
 

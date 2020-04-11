@@ -1,8 +1,11 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
-import androidx.lifecycle.MutableLiveData
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.orNull
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
@@ -11,17 +14,23 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class ResetPasswordViewModel(
-        private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
+        private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
+        private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val email by lazy { MutableLiveData<String?>() }
+    val email: LiveData<String?> by lazy { savedStateHandle.getLiveData(KEY_EMAIL) }
 
-    val emailError by lazy { MutableLiveData<String?>() }
+    val emailError: LiveData<String?> by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL) }
+
+    fun onEmailInputChanged(newValue: String) {
+        savedStateHandle.set(KEY_EMAIL, newValue)
+    }
 
     fun onCompleteSignUp(): Single<Either<Throwable, Unit>>? {
         return validateEmail(email.value).bimap(
-                leftOperation = emailError::setValue,
-                rightOperation = {
+                leftOperation = {
+                    savedStateHandle.set(KEY_ERROR_EMAIL, it)
+                }, rightOperation = {
                     sendPasswordResetEmailInteractor(it)
                             .observeOn(AndroidSchedulers.mainThread())
                 }
@@ -29,13 +38,22 @@ internal class ResetPasswordViewModel(
     }
 
     class Factory(
-            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
-    ) : ViewModelProvider.NewInstanceFactory() {
+            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
+            owner: SavedStateRegistryOwner,
+            defaultArgs: Bundle?
+    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return ResetPasswordViewModel(
-                    sendPasswordResetEmailInteractor
+                    sendPasswordResetEmailInteractor,
+                    handle
             ) as T
         }
     }
+
+    companion object {
+        const val KEY_EMAIL = "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+        const val KEY_ERROR_EMAIL = "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+    }
 }
+
