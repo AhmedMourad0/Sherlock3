@@ -32,7 +32,7 @@ internal annotation class SignedInUserProfileViewModelQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class ResetPasswordViewModelQualifier
+internal annotation class ResetPasswordViewModelFactoryFactoryQualifier
 
 @Qualifier
 @Retention(RUNTIME)
