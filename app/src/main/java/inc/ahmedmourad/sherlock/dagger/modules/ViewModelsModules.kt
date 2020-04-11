@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.dagger.modules
 
 import androidx.lifecycle.ViewModelProvider
 import arrow.syntax.function.curried
+import arrow.syntax.function.partially1
 import arrow.syntax.function.partially2
 import dagger.Module
 import dagger.Provides
@@ -17,6 +18,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishing
 import inc.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import inc.ahmedmourad.sherlock.viewmodel.activity.MainActivityViewModel
 import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.*
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.*
 
@@ -86,12 +88,12 @@ internal object FindChildrenViewModelModule {
 internal object ResetPasswordViewModelModule {
     @Provides
     @Reusable
-    @ResetPasswordViewModelQualifier
+    @ResetPasswordViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
             sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
-    ): ViewModelProvider.NewInstanceFactory {
-        return ResetPasswordViewModel.Factory(
+    ): SimpleViewModelFactoryFactory {
+        return ResetPasswordViewModel::Factory.partially1(
                 sendPasswordResetEmailInteractor
         )
     }
