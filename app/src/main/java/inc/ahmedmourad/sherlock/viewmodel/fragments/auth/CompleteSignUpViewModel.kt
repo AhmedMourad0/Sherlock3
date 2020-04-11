@@ -29,7 +29,7 @@ internal class CompleteSignUpViewModel(
     val displayName by lazy { MutableLiveData<String?>(incompleteUser.displayName?.value) }
     val phoneNumberCountryCode by lazy { MutableLiveData<String?>(incompleteUser.phoneNumber?.countryCode) }
     val phoneNumber by lazy { MutableLiveData<String?>(incompleteUser.phoneNumber?.number) }
-    val picturePath by lazy { MutableLiveData<ImagePicker.PicturePath?>() }
+    val picturePath by lazy { MutableLiveData<ImagePicker.PicturePath?>(incompleteUser.pictureUrl?.value?.let(ImagePicker::PicturePath)) }
 
     val emailError by lazy { MutableLiveData<String?>() }
     val displayNameError by lazy { MutableLiveData<String?>() }
