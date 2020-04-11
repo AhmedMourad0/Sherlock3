@@ -41,8 +41,8 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
     companion object {
 
         /** This's as ridiculous as it looks, but it's the only way this works */
-        const val EXTRA_HACK_BUNDLE = "inc.ahmedmourad.sherlock.external.adapter.extra.HACK_BUNDLE"
-        const val EXTRA_CHILDREN_RESULTS = "inc.ahmedmourad.sherlock.external.adapter.extra.CHILDREN_RESULTS"
+        const val EXTRA_HACK_BUNDLE = "inc.ahmedmourad.sherlock.widget.adapter.extra.HACK_BUNDLE"
+        const val EXTRA_CHILDREN_RESULTS = "inc.ahmedmourad.sherlock.widget.adapter.extra.CHILDREN_RESULTS"
 
         fun create(appWidgetId: Int, results: Map<SimpleRetrievedChild, Weight>): Intent {
 
