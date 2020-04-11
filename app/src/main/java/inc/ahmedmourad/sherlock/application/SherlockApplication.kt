@@ -21,19 +21,17 @@ internal class SherlockApplication : MultiDexApplication() {
 *
 * Use Timber to its full potential (Crashlytics)
 *
-* SavedStateViewModel and DataBinding
-*
 * Dagger encapsulation with qualifiers
 *
 * * Package per feature
 *
-* replace exceptions with ADTs
+* replace exceptions with ADTs in interactors
 *
 * replace RxJava and Coroutines Flow with Monads and Functors for more abstraction
 *
 * The Dagger refactoring stage (Qualifier, Binding, SingleComponent, Kotlin initiative)
 *
-* Have a view model shared across the activity and all fragments that holds shared data such as signed in user and internet connectivity .. etc
+* testing
 *
 *  / ** Done ** /
 *
