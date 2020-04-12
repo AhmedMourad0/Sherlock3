@@ -1,6 +1,5 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
-import android.os.Bundle
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
@@ -18,11 +17,13 @@ internal class ResetPasswordViewModel(
         private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val email: LiveData<String?> by lazy { savedStateHandle.getLiveData(KEY_EMAIL) }
+    val email: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
 
-    val emailError: LiveData<String?> by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL) }
+    val emailError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
 
-    fun onEmailInputChanged(newValue: String) {
+    fun onEmailChange(newValue: String) {
         savedStateHandle.set(KEY_EMAIL, newValue)
     }
 
@@ -39,9 +40,8 @@ internal class ResetPasswordViewModel(
 
     class Factory(
             private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
-            owner: SavedStateRegistryOwner,
-            defaultArgs: Bundle?
-    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+            owner: SavedStateRegistryOwner
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return ResetPasswordViewModel(
@@ -52,8 +52,10 @@ internal class ResetPasswordViewModel(
     }
 
     companion object {
-        const val KEY_EMAIL = "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
-        const val KEY_ERROR_EMAIL = "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+        const val KEY_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+        const val KEY_ERROR_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
     }
 }
 

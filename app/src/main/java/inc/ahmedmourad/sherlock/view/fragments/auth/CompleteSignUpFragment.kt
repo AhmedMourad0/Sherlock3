@@ -3,9 +3,9 @@ package inc.ahmedmourad.sherlock.view.fragments.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -21,7 +21,6 @@ import inc.ahmedmourad.sherlock.databinding.FragmentCompleteSignUpBinding
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
-import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.CompleteSignUpViewModel
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.CompleteSignUpViewModelFactoryFactory
@@ -39,7 +38,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
     private val viewModel: CompleteSignUpViewModel by viewModels {
-        viewModelFactoryFactory(args.incompleteUser.unbundle(IncompleteUser.serializer()))
+        viewModelFactoryFactory(this, args.incompleteUser.unbundle(IncompleteUser.serializer()))
     }
 
     private var completeSignUpDisposable by disposable()
@@ -81,24 +80,18 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                     )
             )
 
-            b.displayNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.displayName.value = s.toString()
-                }
-            })
+            b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onDisplayNameChange(text.toString())
+            }
 
-            b.emailEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.email.value = s.toString()
-                }
-            })
+            b.emailEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onEmailChange(text.toString())
+            }
 
-            b.phoneNumberEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.phoneNumberCountryCode.value = ""
-                    viewModel.phoneNumber.value = s.toString()
-                }
-            })
+            b.phoneNumberEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onPhoneNumberCountryCodeChange("")
+                viewModel.onPhoneNumberChange(text.toString())
+            }
 
             if (viewModel.picturePath.value != null) {
                 Glide.with(appCtx)
@@ -162,7 +155,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             "Parameter data is null!"
         }
 
-        imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
+        imagePicker.get().handleActivityResult(requestCode, data, viewModel::onPicturePathChange)
 
         super.onActivityResult(requestCode, resultCode, data)
     }

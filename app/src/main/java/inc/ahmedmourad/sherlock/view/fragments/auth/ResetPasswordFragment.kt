@@ -26,7 +26,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     @field:ResetPasswordViewModelFactoryFactoryQualifier
     internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
-    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this, null) }
+    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this) }
 
     private var sendEmailDisposable by disposable()
 
@@ -49,7 +49,9 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     private fun initializeEditTexts() {
         binding?.let { b ->
             b.emailEditText.setText(viewModel.email.value)
-            b.emailEditText.doOnTextChanged { text, _, _, _ -> viewModel.onEmailInputChanged(text.toString()) }
+            b.emailEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onEmailChange(text.toString())
+            }
         }
     }
 
