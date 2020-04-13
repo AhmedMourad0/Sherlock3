@@ -146,6 +146,8 @@
 	<string name="phone_number_too_long">Phone number is too long</string>
 	<string name="phone_number_with_country_code">%1$s%2$s</string>
 	<string name="password_empty_or_blank">Password cannot be empty or whitespaces</string>
+	<string name="password_confirmation_empty_or_blank">Password cannot be empty or whitespaces</string>
+	<string name="password_confirmation_does_not_match">Password cannot be empty or whitespaces</string>
 	<string name="phone_number_empty_or_blank">Phone number cannot be empty or whitespaces</string>
 	<string name="password_too_short">Password cannot be shorter than %1$d characters</string>
 	<string name="password_no_capital_letters">Password must contain at least one capital letter</string>
