@@ -20,6 +20,7 @@ import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
 
+//TODO: take email as an optional argument
 internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password), View.OnClickListener {
 
     @Inject

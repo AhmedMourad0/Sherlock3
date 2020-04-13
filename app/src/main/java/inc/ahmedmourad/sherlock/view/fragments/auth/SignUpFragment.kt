@@ -3,13 +3,12 @@ package inc.ahmedmourad.sherlock.view.fragments.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import arrow.core.identity
@@ -18,13 +17,13 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignUpViewModelQualifier
+import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignUpViewModelFactoryFactoryQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentSignUpBinding
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
-import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.SignUpViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -34,13 +33,13 @@ import javax.inject.Inject
 internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClickListener {
 
     @Inject
-    @field:SignUpViewModelQualifier
-    internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    @field:SignUpViewModelFactoryFactoryQualifier
+    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
-    private val viewModel: SignUpViewModel by viewModels { viewModelFactory }
+    private val viewModel: SignUpViewModel by viewModels { viewModelFactory(this) }
 
     private var signUpDisposable by disposable()
 
@@ -77,35 +76,26 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
             b.confirmPasswordEditText.setText(viewModel.passwordConfirmation.value)
             b.phoneNumberEditText.setText(viewModel.phoneNumber.value)
 
-            b.displayNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.displayName.value = s.toString()
-                }
-            })
+            b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onDisplayNameChange(text.toString())
+            }
 
-            b.emailEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.email.value = s.toString()
-                }
-            })
+            b.emailEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onEmailChange(text.toString())
+            }
 
-            b.passwordEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.password.value = s.toString()
-                }
-            })
+            b.passwordEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onPasswordChange(text.toString())
+            }
 
-            b.confirmPasswordEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.passwordConfirmation.value = s.toString()
-                }
-            })
+            b.confirmPasswordEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onPasswordConfirmationChange(text.toString())
+            }
 
-            b.phoneNumberEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.phoneNumber.value = s.toString()
-                }
-            })
+            b.phoneNumberEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onPhoneNumberCountryCodeChange("")
+                viewModel.onPhoneNumberChange(text.toString())
+            }
         }
     }
 
@@ -181,7 +171,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
             "Parameter data is null!"
         }
 
-        imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
+        imagePicker.get().handleActivityResult(requestCode, data, viewModel::onPicturePathChange)
 
         super.onActivityResult(requestCode, resultCode, data)
     }

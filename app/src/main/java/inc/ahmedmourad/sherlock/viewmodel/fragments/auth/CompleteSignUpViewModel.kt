@@ -1,12 +1,17 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
 import android.os.Bundle
-import androidx.lifecycle.*
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
+import inc.ahmedmourad.sherlock.bundlizer.bundle
+import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import inc.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -26,7 +31,7 @@ internal class CompleteSignUpViewModel(
         private val completeSignUpInteractor: CompleteSignUpInteractor
 ) : ViewModel() {
 
-    private val id = savedStateHandle.get<String>(KEY_ID)?.let(::UserId)!!
+    private val id = savedStateHandle.get<Bundle>(KEY_ID)?.unbundle(UserId.serializer())!!
 
     val email: LiveData<String?>
             by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
@@ -160,7 +165,7 @@ internal class CompleteSignUpViewModel(
 
         fun defaultArgs(incompleteUser: IncompleteUser): Bundle {
             return Bundle(6).apply {
-                putString(KEY_ID, incompleteUser.id.value)
+                putBundle(KEY_ID, incompleteUser.id.bundle(UserId.serializer()))
                 putString(KEY_EMAIL, incompleteUser.email?.value)
                 putString(KEY_DISPLAY_NAME, incompleteUser.displayName?.value)
                 putString(KEY_PHONE_NUMBER_COUNTRY_CODE, incompleteUser.phoneNumber?.countryCode)
@@ -172,5 +177,5 @@ internal class CompleteSignUpViewModel(
 }
 
 internal typealias CompleteSignUpViewModelFactoryFactory =
-        (SavedStateRegistryOwner, @JvmSuppressWildcards IncompleteUser) ->
-        @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory
+        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards IncompleteUser) ->
+        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

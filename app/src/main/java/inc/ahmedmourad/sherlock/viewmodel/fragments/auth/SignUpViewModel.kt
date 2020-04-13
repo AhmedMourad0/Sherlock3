@@ -1,11 +1,12 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
-import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
 import inc.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
@@ -21,28 +22,72 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class SignUpViewModel(
+        private val savedStateHandle: SavedStateHandle,
         private val signUpInteractor: SignUpInteractor,
         private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
         private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
         private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
 ) : ViewModel() {
 
-    val password by lazy { MutableLiveData<String?>() }
-    val passwordConfirmation by lazy { MutableLiveData<String?>() }
-    val email by lazy { MutableLiveData<String?>() }
-    val displayName by lazy { MutableLiveData<String?>() }
-    val phoneNumberCountryCode by lazy { MutableLiveData<String?>() }
-    val phoneNumber by lazy { MutableLiveData<String?>() }
-    val picturePath by lazy { MutableLiveData<ImagePicker.PicturePath?>() }
+    val password: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD, null) }
+    val passwordConfirmation: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD_CONFIRMATION, null) }
+    val email: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+    val displayName: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_DISPLAY_NAME, null) }
+    val phoneNumberCountryCode: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
+    val phoneNumber: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER, null) }
+    val picturePath: LiveData<ImagePicker.PicturePath?>
+            by lazy { savedStateHandle.getLiveData(KEY_PICTURE_PATH, null) }
 
-    val passwordError by lazy { MutableLiveData<String?>() }
-    val passwordConfirmationError by lazy { MutableLiveData<String?>() }
-    val emailError by lazy { MutableLiveData<String?>() }
-    val credentialsError by lazy { MutableLiveData<String?>() }
-    val displayNameError by lazy { MutableLiveData<String?>() }
-    val phoneNumberError by lazy { MutableLiveData<String?>() }
-    val picturePathError by lazy { MutableLiveData<String?>() }
-    val userError by lazy { MutableLiveData<String?>() }
+    val passwordError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD, null) }
+    val passwordConfirmationError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD_CONFIRMATION, null) }
+    val emailError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+    val credentialsError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_CREDENTIALS, null) }
+    val displayNameError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_DISPLAY_NAME, null) }
+    val phoneNumberError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PHONE_NUMBER, null) }
+    val picturePathError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PICTURE_PATH, null) }
+    val userError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_USER, null) }
+
+    fun onPasswordChange(newValue: String?) {
+        savedStateHandle.set(KEY_PASSWORD, newValue)
+    }
+
+    fun onPasswordConfirmationChange(newValue: String?) {
+        savedStateHandle.set(KEY_PASSWORD_CONFIRMATION, newValue)
+    }
+
+    fun onEmailChange(newValue: String?) {
+        savedStateHandle.set(KEY_EMAIL, newValue)
+    }
+
+    fun onDisplayNameChange(newValue: String?) {
+        savedStateHandle.set(KEY_DISPLAY_NAME, newValue)
+    }
+
+    fun onPhoneNumberCountryCodeChange(newValue: String?) {
+        savedStateHandle.set(KEY_PHONE_NUMBER_COUNTRY_CODE, newValue)
+    }
+
+    fun onPhoneNumberChange(newValue: String?) {
+        savedStateHandle.set(KEY_PHONE_NUMBER, newValue)
+    }
+
+    fun onPicturePathChange(newValue: ImagePicker.PicturePath?) {
+        savedStateHandle.set(KEY_PICTURE_PATH, newValue)
+    }
 
     fun onSignUpWithGoogle() = signUpWithGoogleInteractor()
             .observeOn(AndroidSchedulers.mainThread())
@@ -62,26 +107,37 @@ internal class SignUpViewModel(
     private fun toAppSignUpUser(): AppSignUpUser? {
         return Either.fx<Unit, AppSignUpUser> {
 
-            val (email) = validateEmail(email.value).mapLeft(emailError::setValue)
-
-            val (password) = validatePassword(password.value).mapLeft(passwordError::setValue)
-
-            if (password.value != passwordConfirmation.value) {
-                passwordConfirmationError.value = ""
-                Unit.left().bind<AppSignUpUser>()
+            val (email) = validateEmail(email.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_EMAIL, it)
             }
 
-            val (credentials) = validateUserCredentials(email, password).mapLeft(credentialsError::setValue)
+            val (password) = validatePassword(password.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PASSWORD, it)
+            }
 
-            val (displayName) = validateDisplayName(displayName.value).mapLeft(displayNameError::setValue)
+            validatePasswordConfirmation(passwordConfirmation.value, password).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PASSWORD_CONFIRMATION, it)
+            }.bind()
+
+            val (credentials) = validateUserCredentials(email, password).mapLeft {
+                savedStateHandle.set(KEY_ERROR_CREDENTIALS, it)
+            }
+
+            val (displayName) = validateDisplayName(displayName.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, it)
+            }
 
             val (phoneNumber) = validatePhoneNumber(
                     phoneNumberCountryCode.value,
                     phoneNumber.value
-            ).mapLeft(phoneNumberError::setValue)
+            ).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
+            }
 
-            val (picturePath) = picturePath.value?.let {
-                validatePicturePath(it.value).mapLeft(picturePathError::setValue)
+            val (picturePath) = picturePath.value?.let { pp ->
+                validatePicturePath(pp.value).mapLeft {
+                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
+                }
             } ?: null.right()
 
             validateAppSignUpUser(
@@ -89,25 +145,64 @@ internal class SignUpViewModel(
                     displayName,
                     phoneNumber,
                     picturePath
-            ).mapLeft(userError::setValue).bind()
+            ).mapLeft {
+                savedStateHandle.set(KEY_ERROR_USER, it)
+            }.bind()
 
         }.orNull()
     }
 
     class Factory(
+            owner: SavedStateRegistryOwner,
             private val signUpInteractor: SignUpInteractor,
             private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
             private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
             private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
-    ) : ViewModelProvider.NewInstanceFactory() {
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return SignUpViewModel(
+                    handle,
                     signUpInteractor,
                     signUpWithGoogleInteractor,
                     signUpWithFacebookInteractor,
                     signUpWithTwitterInteractor
             ) as T
         }
+    }
+
+    companion object {
+
+        private const val KEY_PASSWORD =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PASSWORD"
+        private const val KEY_PASSWORD_CONFIRMATION =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PASSWORD_CONFIRMATION"
+        private const val KEY_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+        private const val KEY_DISPLAY_NAME =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.DISPLAY_NAME"
+        private const val KEY_PHONE_NUMBER_COUNTRY_CODE =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PHONE_NUMBER_COUNTRY_CODE"
+        private const val KEY_PHONE_NUMBER =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PHONE_NUMBER"
+        private const val KEY_PICTURE_PATH =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PICTURE_PATH"
+
+        private const val KEY_ERROR_PASSWORD =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_PASSWORD"
+        private const val KEY_ERROR_PASSWORD_CONFIRMATION =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_PASSWORD_CONFIRMATION"
+        private const val KEY_ERROR_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_EMAIL"
+        private const val KEY_ERROR_CREDENTIALS =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_CREDENTIALS"
+        private const val KEY_ERROR_DISPLAY_NAME =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_DISPLAY_NAME"
+        private const val KEY_ERROR_PHONE_NUMBER =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_PHONE_NUMBER"
+        private const val KEY_ERROR_PICTURE_PATH =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_PICTURE_PATH"
+        private const val KEY_ERROR_USER =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_USER"
     }
 }

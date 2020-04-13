@@ -1,8 +1,10 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
@@ -20,18 +22,32 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class SignInViewModel(
+        private val savedStateHandle: SavedStateHandle,
         private val signInInteractor: SignInInteractor,
         private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
         private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
         private val signInWithTwitterInteractor: SignInWithTwitterInteractor
 ) : ViewModel() {
 
-    val email by lazy { MutableLiveData<String?>() }
-    val password by lazy { MutableLiveData<String?>() }
+    val email: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+    val password: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD, null) }
 
-    val emailError by lazy { MutableLiveData<String?>() }
-    val passwordError by lazy { MutableLiveData<String?>() }
-    val credentailsError by lazy { MutableLiveData<String?>() }
+    val emailError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+    val passwordError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD, null) }
+    val credentialsError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData(KEY_ERROR_CREDENTIALS, null) }
+
+    fun onEmailChange(newValue: String?) {
+        savedStateHandle.set(KEY_EMAIL, newValue)
+    }
+
+    fun onPasswordChange(newValue: String?) {
+        savedStateHandle.set(KEY_PASSWORD, newValue)
+    }
 
     fun onSignInWithGoogle() = signInWithGoogleInteractor()
             .observeOn(AndroidSchedulers.mainThread())
@@ -51,32 +67,55 @@ internal class SignInViewModel(
     private fun toUserCredentials(): UserCredentials? {
         return Either.fx<Unit, UserCredentials> {
 
-            val (email) = validateEmail(email.value).mapLeft(emailError::setValue)
+            val (email) = validateEmail(email.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_EMAIL, it)
+            }
 
-            val (password) = validatePassword(password.value).mapLeft(passwordError::setValue)
+            val (password) = validatePassword(password.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PASSWORD, it)
+            }
 
             validateUserCredentials(
                     email,
                     password
-            ).mapLeft(credentailsError::setValue).bind()
+            ).mapLeft {
+                savedStateHandle.set(KEY_ERROR_CREDENTIALS, it)
+            }.bind()
 
         }.orNull()
     }
 
     class Factory(
+            owner: SavedStateRegistryOwner,
             private val signInInteractor: SignInInteractor,
             private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
             private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
             private val signInWithTwitterInteractor: SignInWithTwitterInteractor
-    ) : ViewModelProvider.NewInstanceFactory() {
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return SignInViewModel(
+                    handle,
                     signInInteractor,
                     signInWithGoogleInteractor,
                     signInWithFacebookInteractor,
                     signInWithTwitterInteractor
             ) as T
         }
+    }
+
+    companion object {
+
+        private const val KEY_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+        private const val KEY_PASSWORD =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.PASSWORD"
+
+        private const val KEY_ERROR_EMAIL =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_EMAIL"
+        private const val KEY_ERROR_PASSWORD =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_PASSWORD"
+        private const val KEY_ERROR_CREDENTIALS =
+                "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.ERROR_CREDENTIALS"
     }
 }

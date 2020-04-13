@@ -6,16 +6,16 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import arrow.core.identity
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignedInUserProfileViewModelQualifier
+import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.SignedInUserProfileViewModelFactoryFactoryQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentSignedInUserProfileBinding
 import inc.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import inc.ahmedmourad.sherlock.domain.platform.DateManager
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -28,10 +28,10 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     internal lateinit var dateManager: Lazy<DateManager>
 
     @Inject
-    @field:SignedInUserProfileViewModelQualifier
-    internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    @field:SignedInUserProfileViewModelFactoryFactoryQualifier
+    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
-    private val viewModel: SignedInUserProfileViewModel by viewModels { viewModelFactory }
+    private val viewModel: SignedInUserProfileViewModel by viewModels { viewModelFactory(this) }
 
     private var binding: FragmentSignedInUserProfileBinding? = null
 
