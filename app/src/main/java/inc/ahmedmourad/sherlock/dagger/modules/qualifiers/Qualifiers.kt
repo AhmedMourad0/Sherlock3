@@ -27,7 +27,7 @@ internal annotation class FindChildrenViewModelQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignedInUserProfileViewModelQualifier
+internal annotation class SignedInUserProfileViewModelFactoryFactoryQualifier
 
 @Qualifier
 @Retention(RUNTIME)
@@ -37,7 +37,7 @@ internal annotation class ResetPasswordViewModelFactoryFactoryQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignInViewModelQualifier
+internal annotation class SignInViewModelFactoryFactoryQualifier
 
 @Qualifier
 @Retention(RUNTIME)
