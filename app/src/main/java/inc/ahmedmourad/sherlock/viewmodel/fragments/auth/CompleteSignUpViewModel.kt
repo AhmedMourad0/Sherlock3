@@ -31,7 +31,7 @@ internal class CompleteSignUpViewModel(
         private val completeSignUpInteractor: CompleteSignUpInteractor
 ) : ViewModel() {
 
-    private val id = savedStateHandle.get<Bundle>(KEY_ID)?.unbundle(UserId.serializer())!!
+    private val id: UserId = savedStateHandle.get<Bundle>(KEY_ID)?.unbundle(UserId.serializer())!!
 
     val email: LiveData<String?>
             by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
