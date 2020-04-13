@@ -2,6 +2,7 @@ package inc.ahmedmourad.sherlock.model.validators.auth
 
 import arrow.core.Either
 import arrow.core.left
+import arrow.core.right
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.domain.model.auth.CompletedUser
 import inc.ahmedmourad.sherlock.domain.model.auth.SignUpUser
@@ -29,6 +30,19 @@ internal fun validatePassword(value: String?): Either<String, Password> {
     }
 
     return Password.of(value).mapLeft(Password.Exception::localizedMessage)
+}
+
+internal fun validatePasswordConfirmation(value: String?, password: Password): Either<String, Unit> {
+
+    if (value == null) {
+        return appCtx.getString(R.string.password_confirmation_empty_or_blank).left()
+    }
+
+    if (value != password.value) {
+        return appCtx.getString(R.string.password_confirmation_does_not_match).left()
+    }
+
+    return Unit.right()
 }
 
 internal fun validateDisplayName(value: String?): Either<String, DisplayName> {
