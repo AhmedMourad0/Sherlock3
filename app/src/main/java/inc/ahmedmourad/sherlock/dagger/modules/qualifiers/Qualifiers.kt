@@ -42,7 +42,7 @@ internal annotation class SignInViewModelFactoryFactoryQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignUpViewModelQualifier
+internal annotation class SignUpViewModelFactoryFactoryQualifier
 
 @Qualifier
 @Retention(RUNTIME)
