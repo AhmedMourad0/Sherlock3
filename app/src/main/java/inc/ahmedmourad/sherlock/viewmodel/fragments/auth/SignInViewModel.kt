@@ -49,6 +49,18 @@ internal class SignInViewModel(
         savedStateHandle.set(KEY_PASSWORD, newValue)
     }
 
+    fun onEmailErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_EMAIL, null)
+    }
+
+    fun onPasswordErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PASSWORD, null)
+    }
+
+    fun onCredentialsErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
+    }
+
     fun onSignInWithGoogle() = signInWithGoogleInteractor()
             .observeOn(AndroidSchedulers.mainThread())
 

@@ -27,6 +27,10 @@ internal class ResetPasswordViewModel(
         savedStateHandle.set(KEY_EMAIL, newValue)
     }
 
+    fun onEmailErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_EMAIL, null)
+    }
+
     fun onCompleteSignUp(): Single<Either<Throwable, Unit>>? {
         return validateEmail(email.value).bimap(
                 leftOperation = {

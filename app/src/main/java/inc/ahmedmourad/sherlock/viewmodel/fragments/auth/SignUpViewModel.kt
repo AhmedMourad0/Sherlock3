@@ -89,6 +89,38 @@ internal class SignUpViewModel(
         savedStateHandle.set(KEY_PICTURE_PATH, newValue)
     }
 
+    fun onPasswordErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PASSWORD, null)
+    }
+
+    fun onPasswordConfirmationErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PASSWORD_CONFIRMATION, null)
+    }
+
+    fun onEmailErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_EMAIL, null)
+    }
+
+    fun onCredentialsErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
+    }
+
+    fun onDisplayNameErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, null)
+    }
+
+    fun onPhoneNumberErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, null)
+    }
+
+    fun onPicturePathErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
+    }
+
+    fun onUserErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_USER, null)
+    }
+
     fun onSignUpWithGoogle() = signUpWithGoogleInteractor()
             .observeOn(AndroidSchedulers.mainThread())
 

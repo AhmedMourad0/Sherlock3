@@ -81,6 +81,26 @@ internal class CompleteSignUpViewModel(
         }
     }
 
+    fun onEmailErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_EMAIL, null)
+    }
+
+    fun onDisplayNameErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, null)
+    }
+
+    fun onPhoneNumberErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, null)
+    }
+
+    fun onPicturePathErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
+    }
+
+    fun onUserErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_USER, null)
+    }
+
     private fun toCompletedUser(): AppCompletedUser? {
         return Either.fx<Unit, AppCompletedUser> {
 
