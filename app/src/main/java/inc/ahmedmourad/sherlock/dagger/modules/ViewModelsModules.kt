@@ -1,9 +1,7 @@
 package inc.ahmedmourad.sherlock.dagger.modules
 
 import androidx.lifecycle.ViewModelProvider
-import arrow.syntax.function.curried
-import arrow.syntax.function.partially1
-import arrow.syntax.function.partially2
+import arrow.syntax.function.*
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -103,12 +101,12 @@ internal object ResetPasswordViewModelModule {
 internal object SignedInUserProfileViewModelModule {
     @Provides
     @Reusable
-    @SignedInUserProfileViewModelQualifier
+    @SignedInUserProfileViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
             @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
-    ): ViewModelProvider.NewInstanceFactory {
-        return SignedInUserProfileViewModel.Factory(
+    ): SimpleViewModelFactoryFactory {
+        return SignedInUserProfileViewModel::Factory.partially2(
                 observeSignedInUserInteractor
         )
     }
@@ -118,20 +116,20 @@ internal object SignedInUserProfileViewModelModule {
 internal object SignInViewModelModule {
     @Provides
     @Reusable
-    @SignInViewModelQualifier
+    @SignInViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
             signInInteractor: SignInInteractor,
             @SignInWithGoogleInteractorQualifier signInWithGoogleInteractor: SignInWithGoogleInteractor,
             @SignInWithFacebookInteractorQualifier signInWithFacebookInteractor: SignInWithFacebookInteractor,
             @SignInWithTwitterInteractorQualifier signInWithTwitterInteractor: SignInWithTwitterInteractor
-    ): ViewModelProvider.NewInstanceFactory {
-        return SignInViewModel.Factory(
-                signInInteractor,
-                signInWithGoogleInteractor,
-                signInWithFacebookInteractor,
-                signInWithTwitterInteractor
-        )
+    ): SimpleViewModelFactoryFactory {
+        return SignInViewModel::Factory.reverse()
+                .curried()
+                .invoke(signInWithTwitterInteractor)
+                .invoke(signInWithFacebookInteractor)
+                .invoke(signInWithGoogleInteractor)
+                .invoke(signInInteractor)
     }
 }
 
@@ -139,20 +137,20 @@ internal object SignInViewModelModule {
 internal object SignUpViewModelModule {
     @Provides
     @Reusable
-    @SignUpViewModelQualifier
+    @SignUpViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
             signUpInteractor: SignUpInteractor,
             @SignInWithGoogleInteractorQualifier signUpWithGoogleInteractor: SignInWithGoogleInteractor,
             @SignInWithFacebookInteractorQualifier signUpWithFacebookInteractor: SignInWithFacebookInteractor,
             @SignInWithTwitterInteractorQualifier signUpWithTwitterInteractor: SignInWithTwitterInteractor
-    ): ViewModelProvider.NewInstanceFactory {
-        return SignUpViewModel.Factory(
-                signUpInteractor,
-                signUpWithGoogleInteractor,
-                signUpWithFacebookInteractor,
-                signUpWithTwitterInteractor
-        )
+    ): SimpleViewModelFactoryFactory {
+        return SignUpViewModel::Factory.reverse()
+                .curried()
+                .invoke(signUpWithTwitterInteractor)
+                .invoke(signUpWithFacebookInteractor)
+                .invoke(signUpWithGoogleInteractor)
+                .invoke(signUpInteractor)
     }
 }
 
@@ -164,7 +162,7 @@ internal object CompleteSignUpViewModelModule {
     fun provide(
             completeSignUpInteractor: CompleteSignUpInteractor
     ): CompleteSignUpViewModelFactoryFactory {
-        return CompleteSignUpViewModel::Factory.partially2(completeSignUpInteractor)
+        return CompleteSignUpViewModel::Factory.partially3(completeSignUpInteractor)
     }
 }
 
