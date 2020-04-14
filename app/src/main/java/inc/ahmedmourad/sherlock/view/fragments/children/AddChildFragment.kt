@@ -3,14 +3,13 @@ package inc.ahmedmourad.sherlock.view.fragments.children
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -22,23 +21,19 @@ import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.bundlizer.bundle
 import inc.ahmedmourad.sherlock.bundlizer.unbundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.AddChildViewModelQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentAddChildBinding
-import inc.ahmedmourad.sherlock.domain.constants.Gender
-import inc.ahmedmourad.sherlock.domain.constants.Hair
-import inc.ahmedmourad.sherlock.domain.constants.PublishingState
-import inc.ahmedmourad.sherlock.domain.constants.Skin
+import inc.ahmedmourad.sherlock.domain.constants.*
 import inc.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import inc.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.utils.defaults.DefaultOnRangeChangedListener
-import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.colors.ColorSelector
 import inc.ahmedmourad.sherlock.utils.pickers.images.ImagePicker
 import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.AddChildViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.children.AddChildViewModelFactoryFactory
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
@@ -49,8 +44,7 @@ import kotlin.math.roundToInt
 internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.OnClickListener {
 
     @Inject
-    @field:AddChildViewModelQualifier
-    internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    internal lateinit var viewModelFactory: AddChildViewModelFactoryFactory
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>
@@ -62,7 +56,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private lateinit var hairColorSelector: ColorSelector<Hair>
 
     private val globalViewModel: GlobalViewModel by activityViewModels()
-    private val viewModel: AddChildViewModel by viewModels { viewModelFactory }
+    private val viewModel: AddChildViewModel by viewModels {
+        viewModelFactory(this, args.child?.unbundle(AppPublishedChild.serializer()))
+    }
 
     private val args: AddChildFragmentArgs by navArgs()
     private var binding: FragmentAddChildBinding? = null
@@ -93,27 +89,22 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 }
             }.exhaust()
         })
+
+        initializePictureImageView()
+        initializeLocationTextView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddChildBinding.bind(view)
 
-        val navigationChild = args.child?.unbundle(AppPublishedChild.serializer())
+        setUserInteractionsEnabled(args.child == null)
 
-        if (navigationChild != null) {
-            handleExternalNavigation(navigationChild)
-        } else {
-            setUserInteractionsEnabled(true)
-        }
-
-        arrayOf(::createSkinColorViews,
-                ::createHairColorViews,
-                ::initializeSeekBars,
-                ::initializeEditTexts,
-                ::initializeGenderRadioGroup,
-                ::initializePictureImageView,
-                ::initializeLocationTextView).forEach { it() }
+        initializeSkinColorViews()
+        initializeHairColorViews()
+        initializeSeekBars()
+        initializeEditTexts()
+        initializeGenderRadioGroup()
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
@@ -135,10 +126,6 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private fun publish() {
         setUserInteractionsEnabled(false)
         viewModel.onPublish()
-    }
-
-    private fun handleExternalNavigation(navigationChild: AppPublishedChild) {
-        viewModel.take(navigationChild)
     }
 
     private fun handlePublishingStateValue(value: PublishingState?) {
@@ -192,28 +179,30 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         binding?.publishButton?.isEnabled = enabled
     }
 
-    private fun createSkinColorViews() {
+    private fun initializeSkinColorViews() {
         binding?.let { b ->
             skinColorSelector = ColorSelector(
                     ColorSelector.newItem(Skin.WHITE, b.skin.skinWhite, R.color.colorSkinWhite),
                     ColorSelector.newItem(Skin.WHEAT, b.skin.skinWheat, R.color.colorSkinWheat),
                     ColorSelector.newItem(Skin.DARK, b.skin.skinDark, R.color.colorSkinDark),
-                    default = viewModel.skin.value ?: Skin.WHITE
+                    default = viewModel.skin.value?.let { findEnum(it, Skin.values()) }
+                            ?: Skin.WHITE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.skin.value = it }
+                onSelectionChangeListeners.add { viewModel.onSkinChange(it.value) }
             }
         }
     }
 
-    private fun createHairColorViews() {
+    private fun initializeHairColorViews() {
         binding?.let { b ->
             hairColorSelector = ColorSelector(
                     ColorSelector.newItem(Hair.BLONDE, b.hair.hairBlonde, R.color.colorHairBlonde),
                     ColorSelector.newItem(Hair.BROWN, b.hair.hairBrown, R.color.colorHairBrown),
                     ColorSelector.newItem(Hair.DARK, b.hair.hairDark, R.color.colorHairDark),
-                    default = viewModel.hair.value ?: Hair.BLONDE
+                    default = viewModel.hair.value?.let { findEnum(it, Hair.values()) }
+                            ?: Hair.BLONDE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.hair.value = it }
+                onSelectionChangeListeners.add { viewModel.onHairChange(it.value) }
             }
         }
     }
@@ -221,44 +210,40 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     //TODO: consider removing all listeners and using observe and onSaveInstanceState instead
     private fun initializeEditTexts() {
         binding?.let { b ->
+
             b.name.firstNameEditText.setText(viewModel.firstName.value)
             b.name.lastNameEditText.setText(viewModel.lastName.value)
             b.notesEditText.setText(viewModel.notes.value)
 
-            b.name.firstNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.firstName.value = s.toString()
-                }
-            })
+            b.name.firstNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onFirstNameChange(text.toString())
+            }
 
-            b.name.lastNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.lastName.value = s.toString()
-                }
-            })
+            b.name.lastNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onLastNameChange(text.toString())
+            }
 
-            b.notesEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.notes.value = s.toString()
-                }
-            })
+            b.notesEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onNotesChange(text.toString())
+            }
         }
     }
 
     private fun initializeGenderRadioGroup() {
         binding?.let { b ->
 
-            b.gender.genderRadioGroup.check(if (viewModel.gender.value == Gender.MALE)
-                R.id.male_radio_button
-            else
-                R.id.female_radio_button
-            )
+            when (viewModel.gender.value) {
+                Gender.MALE.value -> b.gender.genderRadioGroup.check(R.id.male_radio_button)
+                Gender.FEMALE.value -> b.gender.genderRadioGroup.check(R.id.female_radio_button)
+                null -> b.gender.genderRadioGroup.clearCheck()
+            }
 
             b.gender.genderRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                viewModel.gender.value = if (checkedId == R.id.male_radio_button)
-                    Gender.MALE
-                else
-                    Gender.FEMALE
+                viewModel.onGenderChange(if (checkedId == R.id.male_radio_button) {
+                    Gender.MALE.value
+                } else {
+                    Gender.FEMALE.value
+                })
             }
         }
     }
@@ -273,8 +258,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             )
             b.ageSeekBar.setOnRangeChangedListener(object : DefaultOnRangeChangedListener {
                 override fun onRangeChanged(view: RangeSeekBar, min: Float, max: Float, isFromUser: Boolean) {
-                    viewModel.minAge.value = min.roundToInt()
-                    viewModel.maxAge.value = max.roundToInt()
+                    viewModel.onMinAgeChange(min.roundToInt())
+                    viewModel.onMaxAgeChange(max.roundToInt())
                 }
             })
 
@@ -285,8 +270,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             )
             b.heightSeekBar.setOnRangeChangedListener(object : DefaultOnRangeChangedListener {
                 override fun onRangeChanged(view: RangeSeekBar?, min: Float, max: Float, isFromUser: Boolean) {
-                    viewModel.minHeight.value = min.roundToInt()
-                    viewModel.maxHeight.value = max.roundToInt()
+                    viewModel.onMinHeightChange(min.roundToInt())
+                    viewModel.onMaxHeightChange(max.roundToInt())
                 }
             })
         }
@@ -351,8 +336,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             "Parameter data is null!"
         }
 
-        placePicker.get().handleActivityResult(requestCode, data, viewModel.location::setValue)
-        imagePicker.get().handleActivityResult(requestCode, data, viewModel.picturePath::setValue)
+        placePicker.get().handleActivityResult(requestCode, data, viewModel::onLocationChange)
+        imagePicker.get().handleActivityResult(requestCode, data, viewModel::onPicturePathChange)
 
         super.onActivityResult(requestCode, resultCode, data)
     }

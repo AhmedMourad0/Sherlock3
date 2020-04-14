@@ -38,7 +38,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     internal lateinit var viewModelFactoryFactory: ChildDetailsViewModelFactoryFactory
 
     private val viewModel: ChildDetailsViewModel by viewModels {
-        viewModelFactoryFactory(args.childId.unbundle(ChildId.serializer()))
+        viewModelFactoryFactory(this, args.childId.unbundle(ChildId.serializer()))
     }
 
     private val args: ChildDetailsFragmentArgs by navArgs()

@@ -1,8 +1,10 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.left
@@ -15,7 +17,11 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 
-internal class ChildDetailsViewModel(childId: ChildId, interactor: FindChildInteractor) : ViewModel() {
+internal class ChildDetailsViewModel(
+        savedStateHandle: SavedStateHandle,
+        childId: ChildId,
+        interactor: FindChildInteractor
+) : ViewModel() {
 
     private val refreshSubject = PublishSubject.create<Unit>()
 
@@ -28,15 +34,17 @@ internal class ChildDetailsViewModel(childId: ChildId, interactor: FindChildInte
     fun onRefresh() = refreshSubject.onNext(Unit)
 
     internal class Factory(
+            owner: SavedStateRegistryOwner,
             private val childId: ChildId,
             private val interactor: FindChildInteractor
-    ) : ViewModelProvider.NewInstanceFactory() {
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ChildDetailsViewModel(childId, interactor) as T
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+            return ChildDetailsViewModel(handle, childId, interactor) as T
         }
     }
 }
 
 internal typealias ChildDetailsViewModelFactoryFactory =
-        (@JvmSuppressWildcards ChildId) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory
+        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards ChildId) ->
+        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

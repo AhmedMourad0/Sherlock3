@@ -190,7 +190,10 @@ internal class CompleteSignUpViewModel(
                 putString(KEY_DISPLAY_NAME, incompleteUser.displayName?.value)
                 putString(KEY_PHONE_NUMBER_COUNTRY_CODE, incompleteUser.phoneNumber?.countryCode)
                 putString(KEY_PHONE_NUMBER, incompleteUser.phoneNumber?.number)
-                putParcelable(KEY_PICTURE_PATH, incompleteUser.pictureUrl?.value?.let(ImagePicker::PicturePath))
+                putParcelable(
+                        KEY_PICTURE_PATH,
+                        incompleteUser.pictureUrl?.let(ImagePicker.PicturePath.Companion::from)
+                )
             }
         }
     }

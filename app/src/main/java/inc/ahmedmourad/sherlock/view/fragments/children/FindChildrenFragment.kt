@@ -3,31 +3,31 @@ package inc.ahmedmourad.sherlock.view.fragments.children
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import dagger.Lazy
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.bundlizer.bundle
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.FindChildrenViewModelQualifier
+import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.FindChildrenViewModelFactoryFactoryQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentFindChildrenBinding
 import inc.ahmedmourad.sherlock.domain.constants.Gender
 import inc.ahmedmourad.sherlock.domain.constants.Hair
 import inc.ahmedmourad.sherlock.domain.constants.Skin
+import inc.ahmedmourad.sherlock.domain.constants.findEnum
 import inc.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import inc.ahmedmourad.sherlock.domain.utils.exhaust
-import inc.ahmedmourad.sherlock.utils.defaults.DefaultTextWatcher
 import inc.ahmedmourad.sherlock.utils.pickers.colors.ColorSelector
 import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.children.FindChildrenViewModel
 import splitties.init.appCtx
 import timber.log.Timber
@@ -37,8 +37,8 @@ import javax.inject.Inject
 internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children), View.OnClickListener {
 
     @Inject
-    @field:FindChildrenViewModelQualifier
-    internal lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    @field:FindChildrenViewModelFactoryFactoryQualifier
+    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>
@@ -47,7 +47,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     private lateinit var hairColorSelector: ColorSelector<Hair>
 
     private val globalViewModel: GlobalViewModel by activityViewModels()
-    private val viewModel: FindChildrenViewModel by viewModels { viewModelFactory }
+    private val viewModel: FindChildrenViewModel by viewModels { viewModelFactory(this) }
 
     private var binding: FragmentFindChildrenBinding? = null
 
@@ -66,18 +66,19 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 }
             }.exhaust()
         })
+
+        initializeLocationTextView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFindChildrenBinding.bind(view)
 
-        arrayOf(::createSkinColorViews,
-                ::createHairColorViews,
-                ::initializeEditTexts,
-                ::initializeGenderRadioGroup,
-                ::initializeLocationTextView,
-                ::initializeNumberPickers).forEach { it() }
+        createSkinColorViews()
+        createHairColorViews()
+        initializeEditTexts()
+        initializeGenderRadioGroup()
+        initializeNumberPickers()
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
@@ -102,9 +103,10 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     ColorSelector.newItem(Skin.WHITE, b.skin.skinWhite, R.color.colorSkinWhite),
                     ColorSelector.newItem(Skin.WHEAT, b.skin.skinWheat, R.color.colorSkinWheat),
                     ColorSelector.newItem(Skin.DARK, b.skin.skinDark, R.color.colorSkinDark),
-                    default = viewModel.skin.value ?: Skin.WHITE
+                    default = viewModel.skin.value?.let { findEnum(it, Skin.values()) }
+                            ?: Skin.WHITE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.skin.value = it }
+                onSelectionChangeListeners.add { viewModel.onSkinChange(it.value) }
             }
         }
     }
@@ -115,9 +117,10 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     ColorSelector.newItem(Hair.BLONDE, b.hair.hairBlonde, R.color.colorHairBlonde),
                     ColorSelector.newItem(Hair.BROWN, b.hair.hairBrown, R.color.colorHairBrown),
                     ColorSelector.newItem(Hair.DARK, b.hair.hairDark, R.color.colorHairDark),
-                    default = viewModel.hair.value ?: Hair.BLONDE
+                    default = viewModel.hair.value?.let { findEnum(it, Hair.values()) }
+                            ?: Hair.BLONDE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.hair.value = it }
+                onSelectionChangeListeners.add { viewModel.onHairChange(it.value) }
             }
         }
     }
@@ -128,44 +131,48 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             b.name.firstNameEditText.setText(viewModel.firstName.value)
             b.name.lastNameEditText.setText(viewModel.lastName.value)
 
-            b.name.firstNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.firstName.value = s.toString()
-                }
-            })
+            b.name.firstNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onFirstNameChange(text.toString())
+            }
 
-            b.name.lastNameEditText.addTextChangedListener(object : DefaultTextWatcher {
-                override fun afterTextChanged(s: Editable) {
-                    viewModel.lastName.value = s.toString()
-                }
-            })
+            b.name.lastNameEditText.doOnTextChanged { text, _, _, _ ->
+                viewModel.onLastNameChange(text.toString())
+            }
         }
     }
 
     private fun initializeGenderRadioGroup() {
         binding?.let { b ->
 
-            b.gender.genderRadioGroup.check(if (viewModel.gender.value == Gender.MALE)
-                R.id.male_radio_button
-            else
-                R.id.female_radio_button
-            )
+            when (viewModel.gender.value) {
+                Gender.MALE.value -> b.gender.genderRadioGroup.check(R.id.male_radio_button)
+                Gender.FEMALE.value -> b.gender.genderRadioGroup.check(R.id.female_radio_button)
+                null -> b.gender.genderRadioGroup.clearCheck()
+            }
 
             b.gender.genderRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                viewModel.gender.value = if (checkedId == R.id.male_radio_button)
-                    Gender.MALE
-                else
-                    Gender.FEMALE
+                viewModel.onGenderChange(if (checkedId == R.id.male_radio_button) {
+                    Gender.MALE.value
+                } else {
+                    Gender.FEMALE.value
+                })
             }
         }
     }
 
     private fun initializeNumberPickers() {
         binding?.let { b ->
+
             b.ageNumberPicker.value = viewModel.age.value ?: 15
             b.heightNumberPicker.value = viewModel.height.value ?: 120
-            b.ageNumberPicker.setOnValueChangedListener { _, _, newVal -> viewModel.age.value = newVal }
-            b.heightNumberPicker.setOnValueChangedListener { _, _, newVal -> viewModel.height.value = newVal }
+
+            b.ageNumberPicker.setOnValueChangedListener { _, _, newVal ->
+                viewModel.onAgeChange(newVal)
+            }
+
+            b.heightNumberPicker.setOnValueChangedListener { _, _, newVal ->
+                viewModel.onHeightChange(newVal)
+            }
         }
     }
 
@@ -215,7 +222,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             "Parameter data is null!"
         }
 
-        placePicker.get().handleActivityResult(requestCode, data, viewModel.location::setValue)
+        placePicker.get().handleActivityResult(requestCode, data, viewModel::onLocationChange)
 
         super.onActivityResult(requestCode, resultCode, data)
     }

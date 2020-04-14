@@ -1,8 +1,10 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.children
 
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.left
 import inc.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactory
@@ -16,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 
 internal class ChildrenSearchResultsViewModel(
+        savedStateHandle: SavedStateHandle,
         interactor: FindChildrenInteractor,
         filterFactory: ChildrenFilterFactory,
         query: ChildQuery
@@ -33,16 +36,18 @@ internal class ChildrenSearchResultsViewModel(
     fun onRefresh() = refreshSubject.onNext(Unit)
 
     class Factory(
+            owner: SavedStateRegistryOwner,
             private val interactor: FindChildrenInteractor,
             private val filterFactory: ChildrenFilterFactory,
             private val query: ChildQuery
-    ) : ViewModelProvider.NewInstanceFactory() {
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ChildrenSearchResultsViewModel(interactor, filterFactory, query) as T
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+            return ChildrenSearchResultsViewModel(handle, interactor, filterFactory, query) as T
         }
     }
 }
 
 internal typealias ChildrenSearchResultsViewModelFactoryFactory =
-        (@JvmSuppressWildcards ChildQuery) -> @JvmSuppressWildcards ViewModelProvider.NewInstanceFactory
+        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards ChildQuery) ->
+        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

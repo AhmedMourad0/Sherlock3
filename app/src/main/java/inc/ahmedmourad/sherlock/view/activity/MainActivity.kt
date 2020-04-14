@@ -17,7 +17,6 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
 import inc.ahmedmourad.sherlock.R
@@ -36,6 +35,7 @@ import inc.ahmedmourad.sherlock.utils.hideSoftKeyboard
 import inc.ahmedmourad.sherlock.utils.singleTop
 import inc.ahmedmourad.sherlock.viewmodel.activity.MainActivityViewModel
 import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
+import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -44,11 +44,11 @@ internal class MainActivity : AppCompatActivity() {
 
     @Inject
     @field:MainActivityViewModelQualifier
-    lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
+    lateinit var viewModelFactory: SimpleViewModelFactoryFactory
 
     @Inject
     @field:GlobalViewModelQualifier
-    lateinit var globalViewModelFactory: ViewModelProvider.NewInstanceFactory
+    lateinit var globalViewModelFactory: SimpleViewModelFactoryFactory
 
     private var isContentShown = true
 
@@ -57,8 +57,8 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var appNavHostFragment: Fragment
     private lateinit var authNavHostFragment: Fragment
 
-    private val viewModel: MainActivityViewModel by viewModels { viewModelFactory }
-    private val globalViewModel: GlobalViewModel by viewModels { globalViewModelFactory }
+    private val viewModel: MainActivityViewModel by viewModels { viewModelFactory(this) }
+    private val globalViewModel: GlobalViewModel by viewModels { globalViewModelFactory(this) }
 
     private var signOutDisposable by disposable()
 

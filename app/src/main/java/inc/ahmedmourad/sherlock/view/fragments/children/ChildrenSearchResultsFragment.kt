@@ -47,7 +47,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     private lateinit var adapter: DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
 
     private val viewModel: ChildrenSearchResultsViewModel by viewModels {
-        viewModelFactoryFactory(args.query.unbundle(ChildQuery.serializer()))
+        viewModelFactoryFactory(this, args.query.unbundle(ChildQuery.serializer()))
     }
 
     private val args: ChildrenSearchResultsFragmentArgs by navArgs()

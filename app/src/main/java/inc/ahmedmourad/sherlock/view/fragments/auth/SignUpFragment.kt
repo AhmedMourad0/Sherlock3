@@ -48,13 +48,13 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusSignUpFragmentComponent().inject(this)
+        initializePictureImageView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignUpBinding.bind(view)
         initializeEditTexts()
-        initializePictureImageView()
         binding?.let { b ->
             arrayOf(b.pictureImageView,
                     b.pictureTextView,

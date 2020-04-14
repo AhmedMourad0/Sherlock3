@@ -1,8 +1,10 @@
 package inc.ahmedmourad.sherlock.viewmodel.common
 
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -15,6 +17,7 @@ import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class GlobalViewModel(
+        savedStateHandle: SavedStateHandle,
         observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
         observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
         observeSignedInUserInteractor: ObserveSignedInUserInteractor
@@ -41,13 +44,15 @@ internal class GlobalViewModel(
                     .toLiveData()
 
     class Factory(
+            owner: SavedStateRegistryOwner,
             private val observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
             private val observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
             private val observeSignedInUserInteractor: ObserveSignedInUserInteractor
-    ) : ViewModelProvider.NewInstanceFactory() {
+    ) : AbstractSavedStateViewModelFactory(owner, null) {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return GlobalViewModel(
+                    handle,
                     observeInternetConnectivityInteractor,
                     observeUserAuthStateInteractor,
                     observeSignedInUserInteractor

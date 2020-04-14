@@ -49,6 +49,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appCtx.findAppComponent().plusCompleteSignUpFragmentComponent().inject(this)
+        initializePictureImageView()
     }
 
     //TODO: sign out button
@@ -57,7 +58,6 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         binding = FragmentCompleteSignUpBinding.bind(view)
 
         initializeEditTexts()
-        initializePictureImageView()
 
         binding?.let { b ->
             arrayOf(b.pictureImageView,
