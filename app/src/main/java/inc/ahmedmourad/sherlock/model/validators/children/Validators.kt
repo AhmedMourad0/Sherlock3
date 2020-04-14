@@ -118,16 +118,34 @@ internal fun validateHeightNullable(value: Int?): Either<String, Height?> {
     }
 }
 
-internal fun validateGender(gender: Gender?): Either<String, Gender> {
-    return gender?.right() ?: appCtx.getString(R.string.gender_missing).left()
+internal fun validateGender(gender: Int?): Either<String, Gender> {
+
+    if (gender == null) {
+        return appCtx.getString(R.string.gender_missing).left()
+    }
+
+    return Gender.values().firstOrNull { it.value == gender }?.right()
+            ?: appCtx.getString(R.string.gender_missing).left()
 }
 
-internal fun validateSkin(skin: Skin?): Either<String, Skin> {
-    return skin?.right() ?: appCtx.getString(R.string.skin_color_missing).left()
+internal fun validateSkin(skin: Int?): Either<String, Skin> {
+
+    if (skin == null) {
+        return appCtx.getString(R.string.skin_color_missing).left()
+    }
+
+    return Skin.values().firstOrNull { it.value == skin }?.right()
+            ?: appCtx.getString(R.string.skin_color_missing).left()
 }
 
-internal fun validateHair(hair: Hair?): Either<String, Hair> {
-    return hair?.right() ?: appCtx.getString(R.string.hair_color_missing).left()
+internal fun validateHair(hair: Int?): Either<String, Hair> {
+
+    if (hair == null) {
+        return appCtx.getString(R.string.hair_color_missing).left()
+    }
+
+    return Hair.values().firstOrNull { it.value == hair }?.right()
+            ?: appCtx.getString(R.string.hair_color_missing).left()
 }
 
 internal fun validateCoordinates(latitude: Double, longitude: Double): Either<String, Coordinates> {
