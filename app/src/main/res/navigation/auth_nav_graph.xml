@@ -35,7 +35,12 @@
 		android:id="@+id/resetPasswordFragment"
 		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.ResetPasswordFragment"
 		android:label="ResetPasswordFragment"
-		tools:layout="@layout/fragment_reset_password" />
+		tools:layout="@layout/fragment_reset_password">
+		<argument
+			android:name="email"
+			app:argType="string"
+			app:nullable="true" />
+	</fragment>
 	<fragment
 		android:id="@+id/signedInUserProfileFragment"
 		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignedInUserProfileFragment"
