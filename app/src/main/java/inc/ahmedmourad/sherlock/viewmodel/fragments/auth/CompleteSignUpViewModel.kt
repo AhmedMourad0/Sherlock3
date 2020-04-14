@@ -75,12 +75,6 @@ internal class CompleteSignUpViewModel(
         savedStateHandle.set(KEY_PICTURE_PATH, newValue)
     }
 
-    fun onCompleteSignUp(): Single<Either<Throwable, SignedInUser>>? {
-        return toCompletedUser()?.let {
-            completeSignUpInteractor(it.toCompletedUser()).observeOn(AndroidSchedulers.mainThread())
-        }
-    }
-
     fun onEmailErrorDismissed() {
         savedStateHandle.set(KEY_ERROR_EMAIL, null)
     }
@@ -99,6 +93,12 @@ internal class CompleteSignUpViewModel(
 
     fun onUserErrorDismissed() {
         savedStateHandle.set(KEY_ERROR_USER, null)
+    }
+
+    fun onCompleteSignUp(): Single<Either<Throwable, SignedInUser>>? {
+        return toCompletedUser()?.let {
+            completeSignUpInteractor(it.toCompletedUser()).observeOn(AndroidSchedulers.mainThread())
+        }
     }
 
     private fun toCompletedUser(): AppCompletedUser? {
