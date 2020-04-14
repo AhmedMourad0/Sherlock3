@@ -8,7 +8,7 @@ import inc.ahmedmourad.sherlock.domain.interactors.auth.SignOutInteractor
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class MainActivityViewModel(
-        savedStateHandle: SavedStateHandle,
+        @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         signOutInteractor: SignOutInteractor
 ) : ViewModel() {
 

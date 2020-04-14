@@ -14,7 +14,7 @@ import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class SignedInUserProfileViewModel(
-        savedStateHandle: SavedStateHandle,
+        @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         interactor: ObserveSignedInUserInteractor
 ) : ViewModel() {
 

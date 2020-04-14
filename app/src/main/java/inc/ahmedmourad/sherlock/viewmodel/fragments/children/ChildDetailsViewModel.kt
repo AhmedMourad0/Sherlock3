@@ -18,7 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 
 internal class ChildDetailsViewModel(
-        savedStateHandle: SavedStateHandle,
+        @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         childId: ChildId,
         interactor: FindChildInteractor
 ) : ViewModel() {

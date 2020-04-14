@@ -17,7 +17,7 @@ import inc.ahmedmourad.sherlock.utils.toLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 internal class GlobalViewModel(
-        savedStateHandle: SavedStateHandle,
+        @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
         observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
         observeSignedInUserInteractor: ObserveSignedInUserInteractor
