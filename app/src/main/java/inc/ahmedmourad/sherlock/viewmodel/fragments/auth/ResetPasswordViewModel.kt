@@ -1,5 +1,6 @@
 package inc.ahmedmourad.sherlock.viewmodel.fragments.auth
 
+import android.os.Bundle
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
@@ -18,10 +19,10 @@ internal class ResetPasswordViewModel(
 ) : ViewModel() {
 
     val email: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
 
     val emailError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_EMAIL, null) }
 
     fun onEmailChange(newValue: String) {
         savedStateHandle.set(KEY_EMAIL, newValue)
@@ -44,8 +45,9 @@ internal class ResetPasswordViewModel(
 
     class Factory(
             private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
-            owner: SavedStateRegistryOwner
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
+            owner: SavedStateRegistryOwner,
+            email: String?
+    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs(email)) {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return ResetPasswordViewModel(
@@ -56,10 +58,22 @@ internal class ResetPasswordViewModel(
     }
 
     companion object {
+
         const val KEY_EMAIL =
                 "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
         const val KEY_ERROR_EMAIL =
                 "inc.ahmedmourad.sherlock.viewmodel.fragments.auth.key.EMAIL"
+
+        fun defaultArgs(email: String?): Bundle? {
+            return email?.let { e ->
+                Bundle(1).apply {
+                    putString(KEY_EMAIL, e)
+                }
+            }
+        }
     }
 }
 
+internal typealias ResetPasswordViewModelFactoryFactory =
+        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards String?) ->
+        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

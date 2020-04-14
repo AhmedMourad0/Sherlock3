@@ -7,14 +7,14 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import inc.ahmedmourad.sherlock.R
 import inc.ahmedmourad.sherlock.dagger.findAppComponent
-import inc.ahmedmourad.sherlock.dagger.modules.qualifiers.ResetPasswordViewModelFactoryFactoryQualifier
 import inc.ahmedmourad.sherlock.databinding.FragmentResetPasswordBinding
 import inc.ahmedmourad.sherlock.domain.model.common.disposable
-import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
 import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.ResetPasswordViewModel
+import inc.ahmedmourad.sherlock.viewmodel.fragments.auth.ResetPasswordViewModelFactoryFactory
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
@@ -24,10 +24,11 @@ import javax.inject.Inject
 internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password), View.OnClickListener {
 
     @Inject
-    @field:ResetPasswordViewModelFactoryFactoryQualifier
-    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    internal lateinit var viewModelFactory: ResetPasswordViewModelFactoryFactory
 
-    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this) }
+    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this, args.email) }
+
+    private val args: ResetPasswordFragmentArgs by navArgs()
 
     private var sendEmailDisposable by disposable()
 
