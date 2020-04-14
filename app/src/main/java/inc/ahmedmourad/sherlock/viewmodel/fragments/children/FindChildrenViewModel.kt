@@ -15,44 +15,44 @@ import inc.ahmedmourad.sherlock.utils.pickers.places.PlacePicker
 internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
     val firstName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_FIRST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_FIRST_NAME, null) }
     val lastName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_LAST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_LAST_NAME, null) }
     val skin: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_SKIN, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_SKIN, null) }
     val hair: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_HAIR, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_HAIR, null) }
     val gender: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_GENDER, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_GENDER, null) }
     val location: LiveData<PlacePicker.Location?>
-            by lazy { savedStateHandle.getLiveData(KEY_LOCATION, null) }
+            by lazy { savedStateHandle.getLiveData<PlacePicker.Location?>(KEY_LOCATION, null) }
     val age: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_AGE, null) }
     val height: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_HEIGHT, null) }
 
     val firstNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_FIRST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_FIRST_NAME, null) }
     val lastNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_LAST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_LAST_NAME, null) }
     val nameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_NAME, null) }
     val locationError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_LOCATION, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_LOCATION, null) }
     val ageError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_AGE, null) }
     val heightError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_HEIGHT, null) }
     val genderError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_GENDER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_GENDER, null) }
     val skinError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_SKIN, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_SKIN, null) }
     val hairError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_HAIR, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_HAIR, null) }
     val appearanceError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_APPEARANCE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_APPEARANCE, null) }
     val queryError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_QUERY, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_QUERY, null) }
 
     fun onFirstNameChange(newValue: String?) {
         savedStateHandle.set(KEY_FIRST_NAME, newValue)

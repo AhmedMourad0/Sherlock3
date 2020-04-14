@@ -30,16 +30,16 @@ internal class SignInViewModel(
 ) : ViewModel() {
 
     val email: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
     val password: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PASSWORD, null) }
 
     val emailError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_EMAIL, null) }
     val passwordError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PASSWORD, null) }
     val credentialsError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_CREDENTIALS, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_CREDENTIALS, null) }
 
     fun onEmailChange(newValue: String?) {
         savedStateHandle.set(KEY_EMAIL, newValue)

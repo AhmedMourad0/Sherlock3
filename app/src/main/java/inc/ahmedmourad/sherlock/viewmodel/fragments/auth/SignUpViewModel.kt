@@ -30,36 +30,36 @@ internal class SignUpViewModel(
 ) : ViewModel() {
 
     val password: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PASSWORD, null) }
     val passwordConfirmation: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PASSWORD_CONFIRMATION, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PASSWORD_CONFIRMATION, null) }
     val email: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
     val displayName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_DISPLAY_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_DISPLAY_NAME, null) }
     val phoneNumberCountryCode: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
     val phoneNumber: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER, null) }
     val picturePath: LiveData<ImagePicker.PicturePath?>
-            by lazy { savedStateHandle.getLiveData(KEY_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE_PATH, null) }
 
     val passwordError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PASSWORD, null) }
     val passwordConfirmationError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PASSWORD_CONFIRMATION, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PASSWORD_CONFIRMATION, null) }
     val emailError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_EMAIL, null) }
     val credentialsError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_CREDENTIALS, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_CREDENTIALS, null) }
     val displayNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_DISPLAY_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_DISPLAY_NAME, null) }
     val phoneNumberError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PHONE_NUMBER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PHONE_NUMBER, null) }
     val picturePathError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE_PATH, null) }
     val userError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_USER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
 
     fun onPasswordChange(newValue: String?) {
         savedStateHandle.set(KEY_PASSWORD, newValue)

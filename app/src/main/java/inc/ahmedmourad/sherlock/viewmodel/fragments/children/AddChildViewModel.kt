@@ -32,56 +32,56 @@ internal class AddChildViewModel(
 ) : ViewModel() {
 
     val firstName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_FIRST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_FIRST_NAME, null) }
     val lastName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_LAST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_LAST_NAME, null) }
     val skin: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_SKIN, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_SKIN, null) }
     val hair: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_HAIR, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_HAIR, null) }
     val gender: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_GENDER, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_GENDER, null) }
     val location: LiveData<PlacePicker.Location?>
-            by lazy { savedStateHandle.getLiveData(KEY_LOCATION, null) }
+            by lazy { savedStateHandle.getLiveData<PlacePicker.Location?>(KEY_LOCATION, null) }
     val minAge: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_MIN_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_MIN_AGE, null) }
     val maxAge: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_MAX_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_MAX_AGE, null) }
     val minHeight: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_MIN_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_MIN_HEIGHT, null) }
     val maxHeight: LiveData<Int?>
-            by lazy { savedStateHandle.getLiveData(KEY_MAX_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<Int?>(KEY_MAX_HEIGHT, null) }
     val notes: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_NOTES, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_NOTES, null) }
     val picturePath: LiveData<ImagePicker.PicturePath?>
-            by lazy { savedStateHandle.getLiveData(KEY_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE_PATH, null) }
 
     val firstNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_FIRST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_FIRST_NAME, null) }
     val lastNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_LAST_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_LAST_NAME, null) }
     val nameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_NAME, null) }
     val minAgeError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_MIN_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_MIN_AGE, null) }
     val maxAgeError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_MAX_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_MAX_AGE, null) }
     val locationError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_LOCATION, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_LOCATION, null) }
     val ageError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_AGE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_AGE, null) }
     val minHeightError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_MIN_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_MIN_HEIGHT, null) }
     val maxHeightError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_MAX_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_MAX_HEIGHT, null) }
     val heightError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_HEIGHT, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_HEIGHT, null) }
     val appearanceError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_APPEARANCE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_APPEARANCE, null) }
     val picturePathError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE_PATH, null) }
     val childError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_CHILD, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_CHILD, null) }
 
     fun onFirstNameChange(newValue: String?) {
         savedStateHandle.set(KEY_FIRST_NAME, newValue)

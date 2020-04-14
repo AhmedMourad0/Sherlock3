@@ -34,26 +34,26 @@ internal class CompleteSignUpViewModel(
     private val id: UserId = savedStateHandle.get<Bundle>(KEY_ID)?.unbundle(UserId.serializer())!!
 
     val email: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
     val displayName: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_DISPLAY_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_DISPLAY_NAME, null) }
     val phoneNumberCountryCode: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
     val phoneNumber: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_PHONE_NUMBER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER, null) }
     val picturePath: LiveData<ImagePicker.PicturePath?>
-            by lazy { savedStateHandle.getLiveData(KEY_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE_PATH, null) }
 
     val emailError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_EMAIL, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_EMAIL, null) }
     val displayNameError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_DISPLAY_NAME, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_DISPLAY_NAME, null) }
     val phoneNumberError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PHONE_NUMBER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PHONE_NUMBER, null) }
     val picturePathError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_PICTURE_PATH, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE_PATH, null) }
     val userError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData(KEY_ERROR_USER, null) }
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
 
     fun onEmailChange(newValue: String?) {
         savedStateHandle.set(KEY_EMAIL, newValue)
