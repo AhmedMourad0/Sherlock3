@@ -7,7 +7,7 @@
 	android:background="@color/colorPrimary"
 	android:clipChildren="false"
 	android:clipToPadding="false"
-	tools:context=".view.activity.MainActivity">
+	tools:context="dev.ahmedmourad.sherlock.android.view.activity.MainActivity">
 	
 	<androidx.coordinatorlayout.widget.CoordinatorLayout
 		android:id="@+id/backdrop_root"

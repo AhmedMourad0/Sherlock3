@@ -21,7 +21,7 @@ android {
 //    }
     compileSdkVersion 29
     defaultConfig {
-        applicationId "inc.ahmedmourad.sherlock"
+        applicationId "dev.ahmedmourad.sherlock.android"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1

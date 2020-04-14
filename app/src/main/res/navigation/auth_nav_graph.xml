@@ -7,7 +7,7 @@
 	
 	<fragment
 		android:id="@+id/signInFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignInFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.auth.SignInFragment"
 		android:label="SignInFragment"
 		tools:layout="@layout/fragment_sign_in">
 		<action
@@ -19,12 +19,12 @@
 	</fragment>
 	<fragment
 		android:id="@+id/signUpFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignUpFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.auth.SignUpFragment"
 		android:label="SignUpFragment"
 		tools:layout="@layout/fragment_sign_up" />
 	<fragment
 		android:id="@+id/completeSignUpFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.CompleteSignUpFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragment"
 		android:label="CompleteSignUpFragment"
 		tools:layout="@layout/fragment_complete_sign_up">
 		<argument
@@ -33,7 +33,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/resetPasswordFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.ResetPasswordFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.auth.ResetPasswordFragment"
 		android:label="ResetPasswordFragment"
 		tools:layout="@layout/fragment_reset_password">
 		<argument
@@ -43,7 +43,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/signedInUserProfileFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.auth.SignedInUserProfileFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.auth.SignedInUserProfileFragment"
 		android:label="SignedInUserProfileFragment"
 		tools:layout="@layout/fragment_signed_in_user_profile" />
 </navigation>

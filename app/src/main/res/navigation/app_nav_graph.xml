@@ -6,7 +6,7 @@
 	app:startDestination="@id/homeFragment">
 	<fragment
 		android:id="@+id/homeFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.HomeFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.HomeFragment"
 		android:label="HomeFragment"
 		tools:layout="@layout/fragment_home">
 		<action
@@ -18,7 +18,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/addChildFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.children.AddChildFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.children.AddChildFragment"
 		android:label="AddChildFragment"
 		tools:layout="@layout/fragment_add_child">
 		<argument
@@ -31,7 +31,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/findChildrenFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.children.FindChildrenFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.children.FindChildrenFragment"
 		android:label="FindChildrenFragment"
 		tools:layout="@layout/fragment_find_children">
 		<action
@@ -40,7 +40,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/childrenSearchResultsFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.children.ChildrenSearchResultsFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.children.ChildrenSearchResultsFragment"
 		android:label="ChildrenSearchResultsFragment"
 		tools:layout="@layout/fragment_children_search_results">
 		<argument
@@ -52,7 +52,7 @@
 	</fragment>
 	<fragment
 		android:id="@+id/childDetailsFragment"
-		android:name="inc.ahmedmourad.sherlock.view.fragments.children.ChildDetailsFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.children.ChildDetailsFragment"
 		android:label="ChildDetailsFragment"
 		tools:layout="@layout/fragment_child_details">
 		<argument

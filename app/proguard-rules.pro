@@ -22,17 +22,17 @@
 
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class inc.ahmedmourad.sherlock.domain.model.**$$serializer { *; }
--keep,includedescriptorclasses class inc.ahmedmourad.sherlock.model.**$$serializer { *; }
--keepclassmembers class inc.ahmedmourad.sherlock.domain.model.** {
+-keep,includedescriptorclasses class dev.ahmedmourad.sherlock.domain.model.**$$serializer { *; }
+-keep,includedescriptorclasses class dev.ahmedmourad.sherlock.android.model.**$$serializer { *; }
+-keepclassmembers class dev.ahmedmourad.sherlock.domain.model.** {
     *** Companion;
 }
--keepclassmembers class inc.ahmedmourad.sherlock.model.** {
+-keepclassmembers class dev.ahmedmourad.sherlock.android.model.** {
     *** Companion;
 }
--keepclasseswithmembers class inc.ahmedmourad.sherlock.domain.model.** {
+-keepclasseswithmembers class dev.ahmedmourad.sherlock.domain.model.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keepclasseswithmembers class inc.ahmedmourad.sherlock.model.** {
+-keepclasseswithmembers class dev.ahmedmourad.sherlock.android.model.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

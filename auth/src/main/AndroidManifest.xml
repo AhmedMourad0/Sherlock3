@@ -4,7 +4,7 @@
 	
 	<application>
 		
-		<activity android:name=".authenticator.activity.AuthSignInActivity" />
+		<activity android:name="dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity" />
 		
 		<meta-data
 			android:name="com.facebook.sdk.ApplicationId"

@@ -68,7 +68,7 @@
 				android:textColor="@android:color/black"
 				android:textSize="@dimen/findChildrenLabelTextSize" />
 			
-			<inc.ahmedmourad.sherlock.view.views.ProperNumberPicker
+			<dev.ahmedmourad.sherlock.android.view.views.ProperNumberPicker
 				android:id="@+id/age_number_picker"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
 				android:textColor="@android:color/black"
 				android:textSize="@dimen/findChildrenLabelTextSize" />
 			
-			<inc.ahmedmourad.sherlock.view.views.ProperNumberPicker
+			<dev.ahmedmourad.sherlock.android.view.views.ProperNumberPicker
 				android:id="@+id/height_number_picker"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
