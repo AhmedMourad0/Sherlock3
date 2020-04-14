@@ -33,6 +33,7 @@ import inc.ahmedmourad.sherlock.model.common.Connectivity
 import inc.ahmedmourad.sherlock.utils.findNavController
 import inc.ahmedmourad.sherlock.utils.hideSoftKeyboard
 import inc.ahmedmourad.sherlock.utils.singleTop
+import inc.ahmedmourad.sherlock.view.fragments.auth.CompleteSignUpFragmentArgs
 import inc.ahmedmourad.sherlock.viewmodel.activity.MainActivityViewModel
 import inc.ahmedmourad.sherlock.viewmodel.common.GlobalViewModel
 import inc.ahmedmourad.sherlock.viewmodel.factory.SimpleViewModelFactoryFactory
@@ -225,11 +226,11 @@ internal class MainActivity : AppCompatActivity() {
 
             }, ifRight = { either ->
                 either.fold(ifLeft = {
-                    val args = Bundle(1).apply {
-                        putBundle("incompleteUser", it.bundle(IncompleteUser.serializer()))
-                    }
-                    authNavController.navigate(R.id.completeSignUpFragment, args, singleTop())
-                    null
+                    authNavController.navigate(
+                            R.id.completeSignUpFragment,
+                            CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
+                            singleTop()
+                    )
                 }, ifRight = {
                     authNavController.navigate(R.id.signedInUserProfileFragment, null, singleTop())
                 })

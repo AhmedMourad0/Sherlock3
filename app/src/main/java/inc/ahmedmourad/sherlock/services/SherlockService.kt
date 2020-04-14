@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -23,6 +22,8 @@ import inc.ahmedmourad.sherlock.domain.model.ids.ChildId
 import inc.ahmedmourad.sherlock.model.children.AppPublishedChild
 import inc.ahmedmourad.sherlock.utils.backgroundContextChannelId
 import inc.ahmedmourad.sherlock.view.activity.MainActivity
+import inc.ahmedmourad.sherlock.view.fragments.children.AddChildFragmentArgs
+import inc.ahmedmourad.sherlock.view.fragments.children.ChildDetailsFragmentArgs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
@@ -30,7 +31,8 @@ import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
 
-//TODO: use WorkManager with Notifications (maybe ListenableWorker with progress?) and firebase authentication fallback instead
+//TODO: use WorkManager with Notifications (maybe ListenableWorker with progress?)
+// and firebase authentication fallback instead
 internal class SherlockService : Service() {
 
     @Inject
@@ -90,15 +92,11 @@ internal class SherlockService : Service() {
 
     private fun createPublishingNotification(child: AppPublishedChild): Notification {
 
-        val args = Bundle(1).apply {
-            putBundle("child", child.bundle(AppPublishedChild.serializer()))
-        }
-
         val pendingIntent = NavDeepLinkBuilder(applicationContext)
                 .setGraph(R.navigation.app_nav_graph)
                 .setDestination(R.id.addChildFragment)
                 .setComponentName(MainActivity::class.java)
-                .setArguments(args)
+                .setArguments(AddChildFragmentArgs(child.bundle(AppPublishedChild.serializer())).toBundle())
                 .createPendingIntent()
 
         val name = child.name
@@ -125,16 +123,11 @@ internal class SherlockService : Service() {
     private fun showPublishedSuccessfullyNotification(child: SimpleRetrievedChild?) {
 
         val pendingIntent = child?.let {
-
-            val args = Bundle(1).apply {
-                putBundle("childId", it.id.bundle(ChildId.serializer()))
-            }
-
             NavDeepLinkBuilder(applicationContext)
                     .setGraph(R.navigation.app_nav_graph)
                     .setDestination(R.id.childDetailsFragment)
                     .setComponentName(MainActivity::class.java)
-                    .setArguments(args)
+                    .setArguments(ChildDetailsFragmentArgs(it.id.bundle(ChildId.serializer())).toBundle())
                     .createPendingIntent()
         }
 
