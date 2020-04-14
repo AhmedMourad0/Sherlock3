@@ -17,12 +17,7 @@ internal annotation class MainActivityViewModelQualifier
 @Qualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class AddChildViewModelQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class FindChildrenViewModelQualifier
+internal annotation class FindChildrenViewModelFactoryFactoryQualifier
 
 @Qualifier
 @Retention(RUNTIME)
@@ -43,46 +38,6 @@ internal annotation class SignInViewModelFactoryFactoryQualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
 internal annotation class SignUpViewModelFactoryFactoryQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class AddChildControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class FindChildrenControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class ResetPasswordControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignedInUserProfileControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class HomeControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class AddChildControllerIntentQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignInControllerQualifier
-
-@Qualifier
-@Retention(RUNTIME)
-@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
-internal annotation class SignUpControllerQualifier
 
 @Qualifier
 @Retention(RUNTIME)
