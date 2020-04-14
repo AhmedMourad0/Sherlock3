@@ -136,7 +136,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
             R.id.forgot_password_text_view -> {
                 findNavController().navigate(
                         SignInFragmentDirections
-                                .actionSignInFragmentToResetPasswordFragment()
+                                .actionSignInFragmentToResetPasswordFragment(viewModel.email.value)
                 )
             }
         }
