@@ -82,11 +82,10 @@ internal object FindChildrenViewModelModule {
 internal object ResetPasswordViewModelModule {
     @Provides
     @Reusable
-    @ResetPasswordViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
             sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
-    ): SimpleViewModelFactoryFactory {
+    ): ResetPasswordViewModelFactoryFactory {
         return ResetPasswordViewModel::Factory.partially1(
                 sendPasswordResetEmailInteractor
         )
