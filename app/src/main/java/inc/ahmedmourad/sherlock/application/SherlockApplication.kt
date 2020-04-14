@@ -29,7 +29,7 @@ internal class SherlockApplication : MultiDexApplication() {
 *
 * replace RxJava and Coroutines Flow with Monads and Functors for more abstraction
 *
-* The Dagger refactoring stage (Qualifier, Binding, SingleComponent, Kotlin initiative)
+* The Dagger refactoring stage (Qualifier, Binding, SingleComponent, providers, Kotlin initiative)
 *
 * testing
 *
