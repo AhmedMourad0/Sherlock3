@@ -10,8 +10,10 @@ import io.reactivex.Flowable
 typealias FindLastSearchResultsInteractor =
         () -> @JvmSuppressWildcards Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
-internal fun findLastSearchResults(
-        childrenRepository: Lazy<ChildrenRepository>
-): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-    return childrenRepository.get().findLastSearchResults()
+internal class FindLastSearchResultsInteractorImpl(
+        private val childrenRepository: Lazy<ChildrenRepository>
+) : FindLastSearchResultsInteractor {
+    override fun invoke(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+        return childrenRepository.get().findLastSearchResults()
+    }
 }

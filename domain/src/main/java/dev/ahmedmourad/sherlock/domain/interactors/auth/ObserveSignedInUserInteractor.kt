@@ -10,8 +10,10 @@ import io.reactivex.Flowable
 typealias ObserveSignedInUserInteractor =
         () -> @JvmSuppressWildcards Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun observeSignedInUser(
-        authManager: Lazy<AuthManager>
-): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().observeSignedInUser()
+internal class ObserveSignedInUserInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : ObserveSignedInUserInteractor {
+    override fun invoke(): Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get().observeSignedInUser()
+    }
 }

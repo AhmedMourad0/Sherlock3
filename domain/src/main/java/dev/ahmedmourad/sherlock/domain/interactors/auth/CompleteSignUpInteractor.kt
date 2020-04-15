@@ -10,9 +10,10 @@ import io.reactivex.Single
 typealias CompleteSignUpInteractor =
         (@JvmSuppressWildcards CompletedUser) -> @JvmSuppressWildcards Single<Either<Throwable, SignedInUser>>
 
-internal fun completeSignUp(
-        authManager: Lazy<AuthManager>,
-        completedUser: CompletedUser
-): Single<Either<Throwable, SignedInUser>> {
-    return authManager.get().completeSignUp(completedUser)
+internal class CompleteSignUpInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : CompleteSignUpInteractor {
+    override fun invoke(completedUser: CompletedUser): Single<Either<Throwable, SignedInUser>> {
+        return authManager.get().completeSignUp(completedUser)
+    }
 }

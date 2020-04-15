@@ -10,9 +10,10 @@ import io.reactivex.Single
 typealias SignUpInteractor =
         (@JvmSuppressWildcards SignUpUser) -> @JvmSuppressWildcards Single<Either<Throwable, SignedInUser>>
 
-internal fun signUp(
-        authManager: Lazy<AuthManager>,
-        user: SignUpUser
-): Single<Either<Throwable, SignedInUser>> {
-    return authManager.get().signUp(user)
+internal class SignUpInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SignUpInteractor {
+    override fun invoke(user: SignUpUser): Single<Either<Throwable, SignedInUser>> {
+        return authManager.get().signUp(user)
+    }
 }

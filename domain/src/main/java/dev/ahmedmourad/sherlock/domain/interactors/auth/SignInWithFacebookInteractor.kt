@@ -10,8 +10,10 @@ import io.reactivex.Single
 typealias SignInWithFacebookInteractor =
         () -> @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun signInWithFacebook(
-        authManager: Lazy<AuthManager>
-): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().signInWithFacebook()
+internal class SignInWithFacebookInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SignInWithFacebookInteractor {
+    override fun invoke(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get().signInWithFacebook()
+    }
 }

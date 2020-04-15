@@ -12,9 +12,12 @@ typealias SignInInteractor =
         (@JvmSuppressWildcards UserCredentials) ->
         @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun signIn(
-        authManager: Lazy<AuthManager>,
-        credentials: UserCredentials
-): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().signIn(credentials)
+internal class SignInInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SignInInteractor {
+    override fun invoke(
+            credentials: UserCredentials
+    ): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get().signIn(credentials)
+    }
 }

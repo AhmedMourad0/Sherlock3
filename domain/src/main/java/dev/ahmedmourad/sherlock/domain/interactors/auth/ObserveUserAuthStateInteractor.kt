@@ -6,6 +6,10 @@ import io.reactivex.Flowable
 
 typealias ObserveUserAuthStateInteractor = () -> @JvmSuppressWildcards Flowable<Boolean>
 
-internal fun observeUserAuthState(authManager: Lazy<AuthManager>): Flowable<Boolean> {
-    return authManager.get().observeUserAuthState()
+internal class ObserveUserAuthStateInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : ObserveUserAuthStateInteractor {
+    override fun invoke(): Flowable<Boolean> {
+        return authManager.get().observeUserAuthState()
+    }
 }

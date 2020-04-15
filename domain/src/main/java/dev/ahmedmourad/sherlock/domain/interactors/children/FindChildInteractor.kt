@@ -13,9 +13,10 @@ typealias FindChildInteractor =
         (@JvmSuppressWildcards ChildId) ->
         @JvmSuppressWildcards Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>>
 
-internal fun findChild(
-        childrenRepository: Lazy<ChildrenRepository>,
-        childId: ChildId
-): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
-    return childrenRepository.get().find(childId)
+internal class FindChildInteractorImpl(
+        private val childrenRepository: Lazy<ChildrenRepository>
+) : FindChildInteractor {
+    override fun invoke(childId: ChildId): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
+        return childrenRepository.get().find(childId)
+    }
 }

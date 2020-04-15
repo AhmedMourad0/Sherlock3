@@ -8,11 +8,16 @@ import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import io.reactivex.Single
 
-typealias CheckChildPublishingStateInteractor = () -> @JvmSuppressWildcards Single<Option<PublishingState>>
+typealias CheckChildPublishingStateInteractor =
+        () -> @JvmSuppressWildcards Single<Option<PublishingState>>
 
-internal fun checkChildPublishingState(bus: Lazy<Bus>): Single<Option<PublishingState>> {
-    return bus.get()
-            .childPublishingState
-            .map { it.some() }
-            .last(none())
+internal class CheckChildPublishingStateInteractorImpl(
+        private val bus: Lazy<Bus>
+) : CheckChildPublishingStateInteractor {
+    override fun invoke(): Single<Option<PublishingState>> {
+        return bus.get()
+                .childPublishingState
+                .map { it.some() }
+                .last(none())
+    }
 }

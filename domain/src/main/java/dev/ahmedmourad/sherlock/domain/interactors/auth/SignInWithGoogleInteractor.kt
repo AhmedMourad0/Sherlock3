@@ -10,8 +10,10 @@ import io.reactivex.Single
 typealias SignInWithGoogleInteractor =
         () -> @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun signInWithGoogle(
-        authManager: Lazy<AuthManager>
-): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().signInWithGoogle()
+internal class SignInWithGoogleInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SignInWithGoogleInteractor {
+    override fun invoke(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get().signInWithGoogle()
+    }
 }

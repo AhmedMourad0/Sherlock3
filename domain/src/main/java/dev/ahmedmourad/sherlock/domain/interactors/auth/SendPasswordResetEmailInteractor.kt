@@ -8,9 +8,10 @@ import io.reactivex.Single
 
 typealias SendPasswordResetEmailInteractor = (@JvmSuppressWildcards Email) -> @JvmSuppressWildcards Single<Either<Throwable, Unit>>
 
-internal fun sendPasswordResetEmail(
-        authManager: Lazy<AuthManager>,
-        email: Email
-): Single<Either<Throwable, Unit>> {
-    return authManager.get().sendPasswordResetEmail(email)
+internal class SendPasswordResetEmailInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SendPasswordResetEmailInteractor {
+    override fun invoke(email: Email): Single<Either<Throwable, Unit>> {
+        return authManager.get().sendPasswordResetEmail(email)
+    }
 }

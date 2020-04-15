@@ -10,8 +10,10 @@ import io.reactivex.Single
 typealias SignInWithTwitterInteractor =
         () -> @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal fun signInWithTwitter(
-        authManager: Lazy<AuthManager>
-): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-    return authManager.get().signInWithTwitter()
+internal class SignInWithTwitterInteractorImpl(
+        private val authManager: Lazy<AuthManager>
+) : SignInWithTwitterInteractor {
+    override fun invoke(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get().signInWithTwitter()
+    }
 }

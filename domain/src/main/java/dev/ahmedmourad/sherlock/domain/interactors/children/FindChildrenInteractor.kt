@@ -14,10 +14,13 @@ typealias FindChildrenInteractor =
         (@JvmSuppressWildcards ChildQuery, @JvmSuppressWildcards Filter<RetrievedChild>) ->
         @JvmSuppressWildcards Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
-internal fun findChildren(
-        childrenRepository: Lazy<ChildrenRepository>,
-        query: ChildQuery,
-        filter: Filter<RetrievedChild>
-): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-    return childrenRepository.get().findAll(query, filter)
+internal class FindChildrenInteractorImpl(
+        private val childrenRepository: Lazy<ChildrenRepository>
+) : FindChildrenInteractor {
+    override fun invoke(
+            query: ChildQuery,
+            filter: Filter<RetrievedChild>
+    ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+        return childrenRepository.get().findAll(query, filter)
+    }
 }

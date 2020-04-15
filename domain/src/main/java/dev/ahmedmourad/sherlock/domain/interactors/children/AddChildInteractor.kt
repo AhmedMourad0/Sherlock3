@@ -11,6 +11,10 @@ typealias AddChildInteractor =
         (@JvmSuppressWildcards PublishedChild) ->
         @JvmSuppressWildcards Single<Either<Throwable, RetrievedChild>>
 
-internal fun addChild(childrenRepository: Lazy<ChildrenRepository>, child: PublishedChild): Single<Either<Throwable, RetrievedChild>> {
-    return childrenRepository.get().publish(child)
+internal class AddChildInteractorImpl(
+        private val childrenRepository: Lazy<ChildrenRepository>
+) : AddChildInteractor {
+    override fun invoke(child: PublishedChild): Single<Either<Throwable, RetrievedChild>> {
+        return childrenRepository.get().publish(child)
+    }
 }
