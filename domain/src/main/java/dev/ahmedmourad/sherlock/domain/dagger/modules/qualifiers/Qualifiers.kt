@@ -48,3 +48,8 @@ annotation class ObserveUserAuthStateInteractorQualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
 annotation class ObserveInternetConnectivityInteractorQualifier
+
+@Qualifier
+@Retention(RUNTIME)
+@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+internal annotation class InternalApi
