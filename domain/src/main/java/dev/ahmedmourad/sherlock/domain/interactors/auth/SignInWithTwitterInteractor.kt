@@ -9,8 +9,8 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SignInWithTwitterInteractor =
-        () -> @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+interface SignInWithTwitterInteractor :
+        () -> Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
 @Reusable
 internal class SignInWithTwitterInteractorImpl @Inject constructor(

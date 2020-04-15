@@ -6,8 +6,7 @@ import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias ObserveInternetConnectivityInteractor =
-        () -> @JvmSuppressWildcards Flowable<Boolean>
+interface ObserveInternetConnectivityInteractor : () -> Flowable<Boolean>
 
 @Reusable
 internal class ObserveInternetConnectivityInteractorImpl @Inject constructor(

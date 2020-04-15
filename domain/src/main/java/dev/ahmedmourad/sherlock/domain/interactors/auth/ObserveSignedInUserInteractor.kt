@@ -9,8 +9,8 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias ObserveSignedInUserInteractor =
-        () -> @JvmSuppressWildcards Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+interface ObserveSignedInUserInteractor :
+        () -> Flowable<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
 @Reusable
 internal class ObserveSignedInUserInteractorImpl @Inject constructor(

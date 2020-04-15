@@ -7,8 +7,7 @@ import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import javax.inject.Inject
 
-typealias NotifyChildPublishingStateChangeInteractor =
-        (@JvmSuppressWildcards PublishingState) -> @JvmSuppressWildcards Unit
+interface NotifyChildPublishingStateChangeInteractor : (PublishingState) -> Unit
 
 @Reusable
 internal class NotifyChildPublishingStateChangeInteractorImpl @Inject constructor(

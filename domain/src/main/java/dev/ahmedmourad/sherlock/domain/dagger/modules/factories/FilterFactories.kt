@@ -12,8 +12,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.platform.LocationManager
 import javax.inject.Inject
 
-typealias ChildrenFilterFactory =
-        (@JvmSuppressWildcards ChildQuery) -> @JvmSuppressWildcards Filter<RetrievedChild>
+interface ChildrenFilterFactory : (ChildQuery) -> Filter<RetrievedChild>
 
 @Reusable
 internal class ChildrenFilterFactoryImpl @Inject constructor(
@@ -24,8 +23,7 @@ internal class ChildrenFilterFactoryImpl @Inject constructor(
     }
 }
 
-typealias ChildrenCriteriaFactory =
-        (@JvmSuppressWildcards ChildQuery) -> @JvmSuppressWildcards Criteria<RetrievedChild>
+interface ChildrenCriteriaFactory : (ChildQuery) -> Criteria<RetrievedChild>
 
 @Reusable
 internal class ChildrenCriteriaFactoryImpl @Inject constructor(

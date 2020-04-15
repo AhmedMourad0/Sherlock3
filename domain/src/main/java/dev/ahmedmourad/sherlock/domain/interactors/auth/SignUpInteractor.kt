@@ -9,8 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SignUpInteractor =
-        (@JvmSuppressWildcards SignUpUser) -> @JvmSuppressWildcards Single<Either<Throwable, SignedInUser>>
+interface SignUpInteractor : (SignUpUser) -> Single<Either<Throwable, SignedInUser>>
 
 @Reusable
 internal class SignUpInteractorImpl @Inject constructor(

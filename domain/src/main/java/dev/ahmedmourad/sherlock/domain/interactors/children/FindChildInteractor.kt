@@ -11,9 +11,8 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias FindChildInteractor =
-        (@JvmSuppressWildcards ChildId) ->
-        @JvmSuppressWildcards Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>>
+interface FindChildInteractor :
+        (ChildId) -> Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>>
 
 @Reusable
 internal class FindChildInteractorImpl @Inject constructor(

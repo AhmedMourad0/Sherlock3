@@ -9,9 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias AddChildInteractor =
-        (@JvmSuppressWildcards PublishedChild) ->
-        @JvmSuppressWildcards Single<Either<Throwable, RetrievedChild>>
+interface AddChildInteractor : (PublishedChild) -> Single<Either<Throwable, RetrievedChild>>
 
 @Reusable
 internal class AddChildInteractorImpl @Inject constructor(

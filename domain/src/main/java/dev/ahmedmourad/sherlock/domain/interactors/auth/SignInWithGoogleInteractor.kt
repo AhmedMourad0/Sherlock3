@@ -9,8 +9,8 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SignInWithGoogleInteractor =
-        () -> @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+interface SignInWithGoogleInteractor :
+        () -> Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
 @Reusable
 internal class SignInWithGoogleInteractorImpl @Inject constructor(

@@ -8,7 +8,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SendPasswordResetEmailInteractor = (@JvmSuppressWildcards Email) -> @JvmSuppressWildcards Single<Either<Throwable, Unit>>
+interface SendPasswordResetEmailInteractor : (Email) -> Single<Either<Throwable, Unit>>
 
 @Reusable
 internal class SendPasswordResetEmailInteractorImpl @Inject constructor(

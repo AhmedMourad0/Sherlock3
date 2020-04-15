@@ -9,8 +9,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias ObserveChildPublishingStateInteractor =
-        () -> @JvmSuppressWildcards Flowable<PublishingState>
+interface ObserveChildPublishingStateInteractor : () -> Flowable<PublishingState>
 
 @Reusable
 internal class ObserveChildPublishingStateInteractorImpl @Inject constructor(

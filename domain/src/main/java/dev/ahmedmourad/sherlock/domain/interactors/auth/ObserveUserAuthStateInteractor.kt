@@ -6,7 +6,7 @@ import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias ObserveUserAuthStateInteractor = () -> @JvmSuppressWildcards Flowable<Boolean>
+interface ObserveUserAuthStateInteractor : () -> Flowable<Boolean>
 
 @Reusable
 internal class ObserveUserAuthStateInteractorImpl @Inject constructor(

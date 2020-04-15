@@ -7,8 +7,7 @@ import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
 import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import javax.inject.Inject
 
-typealias NotifyChildrenFindingStateChangeInteractor =
-        (@JvmSuppressWildcards BackgroundState) -> @JvmSuppressWildcards Unit
+interface NotifyChildrenFindingStateChangeInteractor : (BackgroundState) -> Unit
 
 @Reusable
 internal class NotifyChildrenFindingStateChangeInteractorImpl @Inject constructor(

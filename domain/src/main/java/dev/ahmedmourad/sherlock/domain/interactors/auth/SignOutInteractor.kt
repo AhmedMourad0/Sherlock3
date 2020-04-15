@@ -7,8 +7,7 @@ import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SignOutInteractor =
-        () -> @JvmSuppressWildcards Single<Either<Throwable, Unit>>
+interface SignOutInteractor : () -> Single<Either<Throwable, Unit>>
 
 @Reusable
 internal class SignOutInteractorImpl @Inject constructor(

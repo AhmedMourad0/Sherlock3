@@ -10,9 +10,8 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias SignInInteractor =
-        (@JvmSuppressWildcards UserCredentials) ->
-        @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+interface SignInInteractor :
+        (UserCredentials) -> Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
 @Reusable
 internal class SignInInteractorImpl @Inject constructor(

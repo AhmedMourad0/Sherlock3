@@ -9,8 +9,8 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-typealias FindLastSearchResultsInteractor =
-        () -> @JvmSuppressWildcards Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
+interface FindLastSearchResultsInteractor :
+        () -> Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
 
 @Reusable
 internal class FindLastSearchResultsInteractorImpl @Inject constructor(

@@ -11,8 +11,7 @@ import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias CheckChildPublishingStateInteractor =
-        () -> @JvmSuppressWildcards Single<Option<PublishingState>>
+interface CheckChildPublishingStateInteractor : () -> Single<Option<PublishingState>>
 
 @Reusable
 internal class CheckChildPublishingStateInteractorImpl @Inject constructor(

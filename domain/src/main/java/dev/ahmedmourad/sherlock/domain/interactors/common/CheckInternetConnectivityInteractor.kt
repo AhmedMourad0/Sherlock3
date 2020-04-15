@@ -6,8 +6,7 @@ import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Single
 import javax.inject.Inject
 
-typealias CheckInternetConnectivityInteractor =
-        () -> @JvmSuppressWildcards Single<Boolean>
+interface CheckInternetConnectivityInteractor : () -> Single<Boolean>
 
 @Reusable
 internal class CheckInternetConnectivityInteractorImpl @Inject constructor(
