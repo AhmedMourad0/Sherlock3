@@ -7,8 +7,6 @@ import dev.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenCriteria
 import dev.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactory
 import dev.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactoryImpl
 import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.NotifyChildFindingStateChangeInteractorQualifier
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.NotifyChildrenFindingStateChangeInteractorQualifier
 import dev.ahmedmourad.sherlock.domain.interactors.children.*
 import dev.ahmedmourad.sherlock.domain.interactors.common.*
 
@@ -41,23 +39,16 @@ internal interface ChildrenModule {
     ): ObserveChildPublishingStateInteractor
 
     @Binds
-    fun bindCheckChildPublishingStateInteractor(
-            interactor: CheckChildPublishingStateInteractorImpl
-    ): CheckChildPublishingStateInteractor
-
-    @Binds
     fun bindNotifyChildPublishingStateChangeInteractor(
             interactor: NotifyChildPublishingStateChangeInteractorImpl
     ): NotifyChildPublishingStateChangeInteractor
 
     @Binds
-    @NotifyChildFindingStateChangeInteractorQualifier
     fun bindNotifyChildFindingStateChangeInteractor(
             interactor: NotifyChildFindingStateChangeInteractorImpl
     ): NotifyChildFindingStateChangeInteractor
 
     @Binds
-    @NotifyChildrenFindingStateChangeInteractorQualifier
     fun bindNotifyChildrenFindingStateChangeInteractor(
             interactor: NotifyChildrenFindingStateChangeInteractorImpl
     ): NotifyChildrenFindingStateChangeInteractor

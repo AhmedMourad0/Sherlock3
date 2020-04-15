@@ -12,7 +12,6 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.*
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.*
 import dev.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactory
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.*
 import dev.ahmedmourad.sherlock.domain.interactors.auth.*
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
@@ -26,9 +25,9 @@ internal object GlobalViewModelModule {
     @GlobalViewModelQualifier
     @JvmStatic
     fun provide(
-            @ObserveInternetConnectivityInteractorQualifier observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
-            @ObserveUserAuthStateInteractorQualifier observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
-            @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
+            observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
+            observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
+            observeSignedInUserInteractor: ObserveSignedInUserInteractor
     ): SimpleViewModelFactoryFactory {
         return GlobalViewModel::Factory.reverse()
                 .curried()
@@ -99,7 +98,7 @@ internal object SignedInUserProfileViewModelModule {
     @SignedInUserProfileViewModelFactoryFactoryQualifier
     @JvmStatic
     fun provide(
-            @ObserveSignedInUserInteractorQualifier observeSignedInUserInteractor: ObserveSignedInUserInteractor
+            observeSignedInUserInteractor: ObserveSignedInUserInteractor
     ): SimpleViewModelFactoryFactory {
         return SignedInUserProfileViewModel::Factory.partially2(
                 observeSignedInUserInteractor
@@ -115,9 +114,9 @@ internal object SignInViewModelModule {
     @JvmStatic
     fun provide(
             signInInteractor: SignInInteractor,
-            @SignInWithGoogleInteractorQualifier signInWithGoogleInteractor: SignInWithGoogleInteractor,
-            @SignInWithFacebookInteractorQualifier signInWithFacebookInteractor: SignInWithFacebookInteractor,
-            @SignInWithTwitterInteractorQualifier signInWithTwitterInteractor: SignInWithTwitterInteractor
+            signInWithGoogleInteractor: SignInWithGoogleInteractor,
+            signInWithFacebookInteractor: SignInWithFacebookInteractor,
+            signInWithTwitterInteractor: SignInWithTwitterInteractor
     ): SimpleViewModelFactoryFactory {
         return SignInViewModel::Factory.reverse()
                 .curried()
@@ -136,9 +135,9 @@ internal object SignUpViewModelModule {
     @JvmStatic
     fun provide(
             signUpInteractor: SignUpInteractor,
-            @SignInWithGoogleInteractorQualifier signUpWithGoogleInteractor: SignInWithGoogleInteractor,
-            @SignInWithFacebookInteractorQualifier signUpWithFacebookInteractor: SignInWithFacebookInteractor,
-            @SignInWithTwitterInteractorQualifier signUpWithTwitterInteractor: SignInWithTwitterInteractor
+            signUpWithGoogleInteractor: SignInWithGoogleInteractor,
+            signUpWithFacebookInteractor: SignInWithFacebookInteractor,
+            signUpWithTwitterInteractor: SignInWithTwitterInteractor
     ): SimpleViewModelFactoryFactory {
         return SignUpViewModel::Factory.reverse()
                 .curried()

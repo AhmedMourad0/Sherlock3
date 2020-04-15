@@ -16,8 +16,6 @@ import dev.ahmedmourad.sherlock.children.repository.SherlockChildrenRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenLocalRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenRemoteRepository
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.NotifyChildFindingStateChangeInteractorQualifier
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.NotifyChildrenFindingStateChangeInteractorQualifier
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
 import dev.ahmedmourad.sherlock.domain.interactors.common.NotifyChildFindingStateChangeInteractor
@@ -39,9 +37,7 @@ internal object ChildrenRepositoryModule {
             childrenRemoteRepository: Lazy<ChildrenRemoteRepository>,
             childrenImageRepository: Lazy<ChildrenImageRepository>,
             notifyChildPublishingStateChangeInteractor: NotifyChildPublishingStateChangeInteractor,
-            @NotifyChildFindingStateChangeInteractorQualifier
             notifyChildFindingStateChangeInteractor: NotifyChildFindingStateChangeInteractor,
-            @NotifyChildrenFindingStateChangeInteractorQualifier
             notifyChildrenFindingStateChangeInteractor: NotifyChildrenFindingStateChangeInteractor
     ): ChildrenRepository {
         return SherlockChildrenRepository(
