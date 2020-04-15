@@ -1,10 +1,13 @@
 package dev.ahmedmourad.sherlock.platform.managers
 
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.platform.TextManager
 import inc.ahmedmourad.sherlock.platform.R
 import splitties.init.appCtx
+import javax.inject.Inject
 
-internal class AndroidTextManager : TextManager {
+@Reusable
+internal class AndroidTextManager @Inject constructor() : TextManager {
 
     override fun whiteSkin(): String = appCtx.getString(R.string.white_skin)
 
