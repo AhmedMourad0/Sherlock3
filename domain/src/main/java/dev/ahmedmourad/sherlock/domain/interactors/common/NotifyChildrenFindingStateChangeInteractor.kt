@@ -4,6 +4,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
+import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import javax.inject.Inject
 
 typealias NotifyChildrenFindingStateChangeInteractor =
@@ -11,7 +12,7 @@ typealias NotifyChildrenFindingStateChangeInteractor =
 
 @Reusable
 internal class NotifyChildrenFindingStateChangeInteractorImpl @Inject constructor(
-        private val bus: Lazy<Bus>
+        @InternalApi private val bus: Lazy<Bus>
 ) : NotifyChildrenFindingStateChangeInteractor {
     override fun invoke(state: BackgroundState) {
         return bus.get().childrenFindingState.accept(state)

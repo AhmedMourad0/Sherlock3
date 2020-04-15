@@ -7,6 +7,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
+import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ typealias CheckChildPublishingStateInteractor =
 
 @Reusable
 internal class CheckChildPublishingStateInteractorImpl @Inject constructor(
-        private val bus: Lazy<Bus>
+        @InternalApi private val bus: Lazy<Bus>
 ) : CheckChildPublishingStateInteractor {
     override fun invoke(): Single<Option<PublishingState>> {
         return bus.get()
