@@ -15,14 +15,22 @@ import dev.ahmedmourad.sherlock.platform.managers.AndroidTextManager
 internal interface ManagersModule {
 
     @Binds
-    fun bind(dateManager: AndroidDateManager): DateManager
+    fun bindDateManager(
+            dateManager: AndroidDateManager
+    ): DateManager
 
     @Binds
-    fun bind(locationManager: AndroidLocationManager): LocationManager
+    fun bindLocationManager(
+            locationManager: AndroidLocationManager
+    ): LocationManager
 
     @Binds
-    fun bind(textManager: AndroidTextManager): TextManager
+    fun bindTextManager(
+            textManager: AndroidTextManager
+    ): TextManager
 
     @Binds
-    fun bind(connectivityManager: AndroidConnectivityManager): ConnectivityManager
+    fun bindConnectivityManager(
+            connectivityManager: AndroidConnectivityManager
+    ): ConnectivityManager
 }
