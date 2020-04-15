@@ -1,8 +1,7 @@
 package dev.ahmedmourad.sherlock.platform.dagger.modules
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import dev.ahmedmourad.sherlock.domain.platform.LocationManager
@@ -13,33 +12,17 @@ import dev.ahmedmourad.sherlock.platform.managers.AndroidLocationManager
 import dev.ahmedmourad.sherlock.platform.managers.AndroidTextManager
 
 @Module
-internal object DateManagerModule {
-    @Provides
-    @Reusable
-    @JvmStatic
-    fun provide(): DateManager = AndroidDateManager()
-}
+internal interface ManagersModule {
 
-@Module
-internal object LocationManagerModule {
-    @Provides
-    @Reusable
-    @JvmStatic
-    fun provide(): LocationManager = AndroidLocationManager()
-}
+    @Binds
+    fun bind(dateManager: AndroidDateManager): DateManager
 
-@Module
-internal object TextManagerModule {
-    @Provides
-    @Reusable
-    @JvmStatic
-    fun provide(): TextManager = AndroidTextManager()
-}
+    @Binds
+    fun bind(locationManager: AndroidLocationManager): LocationManager
 
-@Module
-internal object ConnectivityManagerModule {
-    @Provides
-    @Reusable
-    @JvmStatic
-    fun provide(): ConnectivityManager = AndroidConnectivityManager()
+    @Binds
+    fun bind(textManager: AndroidTextManager): TextManager
+
+    @Binds
+    fun bind(connectivityManager: AndroidConnectivityManager): ConnectivityManager
 }
