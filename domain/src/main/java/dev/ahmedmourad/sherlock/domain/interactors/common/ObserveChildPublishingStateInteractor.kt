@@ -1,15 +1,18 @@
 package dev.ahmedmourad.sherlock.domain.interactors.common
 
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import javax.inject.Inject
 
 typealias ObserveChildPublishingStateInteractor =
         () -> @JvmSuppressWildcards Flowable<PublishingState>
 
-internal class ObserveChildPublishingStateInteractorImpl(
+@Reusable
+internal class ObserveChildPublishingStateInteractorImpl @Inject constructor(
         private val bus: Lazy<Bus>
 ) : ObserveChildPublishingStateInteractor {
     override fun invoke(): Flowable<PublishingState> {

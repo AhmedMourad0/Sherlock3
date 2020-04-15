@@ -2,17 +2,20 @@ package dev.ahmedmourad.sherlock.domain.interactors.auth
 
 import arrow.core.Either
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Single
+import javax.inject.Inject
 
 typealias SignInInteractor =
         (@JvmSuppressWildcards UserCredentials) ->
         @JvmSuppressWildcards Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
 
-internal class SignInInteractorImpl(
+@Reusable
+internal class SignInInteractorImpl @Inject constructor(
         private val authManager: Lazy<AuthManager>
 ) : SignInInteractor {
     override fun invoke(
