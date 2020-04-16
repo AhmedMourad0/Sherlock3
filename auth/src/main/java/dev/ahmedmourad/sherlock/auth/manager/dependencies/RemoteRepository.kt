@@ -7,7 +7,7 @@ import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Flowable
 import io.reactivex.Single
 
-internal interface AuthRemoteRepository {
+internal interface RemoteRepository {
 
     fun storeSignUpUser(user: RemoteSignUpUser): Single<Either<Throwable, SignedInUser>>
 
