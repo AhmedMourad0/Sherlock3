@@ -4,9 +4,11 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dagger.Lazy
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthAuthenticator
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthImageRepository
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthRemoteRepository
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.auth.mapper.toRemoteSignUpUser
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
@@ -18,18 +20,20 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-internal typealias ObserveUserAuthState = () -> @JvmSuppressWildcards Flowable<Boolean>
+internal interface ObserveUserAuthState : () -> Flowable<Boolean>
 
-internal class SherlockAuthManager(
-        private val authenticator: Lazy<AuthAuthenticator>,
-        private val remoteRepository: Lazy<AuthRemoteRepository>,
-        private val imageRepository: Lazy<AuthImageRepository>
+@Reusable
+internal class AuthManagerImpl @Inject constructor(
+        @InternalApi private val authenticator: Lazy<Authenticator>,
+        @InternalApi private val remoteRepository: Lazy<RemoteRepository>,
+        @InternalApi private val imageRepository: Lazy<ImageRepository>,
+        @InternalApi private val observeUserAuthState: ObserveUserAuthState
 ) : AuthManager {
 
     override fun observeUserAuthState(): Flowable<Boolean> {
-        return authenticator.get()
-                .observeUserAuthState()
+        return observeUserAuthState.invoke()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
@@ -130,19 +134,19 @@ internal class SherlockAuthManager(
     }
 
     override fun signInWithGoogle(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-        return createSignInWithProvider(AuthAuthenticator::signInWithGoogle)
+        return createSignInWithProvider(Authenticator::signInWithGoogle)
     }
 
     override fun signInWithFacebook(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-        return createSignInWithProvider(AuthAuthenticator::signInWithFacebook)
+        return createSignInWithProvider(Authenticator::signInWithFacebook)
     }
 
     override fun signInWithTwitter(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-        return createSignInWithProvider(AuthAuthenticator::signInWithTwitter)
+        return createSignInWithProvider(Authenticator::signInWithTwitter)
     }
 
     private fun createSignInWithProvider(
-            signInWithProvider: AuthAuthenticator.() -> Single<Either<Throwable, IncompleteUser>>
+            signInWithProvider: Authenticator.() -> Single<Either<Throwable, IncompleteUser>>
     ): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
         return authenticator.get()
                 .signInWithProvider()
