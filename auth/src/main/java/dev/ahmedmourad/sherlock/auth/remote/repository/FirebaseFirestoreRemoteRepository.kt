@@ -12,8 +12,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthRemoteRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser
 import dev.ahmedmourad.sherlock.auth.remote.contract.Contract
 import dev.ahmedmourad.sherlock.auth.remote.utils.toMap
@@ -35,12 +37,14 @@ import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
+import javax.inject.Inject
 
-internal class AuthFirebaseFirestoreRemoteRepository(
-        private val db: Lazy<FirebaseFirestore>,
+@Reusable
+internal class FirebaseFirestoreRemoteRepository @Inject constructor(
+        @InternalApi private val db: Lazy<FirebaseFirestore>,
         private val connectivityManager: Lazy<ConnectivityManager>,
-        private val observeUserAuthState: ObserveUserAuthState
-) : AuthRemoteRepository {
+        @InternalApi private val observeUserAuthState: ObserveUserAuthState
+) : RemoteRepository {
 
     init {
         if (FirebaseApp.getApps(appCtx).isEmpty()) {
