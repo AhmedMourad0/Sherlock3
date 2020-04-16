@@ -11,9 +11,12 @@ import com.google.firebase.auth.*
 import com.twitter.sdk.android.core.TwitterAuthToken
 import com.twitter.sdk.android.core.TwitterCore
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthAuthenticator
+import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
+import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.domain.exceptions.*
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
@@ -28,13 +31,14 @@ import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
+import javax.inject.Inject
 
-internal class AuthFirebaseAuthenticator(
-        private val auth: Lazy<FirebaseAuth>,
-        private val connectivityManager: Lazy<ConnectivityManager>
-) : AuthAuthenticator {
+@Reusable
+internal class ObserveUserAuthStateImpl @Inject constructor(
+        @InternalApi private val auth: Lazy<FirebaseAuth>
+) : ObserveUserAuthState {
 
-    override fun observeUserAuthState(): Flowable<Boolean> {
+    override fun invoke(): Flowable<Boolean> {
         return createObserveUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -53,6 +57,14 @@ internal class AuthFirebaseAuthenticator(
 
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
+}
+
+@Reusable
+internal class FirebaseAuthenticator @Inject constructor(
+        @InternalApi private val auth: Lazy<FirebaseAuth>,
+        @InternalApi private val observeUserAuthState: ObserveUserAuthState,
+        private val connectivityManager: Lazy<ConnectivityManager>
+) : Authenticator {
 
     override fun getCurrentUser(): Flowable<Either<Throwable, IncompleteUser>> {
         return connectivityManager.get()
