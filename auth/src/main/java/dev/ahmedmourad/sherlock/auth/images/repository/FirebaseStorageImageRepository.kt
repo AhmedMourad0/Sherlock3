@@ -8,9 +8,11 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
 import dev.ahmedmourad.sherlock.auth.images.contract.Contract
 import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.AuthImageRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
@@ -19,12 +21,14 @@ import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-internal class AuthFirebaseStorageImageRepository(
+@Reusable
+internal class FirebaseStorageImageRepository @Inject constructor(
         private val connectivityManager: Lazy<ConnectivityManager>,
-        private val observeUserAuthState: ObserveUserAuthState,
-        private val storage: Lazy<FirebaseStorage>
-) : AuthImageRepository {
+        @InternalApi private val observeUserAuthState: ObserveUserAuthState,
+        @InternalApi private val storage: Lazy<FirebaseStorage>
+) : ImageRepository {
 
     override fun storeUserPicture(id: UserId, picture: ByteArray?): Single<Either<Throwable, Url?>> {
 
