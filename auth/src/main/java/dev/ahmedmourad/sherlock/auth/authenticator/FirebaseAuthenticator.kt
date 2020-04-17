@@ -15,7 +15,6 @@ import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
 import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
-import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.domain.exceptions.*
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
@@ -34,11 +33,12 @@ import timber.log.error
 import javax.inject.Inject
 
 @Reusable
-internal class ObserveUserAuthStateImpl @Inject constructor(
-        @InternalApi private val auth: Lazy<FirebaseAuth>
-) : ObserveUserAuthState {
+internal class FirebaseAuthenticator @Inject constructor(
+        @InternalApi private val auth: Lazy<FirebaseAuth>,
+        private val connectivityManager: Lazy<ConnectivityManager>
+) : Authenticator {
 
-    override fun invoke(): Flowable<Boolean> {
+    override fun observeUserAuthState(): Flowable<Boolean> {
         return createObserveUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -57,14 +57,6 @@ internal class ObserveUserAuthStateImpl @Inject constructor(
 
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
-}
-
-@Reusable
-internal class FirebaseAuthenticator @Inject constructor(
-        @InternalApi private val auth: Lazy<FirebaseAuth>,
-        @InternalApi private val observeUserAuthState: ObserveUserAuthState,
-        private val connectivityManager: Lazy<ConnectivityManager>
-) : Authenticator {
 
     override fun getCurrentUser(): Flowable<Either<Throwable, IncompleteUser>> {
         return connectivityManager.get()
