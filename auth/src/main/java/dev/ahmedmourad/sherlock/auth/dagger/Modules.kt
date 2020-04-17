@@ -8,13 +8,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.FirebaseAuthenticator
-import dev.ahmedmourad.sherlock.auth.authenticator.ObserveUserAuthStateImpl
 import dev.ahmedmourad.sherlock.auth.images.repository.FirebaseStorageImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.AuthManagerImpl
-import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.remote.repository.FirebaseFirestoreRemoteRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 
@@ -32,15 +31,15 @@ internal interface AuthManagerModule {
 
     @Binds
     @InternalApi
-    fun bindObserveUserAuthState(
-            observeUserAuthStateImpl: ObserveUserAuthStateImpl
-    ): ObserveUserAuthState
-
-    @Binds
-    @InternalApi
     fun bindAuthenticator(
             authenticator: FirebaseAuthenticator
     ): Authenticator
+
+    @Binds
+    @InternalApi
+    fun bindUserAuthStateObservable(
+            @InternalApi authenticator: Authenticator
+    ): UserAuthStateObservable
 
     @Binds
     @InternalApi
