@@ -14,8 +14,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
-import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser
 import dev.ahmedmourad.sherlock.auth.remote.contract.Contract
 import dev.ahmedmourad.sherlock.auth.remote.utils.toMap
@@ -43,7 +43,7 @@ import javax.inject.Inject
 internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         @InternalApi private val db: Lazy<FirebaseFirestore>,
         private val connectivityManager: Lazy<ConnectivityManager>,
-        @InternalApi private val observeUserAuthState: ObserveUserAuthState
+        @InternalApi private val userAuthStateObservable: UserAuthStateObservable
 ) : RemoteRepository {
 
     init {
@@ -62,7 +62,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeOn(Schedulers.io())
                 .flatMap { isInternetConnected ->
                     if (isInternetConnected) {
-                        observeUserAuthState().map(Boolean::right).singleOrError()
+                        userAuthStateObservable.observeUserAuthState()
+                                .map(Boolean::right)
+                                .singleOrError()
                     } else {
                         Single.just(NoInternetConnectionException().left())
                     }
@@ -108,7 +110,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeOn(Schedulers.io())
                 .flatMap { isInternetConnected ->
                     if (isInternetConnected) {
-                        observeUserAuthState().map(Boolean::right)
+                        userAuthStateObservable.observeUserAuthState().map(Boolean::right)
                     } else {
                         Flowable.just(NoInternetConnectionException().left())
                     }
@@ -164,7 +166,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeOn(Schedulers.io())
                 .flatMap { isInternetConnected ->
                     if (isInternetConnected) {
-                        observeUserAuthState().map(Boolean::right).singleOrError()
+                        userAuthStateObservable.observeUserAuthState()
+                                .map(Boolean::right)
+                                .singleOrError()
                     } else {
                         Single.just(NoInternetConnectionException().left())
                     }

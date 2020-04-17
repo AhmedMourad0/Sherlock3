@@ -11,8 +11,8 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
 import dev.ahmedmourad.sherlock.auth.images.contract.Contract
-import dev.ahmedmourad.sherlock.auth.manager.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @Reusable
 internal class FirebaseStorageImageRepository @Inject constructor(
         private val connectivityManager: Lazy<ConnectivityManager>,
-        @InternalApi private val observeUserAuthState: ObserveUserAuthState,
+        @InternalApi private val userAuthStateObservable: UserAuthStateObservable,
         @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
@@ -42,7 +42,9 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 .observeOn(Schedulers.io())
                 .flatMap { isInternetConnected ->
                     if (isInternetConnected)
-                        observeUserAuthState().map(Boolean::right).firstOrError()
+                        userAuthStateObservable.observeUserAuthState()
+                                .map(Boolean::right)
+                                .firstOrError()
                     else
                         Single.just(NoInternetConnectionException().left())
                 }.flatMap { isUserSignedInEither ->

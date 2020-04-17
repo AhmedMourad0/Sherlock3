@@ -9,6 +9,7 @@ import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.mapper.toRemoteSignUpUser
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
@@ -22,18 +23,16 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-internal interface ObserveUserAuthState : () -> Flowable<Boolean>
-
 @Reusable
 internal class AuthManagerImpl @Inject constructor(
         @InternalApi private val authenticator: Lazy<Authenticator>,
         @InternalApi private val remoteRepository: Lazy<RemoteRepository>,
         @InternalApi private val imageRepository: Lazy<ImageRepository>,
-        @InternalApi private val observeUserAuthState: ObserveUserAuthState
+        @InternalApi private val userAuthStateObservable: UserAuthStateObservable
 ) : AuthManager {
 
     override fun observeUserAuthState(): Flowable<Boolean> {
-        return observeUserAuthState.invoke()
+        return userAuthStateObservable.observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
