@@ -8,7 +8,13 @@ import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Flowable
 import io.reactivex.Single
 
-internal interface Authenticator {
+internal interface UserAuthStateObservable {
+    fun observeUserAuthState(): Flowable<Boolean>
+}
+
+internal interface Authenticator : UserAuthStateObservable {
+
+    override fun observeUserAuthState(): Flowable<Boolean>
 
     fun getCurrentUser(): Flowable<Either<Throwable, IncompleteUser>>
 
