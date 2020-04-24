@@ -10,22 +10,22 @@ import dev.ahmedmourad.sherlock.children.local.entities.RoomChildEntity
 import splitties.init.appCtx
 
 @Database(entities = [RoomChildEntity::class], version = 1)
-internal abstract class SherlockDatabase : RoomDatabase() {
+internal abstract class ChildrenRoomDatabase : RoomDatabase() {
 
     abstract fun resultsDao(): SearchResultsDao
 
     internal companion object {
 
         @Volatile
-        private var INSTANCE: SherlockDatabase? = null
+        private var INSTANCE: ChildrenRoomDatabase? = null
 
-        fun getInstance() = INSTANCE ?: synchronized(SherlockDatabase::class.java) {
+        fun getInstance() = INSTANCE ?: synchronized(ChildrenRoomDatabase::class.java) {
             INSTANCE ?: buildDatabase().also { INSTANCE = it }
         }
 
         private fun buildDatabase() = Room.databaseBuilder(
                 appCtx,
-                SherlockDatabase::class.java,
+                ChildrenRoomDatabase::class.java,
                 Contract.DATABASE_NAME
         ).build()
     }
