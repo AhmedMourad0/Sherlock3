@@ -2,9 +2,9 @@ package dev.ahmedmourad.sherlock.children.repository
 
 import arrow.core.*
 import dagger.Lazy
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenImageRepository
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenLocalRepository
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenRemoteRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
@@ -25,29 +25,29 @@ import java.util.*
 
 //TODO: if requireUserSignedIn doesn't fail and user is not signed in with FirebaseAuth
 // implement a fallback mechanism and sign the user in anonymously
-internal class SherlockChildrenRepository(
-        private val childrenLocalRepository: Lazy<ChildrenLocalRepository>,
-        private val childrenRemoteRepository: Lazy<ChildrenRemoteRepository>,
-        private val childrenImageRepository: Lazy<ChildrenImageRepository>,
+internal class ChildrenRepositoryImpl(
+        private val localRepository: Lazy<LocalRepository>,
+        private val remoteRepository: Lazy<RemoteRepository>,
+        private val imageRepository: Lazy<ImageRepository>,
         private val notifyChildPublishingStateChangeInteractor: NotifyChildPublishingStateChangeInteractor,
         private val notifyChildFindingStateChangeInteractor: NotifyChildFindingStateChangeInteractor,
         private val notifyChildrenFindingStateChangeInteractor: NotifyChildrenFindingStateChangeInteractor
 ) : ChildrenRepository {
 
-    private val tester by lazy { SherlockTester(childrenRemoteRepository, childrenLocalRepository) }
+    private val tester by lazy { SherlockTester(remoteRepository, localRepository) }
 
     override fun publish(child: PublishedChild): Single<Either<Throwable, RetrievedChild>> {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
-        return childrenImageRepository.get().storeChildPicture(childId, child.picture)
+        return imageRepository.get().storeChildPicture(childId, child.picture)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { urlEither ->
                     urlEither.fold(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = {
-                        childrenRemoteRepository.get().publish(childId, child, it)
+                        remoteRepository.get().publish(childId, child, it)
                     })
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
@@ -62,7 +62,7 @@ internal class SherlockChildrenRepository(
     override fun find(
             childId: ChildId
     ): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
-        return childrenRemoteRepository.get()
+        return remoteRepository.get()
                 .find(childId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -73,7 +73,7 @@ internal class SherlockChildrenRepository(
                         if (child == null) {
                             Flowable.just(null.right())
                         } else {
-                            childrenLocalRepository.get()
+                            localRepository.get()
                                     .updateIfExists(child)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
@@ -90,7 +90,7 @@ internal class SherlockChildrenRepository(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
     ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-        return childrenRemoteRepository.get()
+        return remoteRepository.get()
                 .findAll(query, filter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -98,7 +98,7 @@ internal class SherlockChildrenRepository(
                     resultsEither.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { results ->
-                        childrenLocalRepository.get()
+                        localRepository.get()
                                 .replaceAll(results)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(Schedulers.io())
@@ -113,7 +113,7 @@ internal class SherlockChildrenRepository(
     }
 
     override fun findLastSearchResults(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-        return childrenLocalRepository.get()
+        return localRepository.get()
                 .findAllWithWeight()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -124,11 +124,11 @@ internal class SherlockChildrenRepository(
     }
 
     class SherlockTester(
-            private val childrenRemoteRepository: Lazy<ChildrenRemoteRepository>,
-            private val childrenLocalRepository: Lazy<ChildrenLocalRepository>
+            private val remoteRepository: Lazy<RemoteRepository>,
+            private val localRepository: Lazy<LocalRepository>
     ) : ChildrenRepository.Tester {
         override fun clear(): Single<Either<Throwable, Unit>> {
-            return childrenRemoteRepository.get()
+            return remoteRepository.get()
                     .clear()
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -136,7 +136,7 @@ internal class SherlockChildrenRepository(
                         either.fold(ifLeft = {
                             Single.just(it.left())
                         }, ifRight = {
-                            childrenLocalRepository.get()
+                            localRepository.get()
                                     .clear()
                                     .andThen(Single.just(Unit.right()))
                         })
