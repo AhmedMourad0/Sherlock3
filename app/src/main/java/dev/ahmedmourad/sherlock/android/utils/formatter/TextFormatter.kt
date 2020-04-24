@@ -10,7 +10,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.HeightRange
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 
-internal interface Formatter {
+internal interface TextFormatter {
 
     fun formatSkin(skin: Skin?): String
 
