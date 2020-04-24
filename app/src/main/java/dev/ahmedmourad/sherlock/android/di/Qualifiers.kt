@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers
+package dev.ahmedmourad.sherlock.android.di
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -38,3 +38,8 @@ internal annotation class SignUpViewModelFactoryFactoryQualifier
 @Retention(RUNTIME)
 @Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
 internal annotation class SherlockServiceIntentQualifier
+
+@Qualifier
+@Retention(RUNTIME)
+@Target(FIELD, VALUE_PARAMETER, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+internal annotation class InternalApi
