@@ -5,7 +5,7 @@ import dagger.Module
 import dev.ahmedmourad.sherlock.domain.interactors.auth.*
 
 @Module
-internal interface AuthModuleBindings {
+internal interface AuthBindingsModule {
 
     @Binds
     fun bindObserveUserAuthStateInteractor(
