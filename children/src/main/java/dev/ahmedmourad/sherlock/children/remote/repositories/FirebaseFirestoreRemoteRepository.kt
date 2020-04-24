@@ -12,7 +12,7 @@ import com.google.firebase.firestore.*
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.children.remote.contract.Contract
 import dev.ahmedmourad.sherlock.children.remote.utils.toMap
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenRemoteRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
@@ -38,11 +38,11 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 
-internal class ChildrenFirebaseFirestoreRemoteRepository(
+internal class FirebaseFirestoreRemoteRepository(
         private val db: Lazy<FirebaseFirestore>,
         private val authManager: Lazy<AuthManager>,
         private val connectivityManager: Lazy<ConnectivityManager>
-) : ChildrenRemoteRepository {
+) : RemoteRepository {
 
     init {
         if (FirebaseApp.getApps(appCtx).isEmpty()) {
