@@ -1,14 +1,15 @@
 package dev.ahmedmourad.sherlock.android.application
 
 import androidx.multidex.MultiDexApplication
+import dev.ahmedmourad.sherlock.android.dagger.DaggerComponentProvider
 import dev.ahmedmourad.sherlock.android.dagger.components.ApplicationComponent
 import dev.ahmedmourad.sherlock.android.dagger.components.DaggerApplicationComponent
 import timber.log.LogcatTree
 import timber.log.Timber
 
 @Suppress("unused")
-internal class SherlockApplication : MultiDexApplication() {
-    val appComponent: ApplicationComponent = DaggerApplicationComponent.create()
+internal class SherlockApplication : MultiDexApplication(), DaggerComponentProvider {
+    override val component: ApplicationComponent = DaggerApplicationComponent.create()
     override fun onCreate() {
         super.onCreate()
         Timber.plant(LogcatTree("Sherlock"))
