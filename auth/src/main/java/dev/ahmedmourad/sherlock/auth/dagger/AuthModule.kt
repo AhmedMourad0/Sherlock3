@@ -2,5 +2,5 @@ package dev.ahmedmourad.sherlock.auth.dagger
 
 import dagger.Module
 
-@Module(includes = [AuthManagerModule::class])
+@Module(includes = [AuthBindingsModule::class])
 interface AuthModule

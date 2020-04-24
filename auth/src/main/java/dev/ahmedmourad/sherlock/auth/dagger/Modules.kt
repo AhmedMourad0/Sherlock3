@@ -22,7 +22,7 @@ import dev.ahmedmourad.sherlock.domain.data.AuthManager
     FirebaseAuthModule::class,
     FirebaseStorageModule::class
 ])
-internal interface AuthManagerModule {
+internal interface AuthBindingsModule {
 
     @Binds
     fun bindAuthManager(
