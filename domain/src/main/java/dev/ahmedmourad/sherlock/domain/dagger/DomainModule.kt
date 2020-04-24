@@ -1,13 +1,13 @@
 package dev.ahmedmourad.sherlock.domain.dagger
 
 import dagger.Module
-import dev.ahmedmourad.sherlock.domain.dagger.modules.AuthModule
-import dev.ahmedmourad.sherlock.domain.dagger.modules.ChildrenModule
-import dev.ahmedmourad.sherlock.domain.dagger.modules.CommonModule
+import dev.ahmedmourad.sherlock.domain.dagger.modules.AuthModuleBindings
+import dev.ahmedmourad.sherlock.domain.dagger.modules.ChildrenModuleBindings
+import dev.ahmedmourad.sherlock.domain.dagger.modules.CommonModuleBindings
 
 @Module(includes = [
-    ChildrenModule::class,
-    AuthModule::class,
-    CommonModule::class
+    ChildrenModuleBindings::class,
+    AuthModuleBindings::class,
+    CommonModuleBindings::class
 ])
 object DomainModule
