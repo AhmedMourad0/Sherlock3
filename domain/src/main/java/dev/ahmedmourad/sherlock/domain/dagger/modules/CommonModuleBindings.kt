@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnect
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractorImpl
 
 @Module
-internal interface CommonModule {
+internal interface CommonModuleBindings {
 
     @Binds
     fun bindObserveInternetConnectivityInteractor(
