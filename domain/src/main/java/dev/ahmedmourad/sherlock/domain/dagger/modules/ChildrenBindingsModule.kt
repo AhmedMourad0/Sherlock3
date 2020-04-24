@@ -11,7 +11,7 @@ import dev.ahmedmourad.sherlock.domain.interactors.children.*
 import dev.ahmedmourad.sherlock.domain.interactors.common.*
 
 @Module
-internal interface ChildrenModuleBindings {
+internal interface ChildrenBindingsModule {
 
     @Binds
     fun bindAddChildInteractor(
