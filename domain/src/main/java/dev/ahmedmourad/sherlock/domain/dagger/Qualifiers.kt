@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers
+package dev.ahmedmourad.sherlock.domain.dagger
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME
