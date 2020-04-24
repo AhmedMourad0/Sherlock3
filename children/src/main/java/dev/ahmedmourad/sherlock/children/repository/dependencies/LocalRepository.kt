@@ -10,7 +10,7 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 
-internal interface ChildrenLocalRepository {
+internal interface LocalRepository {
 
     fun updateIfExists(
             child: RetrievedChild
