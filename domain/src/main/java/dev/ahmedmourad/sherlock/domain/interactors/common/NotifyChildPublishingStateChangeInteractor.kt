@@ -4,7 +4,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
+import dev.ahmedmourad.sherlock.domain.dagger.InternalApi
 import javax.inject.Inject
 
 interface NotifyChildPublishingStateChangeInteractor : (PublishingState) -> Unit
