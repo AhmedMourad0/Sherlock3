@@ -11,17 +11,19 @@ import com.bumptech.glide.RequestManager
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ItemResultBinding
-import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
+import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import splitties.init.appCtx
 import java.util.*
 
+internal typealias OnChildSelectedListener = (Tuple2<SimpleRetrievedChild, Weight>) -> Unit
+
 internal class ChildrenRecyclerAdapter(
         private val dateManager: Lazy<DateManager>,
-        private val formatter: Lazy<Formatter>,
-        private val onResultSelectedListener: (Tuple2<SimpleRetrievedChild, Weight>) -> Unit
+        private val textFormatter: Lazy<TextFormatter>,
+        private val onChildSelectedListener: OnChildSelectedListener
 ) : DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, ChildrenRecyclerAdapter.ViewHolder>() {
 
     private val resultsList = ArrayList<Tuple2<SimpleRetrievedChild, Weight>>()
@@ -54,10 +56,10 @@ internal class ChildrenRecyclerAdapter(
 
             //TODO: this needs to change with time
             binding.dateTextView.text = dateManager.get().getRelativeDateTimeString(result.a.publicationDate)
-            binding.notesTextView.text = formatter.get().formatNotes(result.a.notes)
-            binding.locationTextView.text = formatter.get().formatLocation(result.a.locationName, result.a.locationAddress)
+            binding.notesTextView.text = textFormatter.get().formatNotes(result.a.notes)
+            binding.locationTextView.text = textFormatter.get().formatLocation(result.a.locationName, result.a.locationAddress)
 
-            itemView.setOnClickListener { onResultSelectedListener(result) }
+            itemView.setOnClickListener { onChildSelectedListener(result) }
         }
     }
 }
