@@ -9,7 +9,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.children.images.contract.Contract
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ChildrenImageRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
@@ -20,11 +20,11 @@ import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-internal class ChildrenFirebaseStorageImageRepository(
+internal class FirebaseStorageImageRepository(
         private val connectivityManager: Lazy<ConnectivityManager>,
         private val authManager: Lazy<AuthManager>,
         private val storage: Lazy<FirebaseStorage>
-) : ChildrenImageRepository {
+) : ImageRepository {
 
     override fun storeChildPicture(id: ChildId, picture: ByteArray?): Single<Either<Throwable, Url?>> {
 
