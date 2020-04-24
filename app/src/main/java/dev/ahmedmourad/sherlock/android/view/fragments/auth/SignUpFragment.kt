@@ -16,9 +16,9 @@ import arrow.core.right
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers.SignUpViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.SignUpViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignUpViewModel
@@ -47,7 +47,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusSignUpFragmentComponent().inject(this)
+        injector.inject(this)
         initializePictureImageView()
     }
 

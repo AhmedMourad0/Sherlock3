@@ -20,8 +20,8 @@ import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
 import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
+import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.defaults.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
@@ -65,7 +65,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusAddChildFragmentComponent().inject(this)
+        injector.inject(this)
 
         globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
             when (either) {

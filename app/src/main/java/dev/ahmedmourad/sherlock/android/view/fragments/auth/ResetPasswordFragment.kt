@@ -10,12 +10,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
 import dev.ahmedmourad.sherlock.android.databinding.FragmentResetPasswordBinding
+import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.common.disposable
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -36,7 +35,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusResetPasswordFragmentComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

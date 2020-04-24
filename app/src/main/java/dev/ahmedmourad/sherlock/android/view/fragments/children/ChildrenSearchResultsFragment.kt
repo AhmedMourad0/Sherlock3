@@ -15,9 +15,9 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.adapters.DynamicRecyclerAdapter
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.factories.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModelFactoryFactory
@@ -25,7 +25,6 @@ import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -55,7 +54,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusChildrenSearchResultsFragmentComponent().inject(this)
+        injector.inject(this)
 
         //TODO: either give the option to update or not, or onPublish new values to the bottom
         //TODO: paginate

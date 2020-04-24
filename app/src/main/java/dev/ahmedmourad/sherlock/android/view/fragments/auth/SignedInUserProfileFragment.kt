@@ -10,9 +10,9 @@ import arrow.core.identity
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers.SignedInUserProfileViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.SignedInUserProfileViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -37,7 +37,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusSignedInUserProfileFragmentComponent().inject(this)
+        injector.inject(this)
 
         viewModel.signedInUser.observe(viewLifecycleOwner, Observer { resultEither ->
             resultEither.fold(ifLeft = {

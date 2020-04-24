@@ -7,8 +7,8 @@ import android.os.Bundle
 import android.widget.RemoteViewsService
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.factories.ChildrenRemoteViewsFactoryFactory
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRemoteViewsFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import kotlinx.serialization.builtins.MapSerializer
@@ -23,7 +23,7 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
     override fun onCreate() {
         super.onCreate()
-        findAppComponent().plusChildrenRemoteViewsServiceComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {

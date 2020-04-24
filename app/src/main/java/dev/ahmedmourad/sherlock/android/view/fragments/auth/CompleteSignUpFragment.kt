@@ -16,8 +16,8 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
+import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModelFactoryFactory
@@ -48,7 +48,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusCompleteSignUpFragmentComponent().inject(this)
+        injector.inject(this)
         initializePictureImageView()
     }
 

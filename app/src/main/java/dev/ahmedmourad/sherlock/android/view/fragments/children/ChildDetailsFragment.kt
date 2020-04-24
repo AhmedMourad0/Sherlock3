@@ -15,8 +15,8 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
+import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModelFactoryFactory
@@ -46,7 +46,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusChildDetailsFragmentComponent().inject(this)
+        injector.inject(this)
 
         //TODO: notify the user when the data is updated or deleted
         viewModel.result.observe(viewLifecycleOwner, Observer { resultEither ->

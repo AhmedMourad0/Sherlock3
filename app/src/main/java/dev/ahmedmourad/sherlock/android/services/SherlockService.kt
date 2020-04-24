@@ -14,7 +14,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
+import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.backgroundContextChannelId
 import dev.ahmedmourad.sherlock.android.view.activity.MainActivity
@@ -42,7 +42,7 @@ internal class SherlockService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        appCtx.findAppComponent().plusSherlockServiceComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -8,9 +8,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import arrow.syntax.function.partially1
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.factories.AppSectionsRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.databinding.FragmentHomeBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.factories.AppSectionsRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
 import splitties.init.appCtx
 import java.util.*
@@ -25,7 +25,7 @@ internal class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusHomeFragmentComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

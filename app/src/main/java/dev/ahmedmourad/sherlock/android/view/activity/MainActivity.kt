@@ -21,10 +21,10 @@ import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers.GlobalViewModelQualifier
-import dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers.MainActivityViewModelQualifier
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.GlobalViewModelQualifier
+import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.MainActivityViewModelQualifier
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
@@ -69,7 +69,7 @@ internal class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        findAppComponent().plusMainActivityComponent().inject(this)
+        injector.inject(this)
 
         setSupportActionBar(binding.toolbar)
 

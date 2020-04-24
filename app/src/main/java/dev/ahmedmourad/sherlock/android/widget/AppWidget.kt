@@ -6,8 +6,8 @@ import android.content.Context
 import android.widget.RemoteViews
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.factories.ChildrenRemoteViewsServiceIntentFactory
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRemoteViewsServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.utils.DisposablesSparseArray
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
@@ -15,7 +15,6 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -31,7 +30,7 @@ internal class AppWidget : AppWidgetProvider() {
     private val disposables = DisposablesSparseArray()
 
     init {
-        appCtx.findAppComponent().plusAppWidgetComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {

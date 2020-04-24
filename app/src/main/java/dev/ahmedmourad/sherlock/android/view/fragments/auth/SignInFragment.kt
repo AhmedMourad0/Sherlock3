@@ -10,15 +10,14 @@ import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import arrow.core.identity
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.dagger.findAppComponent
-import dev.ahmedmourad.sherlock.android.dagger.modules.qualifiers.SignInViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignInBinding
+import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.SignInViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignInViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.common.disposable
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -37,7 +36,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appCtx.findAppComponent().plusSignInFragmentComponent().inject(this)
+        injector.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
