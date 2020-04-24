@@ -2,6 +2,7 @@ package dev.ahmedmourad.sherlock.android.utils.formatter
 
 import android.annotation.SuppressLint
 import arrow.core.Either
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
@@ -11,8 +12,12 @@ import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.platform.TextManager
 import splitties.init.appCtx
 import java.util.*
+import javax.inject.Inject
 
-internal class TextFormatter(private val textManager: TextManager) : Formatter {
+@Reusable
+internal class TextFormatterImpl @Inject constructor(
+        private val textManager: TextManager
+) : TextFormatter {
 
     override fun formatSkin(skin: Skin?): String {
         return skin?.getMessage(textManager) ?: appCtx.getString(R.string.not_available)
