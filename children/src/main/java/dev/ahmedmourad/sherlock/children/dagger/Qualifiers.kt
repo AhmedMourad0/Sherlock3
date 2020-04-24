@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.children.dagger.modules
+package dev.ahmedmourad.sherlock.children.dagger
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME
