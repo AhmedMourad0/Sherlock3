@@ -5,6 +5,6 @@ import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Single
 
-internal interface ChildrenImageRepository {
+internal interface ImageRepository {
     fun storeChildPicture(id: ChildId, picture: ByteArray?): Single<Either<Throwable, Url?>>
 }
