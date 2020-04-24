@@ -11,7 +11,7 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Flowable
 import io.reactivex.Single
 
-internal interface ChildrenRemoteRepository {
+internal interface RemoteRepository {
 
     fun publish(
             childId: ChildId,
