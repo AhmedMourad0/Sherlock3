@@ -1,8 +1,7 @@
-package dev.ahmedmourad.sherlock.domain.dagger.modules.factories
+package dev.ahmedmourad.sherlock.domain.dagger
 
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.domain.dagger.modules.qualifiers.InternalApi
 import dev.ahmedmourad.sherlock.domain.filter.Filter
 import dev.ahmedmourad.sherlock.domain.filter.ResultsFilter
 import dev.ahmedmourad.sherlock.domain.filter.criteria.Criteria
