@@ -1,9 +1,9 @@
 package dev.ahmedmourad.sherlock.android.application
 
 import androidx.multidex.MultiDexApplication
-import dev.ahmedmourad.sherlock.android.dagger.DaggerComponentProvider
-import dev.ahmedmourad.sherlock.android.dagger.components.ApplicationComponent
-import dev.ahmedmourad.sherlock.android.dagger.components.DaggerApplicationComponent
+import dev.ahmedmourad.sherlock.android.di.ApplicationComponent
+import dev.ahmedmourad.sherlock.android.di.DaggerApplicationComponent
+import dev.ahmedmourad.sherlock.android.di.DaggerComponentProvider
 import timber.log.LogcatTree
 import timber.log.Timber
 
