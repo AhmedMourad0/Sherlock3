@@ -8,6 +8,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.children.dagger.InternalApi
 import dev.ahmedmourad.sherlock.children.images.contract.Contract
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
@@ -19,11 +21,13 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-internal class FirebaseStorageImageRepository(
+@Reusable
+internal class FirebaseStorageImageRepository @Inject constructor(
         private val connectivityManager: Lazy<ConnectivityManager>,
         private val authManager: Lazy<AuthManager>,
-        private val storage: Lazy<FirebaseStorage>
+        @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
     override fun storeChildPicture(id: ChildId, picture: ByteArray?): Single<Either<Throwable, Url?>> {

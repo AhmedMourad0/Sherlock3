@@ -2,6 +2,8 @@ package dev.ahmedmourad.sherlock.children.local.repository
 
 import arrow.core.*
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.children.dagger.InternalApi
 import dev.ahmedmourad.sherlock.children.local.database.ChildrenRoomDatabase
 import dev.ahmedmourad.sherlock.children.local.entities.RoomChildEntity
 import dev.ahmedmourad.sherlock.children.local.mapper.toRoomChildEntity
@@ -14,8 +16,12 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-internal class RoomLocalRepository(private val db: Lazy<ChildrenRoomDatabase>) : LocalRepository {
+@Reusable
+internal class RoomLocalRepository @Inject constructor(
+        @InternalApi private val db: Lazy<ChildrenRoomDatabase>
+) : LocalRepository {
 
     override fun updateIfExists(
             child: RetrievedChild

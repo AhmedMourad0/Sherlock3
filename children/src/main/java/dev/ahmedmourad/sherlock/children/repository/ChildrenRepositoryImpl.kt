@@ -2,6 +2,8 @@ package dev.ahmedmourad.sherlock.children.repository
 
 import arrow.core.*
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.children.dagger.InternalApi
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
@@ -22,13 +24,15 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import javax.inject.Inject
 
 //TODO: if requireUserSignedIn doesn't fail and user is not signed in with FirebaseAuth
 // implement a fallback mechanism and sign the user in anonymously
-internal class ChildrenRepositoryImpl(
-        private val localRepository: Lazy<LocalRepository>,
-        private val remoteRepository: Lazy<RemoteRepository>,
-        private val imageRepository: Lazy<ImageRepository>,
+@Reusable
+internal class ChildrenRepositoryImpl @Inject constructor(
+        @InternalApi private val localRepository: Lazy<LocalRepository>,
+        @InternalApi private val remoteRepository: Lazy<RemoteRepository>,
+        @InternalApi private val imageRepository: Lazy<ImageRepository>,
         private val notifyChildPublishingStateChangeInteractor: NotifyChildPublishingStateChangeInteractor,
         private val notifyChildFindingStateChangeInteractor: NotifyChildFindingStateChangeInteractor,
         private val notifyChildrenFindingStateChangeInteractor: NotifyChildrenFindingStateChangeInteractor

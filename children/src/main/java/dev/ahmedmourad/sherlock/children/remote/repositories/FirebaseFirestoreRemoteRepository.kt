@@ -10,6 +10,8 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
 import dagger.Lazy
+import dagger.Reusable
+import dev.ahmedmourad.sherlock.children.dagger.InternalApi
 import dev.ahmedmourad.sherlock.children.remote.contract.Contract
 import dev.ahmedmourad.sherlock.children.remote.utils.toMap
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
@@ -37,9 +39,11 @@ import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
+import javax.inject.Inject
 
-internal class FirebaseFirestoreRemoteRepository(
-        private val db: Lazy<FirebaseFirestore>,
+@Reusable
+internal class FirebaseFirestoreRemoteRepository @Inject constructor(
+        @InternalApi private val db: Lazy<FirebaseFirestore>,
         private val authManager: Lazy<AuthManager>,
         private val connectivityManager: Lazy<ConnectivityManager>
 ) : RemoteRepository {
