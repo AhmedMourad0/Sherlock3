@@ -5,7 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
+import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository

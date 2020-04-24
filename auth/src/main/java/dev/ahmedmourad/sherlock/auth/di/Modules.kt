@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.auth.dagger
+package dev.ahmedmourad.sherlock.auth.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

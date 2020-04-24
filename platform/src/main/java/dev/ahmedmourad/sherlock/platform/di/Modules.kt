@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.platform.dagger
+package dev.ahmedmourad.sherlock.platform.di
 
 import dagger.Binds
 import dagger.Module

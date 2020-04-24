@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.children.dagger
+package dev.ahmedmourad.sherlock.children.di
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage

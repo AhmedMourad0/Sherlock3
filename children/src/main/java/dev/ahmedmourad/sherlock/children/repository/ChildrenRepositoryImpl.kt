@@ -3,7 +3,7 @@ package dev.ahmedmourad.sherlock.children.repository
 import arrow.core.*
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.children.dagger.InternalApi
+import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository

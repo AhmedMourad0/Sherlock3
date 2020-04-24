@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.children.dagger
+package dev.ahmedmourad.sherlock.children.di
 
 import dagger.Module
 

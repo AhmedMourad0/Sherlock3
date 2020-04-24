@@ -4,7 +4,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
-import dev.ahmedmourad.sherlock.domain.dagger.InternalApi
+import dev.ahmedmourad.sherlock.domain.di.InternalApi
 import javax.inject.Inject
 
 interface NotifyChildrenFindingStateChangeInteractor : (BackgroundState) -> Unit

@@ -4,7 +4,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
-import dev.ahmedmourad.sherlock.domain.dagger.InternalApi
+import dev.ahmedmourad.sherlock.domain.di.InternalApi
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import javax.inject.Inject

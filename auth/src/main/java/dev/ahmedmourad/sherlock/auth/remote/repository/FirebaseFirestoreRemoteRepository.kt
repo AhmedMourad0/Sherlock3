@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
+import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser

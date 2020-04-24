@@ -14,7 +14,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
-import dev.ahmedmourad.sherlock.auth.dagger.InternalApi
+import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.domain.exceptions.*
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser

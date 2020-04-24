@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.domain.dagger
+package dev.ahmedmourad.sherlock.domain.di
 
 import dagger.Module
 

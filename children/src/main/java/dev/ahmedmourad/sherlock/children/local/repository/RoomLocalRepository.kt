@@ -3,7 +3,7 @@ package dev.ahmedmourad.sherlock.children.local.repository
 import arrow.core.*
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.children.dagger.InternalApi
+import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.local.database.ChildrenRoomDatabase
 import dev.ahmedmourad.sherlock.children.local.entities.RoomChildEntity
 import dev.ahmedmourad.sherlock.children.local.mapper.toRoomChildEntity

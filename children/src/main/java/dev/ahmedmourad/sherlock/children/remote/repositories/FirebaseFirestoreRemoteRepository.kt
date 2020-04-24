@@ -11,7 +11,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
 import dagger.Lazy
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.children.dagger.InternalApi
+import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.remote.contract.Contract
 import dev.ahmedmourad.sherlock.children.remote.utils.toMap
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
