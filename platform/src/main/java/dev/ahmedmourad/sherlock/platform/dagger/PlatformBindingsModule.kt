@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.platform.dagger.modules
+package dev.ahmedmourad.sherlock.platform.dagger
 
 import dagger.Binds
 import dagger.Module
@@ -12,7 +12,7 @@ import dev.ahmedmourad.sherlock.platform.managers.AndroidLocationManager
 import dev.ahmedmourad.sherlock.platform.managers.AndroidTextManager
 
 @Module
-internal interface ManagersModule {
+internal interface PlatformBindingsModule {
 
     @Binds
     fun bindDateManager(
