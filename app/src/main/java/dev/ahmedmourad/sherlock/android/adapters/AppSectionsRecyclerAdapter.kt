@@ -9,9 +9,11 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ItemSectionBinding
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
 
+internal typealias OnSectionSelectedListener = (NavDirections?) -> Unit
+
 internal class AppSectionsRecyclerAdapter(
         private val sectionsList: List<AppSection>,
-        private val onSectionSelectedListener: (NavDirections?) -> Unit
+        private val onSectionSelectedListener: OnSectionSelectedListener
 ) : RecyclerView.Adapter<AppSectionsRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): ViewHolder {
