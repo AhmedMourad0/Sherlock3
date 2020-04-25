@@ -23,7 +23,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
-import dev.ahmedmourad.sherlock.android.utils.defaults.DefaultOnRangeChangedListener
+import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker

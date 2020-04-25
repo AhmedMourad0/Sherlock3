@@ -8,7 +8,7 @@ import arrow.core.toT
 import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
+import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.common.Url
@@ -20,7 +20,7 @@ import timber.log.error
 internal class ChildrenRemoteViewsFactory(
         private val context: Context,
         results: Map<SimpleRetrievedChild, Weight>,
-        private val formatter: Lazy<Formatter>,
+        private val textFormatter: Lazy<TextFormatter>,
         private val dateManager: Lazy<DateManager>
 ) : RemoteViewsService.RemoteViewsFactory {
 
@@ -60,7 +60,7 @@ internal class ChildrenRemoteViewsFactory(
 
         views.setTextViewText(
                 R.id.widget_result_location,
-                formatter.get().formatLocation(
+                textFormatter.get().formatLocation(
                         result.a.locationName,
                         result.a.locationAddress
                 )

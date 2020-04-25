@@ -1,7 +1,6 @@
-package dev.ahmedmourad.sherlock.android.dagger
+package dev.ahmedmourad.sherlock.android.di
 
 import android.content.Context
-import dev.ahmedmourad.sherlock.android.dagger.components.ApplicationComponent
 import splitties.init.appCtx
 
 internal interface DaggerComponentProvider {

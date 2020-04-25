@@ -11,8 +11,8 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
+import dev.ahmedmourad.sherlock.android.di.SignedInUserProfileViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.SignedInUserProfileViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser

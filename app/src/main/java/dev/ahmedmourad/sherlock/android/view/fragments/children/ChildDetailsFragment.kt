@@ -17,7 +17,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
+import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
@@ -32,7 +32,7 @@ import javax.inject.Inject
 internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) {
 
     @Inject
-    internal lateinit var formatter: Lazy<Formatter>
+    internal lateinit var textFormatter: Lazy<TextFormatter>
 
     @Inject
     internal lateinit var viewModelFactoryFactory: ChildDetailsViewModelFactoryFactory
@@ -88,23 +88,23 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                     .into(it.childPicture)
 
 
-            val name = formatter.get().formatName(result.a.name)
+            val name = textFormatter.get().formatName(result.a.name)
             it.toolbar.title = name
             it.childName.text = name
 
-            it.childAge.text = formatter.get().formatAge(result.a.appearance.ageRange)
+            it.childAge.text = textFormatter.get().formatAge(result.a.appearance.ageRange)
 
-            it.childGender.text = formatter.get().formatGender(result.a.appearance.gender)
+            it.childGender.text = textFormatter.get().formatGender(result.a.appearance.gender)
 
-            it.childHeight.text = formatter.get().formatHeight(result.a.appearance.heightRange)
+            it.childHeight.text = textFormatter.get().formatHeight(result.a.appearance.heightRange)
 
-            it.childSkin.text = formatter.get().formatSkin(result.a.appearance.skin)
+            it.childSkin.text = textFormatter.get().formatSkin(result.a.appearance.skin)
 
-            it.childHair.text = formatter.get().formatHair(result.a.appearance.hair)
+            it.childHair.text = textFormatter.get().formatHair(result.a.appearance.hair)
 
-            it.childLocation.text = formatter.get().formatLocation(result.a.location)
+            it.childLocation.text = textFormatter.get().formatLocation(result.a.location)
 
-            it.notes.text = formatter.get().formatNotes(result.a.notes)
+            it.notes.text = textFormatter.get().formatNotes(result.a.notes)
         }
     }
 

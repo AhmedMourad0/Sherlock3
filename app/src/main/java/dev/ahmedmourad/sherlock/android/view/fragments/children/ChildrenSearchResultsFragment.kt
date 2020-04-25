@@ -18,7 +18,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRecyclerAdapterFactory
-import dev.ahmedmourad.sherlock.android.utils.formatter.Formatter
+import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
@@ -35,7 +35,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     internal lateinit var dateManager: Lazy<DateManager>
 
     @Inject
-    internal lateinit var formatter: Lazy<Formatter>
+    internal lateinit var textFormatter: Lazy<TextFormatter>
 
     @Inject
     internal lateinit var adapterFactory: ChildrenRecyclerAdapterFactory

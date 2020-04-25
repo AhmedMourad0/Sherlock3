@@ -8,7 +8,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.left
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
-import dev.ahmedmourad.sherlock.domain.dagger.modules.factories.ChildrenFilterFactory
+import dev.ahmedmourad.sherlock.domain.di.ChildrenFilterFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild

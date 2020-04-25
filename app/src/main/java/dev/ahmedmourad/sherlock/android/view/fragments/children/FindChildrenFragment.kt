@@ -16,8 +16,8 @@ import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
+import dev.ahmedmourad.sherlock.android.di.FindChildrenViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.FindChildrenViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.common.GlobalViewModel

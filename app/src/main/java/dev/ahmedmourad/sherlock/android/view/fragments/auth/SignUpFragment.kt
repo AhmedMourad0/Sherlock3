@@ -17,8 +17,8 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
+import dev.ahmedmourad.sherlock.android.di.SignUpViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.SignUpViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignUpViewModel

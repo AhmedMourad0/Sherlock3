@@ -22,9 +22,9 @@ import com.google.android.material.snackbar.Snackbar
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
+import dev.ahmedmourad.sherlock.android.di.GlobalViewModelQualifier
+import dev.ahmedmourad.sherlock.android.di.MainActivityViewModelQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.GlobalViewModelQualifier
-import dev.ahmedmourad.sherlock.android.di.modules.qualifiers.MainActivityViewModelQualifier
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
