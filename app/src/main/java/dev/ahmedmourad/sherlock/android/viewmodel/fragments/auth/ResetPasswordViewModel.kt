@@ -59,12 +59,12 @@ internal class ResetPasswordViewModel(
 
     companion object {
 
-        const val KEY_EMAIL =
+        private const val KEY_EMAIL =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
-        const val KEY_ERROR_EMAIL =
+        private const val KEY_ERROR_EMAIL =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
 
-        fun defaultArgs(email: String?): Bundle? {
+        private fun defaultArgs(email: String?): Bundle? {
             return email?.let { e ->
                 Bundle(1).apply {
                     putString(KEY_EMAIL, e)

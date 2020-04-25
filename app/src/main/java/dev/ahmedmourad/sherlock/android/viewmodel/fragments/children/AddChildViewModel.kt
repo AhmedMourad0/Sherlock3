@@ -12,7 +12,7 @@ import arrow.core.extensions.fx
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
-import dev.ahmedmourad.sherlock.android.dagger.modules.factories.SherlockServiceIntentFactory
+import dev.ahmedmourad.sherlock.android.di.modules.factories.SherlockServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
@@ -353,7 +353,7 @@ internal class AddChildViewModel(
         private const val KEY_ERROR_CHILD =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_CHILD"
 
-        fun defaultArgs(child: AppPublishedChild?): Bundle? {
+        private fun defaultArgs(child: AppPublishedChild?): Bundle? {
             return child?.let { c ->
                 Bundle(12).apply {
 

@@ -183,7 +183,7 @@ internal class CompleteSignUpViewModel(
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
 
-        fun defaultArgs(incompleteUser: IncompleteUser): Bundle {
+        private fun defaultArgs(incompleteUser: IncompleteUser): Bundle {
             return Bundle(6).apply {
                 putBundle(KEY_ID, incompleteUser.id.bundle(UserId.serializer()))
                 putString(KEY_EMAIL, incompleteUser.email?.value)
