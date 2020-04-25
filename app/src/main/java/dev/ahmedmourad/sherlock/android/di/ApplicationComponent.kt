@@ -21,7 +21,8 @@ import javax.inject.Singleton
     DomainModule::class,
     PlatformModule::class,
     ChildrenModule::class,
-    AuthModule::class
+    AuthModule::class,
+    AppModule::class
 ])
 @Singleton
 internal interface ApplicationComponent {
