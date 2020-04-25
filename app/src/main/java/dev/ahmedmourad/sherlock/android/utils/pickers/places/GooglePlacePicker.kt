@@ -5,9 +5,10 @@ import android.content.Intent
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import splitties.init.appCtx
+import javax.inject.Inject
 import com.google.android.gms.location.places.ui.PlacePicker as DelegatePlacePicker
 
-internal class GooglePlacePicker : PlacePicker {
+internal class GooglePlacePicker @Inject constructor() : PlacePicker {
 
     private val requestCode = (0..Int.MAX_VALUE).random()
 

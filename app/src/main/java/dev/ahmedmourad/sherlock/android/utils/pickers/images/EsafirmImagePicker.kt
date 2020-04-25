@@ -5,9 +5,10 @@ import android.content.Intent
 import com.esafirm.imagepicker.features.ReturnMode
 import dev.ahmedmourad.sherlock.android.R
 import splitties.init.appCtx
+import javax.inject.Inject
 import com.esafirm.imagepicker.features.ImagePicker as DelegateImagePicker
 
-internal class EsafirmImagePicker : ImagePicker {
+internal class EsafirmImagePicker @Inject constructor() : ImagePicker {
 
     private val requestCode = (0..Int.MAX_VALUE).random()
 
