@@ -38,34 +38,32 @@ internal class AuthSignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_auth_sign_in)
-
-        cancellationDisposable = AuthenticatorBus.signInCancellation.subscribe({
-            finishAffinity()
-        }, {
-            Timber.error(it, it::toString)
-        })
-
         signInStrategy = when (val action = intent.action) {
             ACTION_SIGN_IN_WITH_GOOGLE -> GoogleSignInStrategy()
             ACTION_SIGN_IN_WITH_FACEBOOK -> FacebookSignInStrategy()
             ACTION_SIGN_IN_WITH_TWITTER -> TwitterSignInStrategy()
             else -> throw IllegalArgumentException("Action not supported: $action")
         }
+        signInStrategy.initiate()
     }
 
     override fun onStart() {
         super.onStart()
-        signInStrategy.initiate()
+        cancellationDisposable = AuthenticatorBus.signInCancellation.subscribe({
+            finish()
+        }, {
+            Timber.error(it, it::toString)
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        signInStrategy.handleResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
+        signInStrategy.handleResult(requestCode, resultCode, data)
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
         cancellationDisposable?.dispose()
-        super.onDestroy()
+        super.onStop()
     }
 
     private inner class GoogleSignInStrategy : SignInStrategy {
@@ -83,7 +81,6 @@ internal class AuthSignInActivity : AppCompatActivity() {
         }
 
         override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
             if (requestCode == REQUEST_CODE_GOOGLE_SIGN_IN) {
 
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -92,10 +89,10 @@ internal class AuthSignInActivity : AppCompatActivity() {
                     AuthenticatorBus.signInCompletion.accept(GoogleAuthProvider.getCredential(
                             task.getResult(ApiException::class.java)?.idToken, null
                     ).right())
-                } catch (e: ApiException) {
+                } catch (e: Exception) {
                     AuthenticatorBus.signInCompletion.accept(e.left())
                 } finally {
-                    finishAffinity()
+                    finish()
                 }
             }
         }
@@ -114,17 +111,17 @@ internal class AuthSignInActivity : AppCompatActivity() {
                     AuthenticatorBus.signInCompletion.accept(FacebookAuthProvider.getCredential(
                             loginResult.accessToken.token
                     ).right())
-                    finishAffinity()
+                    finish()
                 }
 
                 override fun onCancel() {
                     AuthenticatorBus.signInCompletion.accept(SignInCancelledException().left())
-                    finishAffinity()
+                    finish()
                 }
 
                 override fun onError(exception: FacebookException) {
                     AuthenticatorBus.signInCompletion.accept(exception.left())
-                    finishAffinity()
+                    finish()
                 }
             })
 
@@ -160,12 +157,12 @@ internal class AuthSignInActivity : AppCompatActivity() {
                             result.data.authToken.token,
                             result.data.authToken.secret
                     ).right())
-                    finishAffinity()
+                    finish()
                 }
 
                 override fun failure(exception: TwitterException) {
                     AuthenticatorBus.signInCompletion.accept(exception.left())
-                    finishAffinity()
+                    finish()
                 }
             })
         }
