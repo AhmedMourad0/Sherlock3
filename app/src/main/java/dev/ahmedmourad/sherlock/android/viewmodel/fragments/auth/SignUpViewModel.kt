@@ -1,18 +1,19 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
@@ -20,6 +21,7 @@ import dev.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 internal class SignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -184,22 +186,21 @@ internal class SignUpViewModel(
         }.orNull()
     }
 
-    class Factory(
-            owner: SavedStateRegistryOwner,
+    @Reusable
+    class Factory @Inject constructor(
             private val signUpInteractor: SignUpInteractor,
             private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
             private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
             private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    ) : AssistedViewModelFactory<SignUpViewModel> {
+        override fun invoke(handle: SavedStateHandle): SignUpViewModel {
             return SignUpViewModel(
                     handle,
                     signUpInteractor,
                     signUpWithGoogleInteractor,
                     signUpWithFacebookInteractor,
                     signUpWithTwitterInteractor
-            ) as T
+            )
         }
     }
 
@@ -236,5 +237,7 @@ internal class SignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PICTURE_PATH"
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
+
+        fun defaultArgs(): Bundle? = null
     }
 }

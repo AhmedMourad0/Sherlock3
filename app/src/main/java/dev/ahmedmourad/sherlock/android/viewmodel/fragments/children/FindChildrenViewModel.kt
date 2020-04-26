@@ -1,16 +1,18 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.children
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
+import javax.inject.Inject
 
 internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
@@ -210,10 +212,10 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
         }.orNull()
     }
 
-    class Factory(owner: SavedStateRegistryOwner) : AbstractSavedStateViewModelFactory(owner, null) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            return FindChildrenViewModel(handle) as T
+    @Reusable
+    class Factory @Inject constructor() : AssistedViewModelFactory<FindChildrenViewModel> {
+        override fun invoke(handle: SavedStateHandle): FindChildrenViewModel {
+            return FindChildrenViewModel(handle)
         }
     }
 
@@ -258,5 +260,7 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_APPEARANCE"
         private const val KEY_ERROR_QUERY =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_QUERY"
+
+        fun defaultArgs(): Bundle? = null
     }
 }

@@ -1,17 +1,18 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 
 import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.orNull
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 internal class ResetPasswordViewModel(
         private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
@@ -43,17 +44,15 @@ internal class ResetPasswordViewModel(
         ).orNull()
     }
 
-    class Factory(
-            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
-            owner: SavedStateRegistryOwner,
-            email: String?
-    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs(email)) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    @Reusable
+    class Factory @Inject constructor(
+            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
+    ) : AssistedViewModelFactory<ResetPasswordViewModel> {
+        override fun invoke(handle: SavedStateHandle): ResetPasswordViewModel {
             return ResetPasswordViewModel(
                     sendPasswordResetEmailInteractor,
                     handle
-            ) as T
+            )
         }
     }
 
@@ -64,7 +63,7 @@ internal class ResetPasswordViewModel(
         private const val KEY_ERROR_EMAIL =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
 
-        private fun defaultArgs(email: String?): Bundle? {
+        fun defaultArgs(email: String?): Bundle? {
             return email?.let { e ->
                 Bundle(1).apply {
                     putString(KEY_EMAIL, e)
@@ -73,7 +72,3 @@ internal class ResetPasswordViewModel(
         }
     }
 }
-
-internal typealias ResetPasswordViewModelFactoryFactory =
-        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards String?) ->
-        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

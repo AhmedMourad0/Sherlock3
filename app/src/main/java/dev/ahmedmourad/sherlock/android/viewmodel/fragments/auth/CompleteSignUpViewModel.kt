@@ -1,15 +1,14 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 
 import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
@@ -19,12 +18,14 @@ import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validatePhoneNumber
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 internal class CompleteSignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -138,21 +139,15 @@ internal class CompleteSignUpViewModel(
         }.orNull()
     }
 
-    class Factory(
-            owner: SavedStateRegistryOwner,
-            incompleteUser: IncompleteUser,
+    @Reusable
+    class Factory @Inject constructor(
             private val completeSignUpInteractor: CompleteSignUpInteractor
-    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs(incompleteUser)) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle
-        ): T {
+    ) : AssistedViewModelFactory<CompleteSignUpViewModel> {
+        override fun invoke(handle: SavedStateHandle): CompleteSignUpViewModel {
             return CompleteSignUpViewModel(
                     handle,
                     completeSignUpInteractor
-            ) as T
+            )
         }
     }
 
@@ -183,7 +178,7 @@ internal class CompleteSignUpViewModel(
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
 
-        private fun defaultArgs(incompleteUser: IncompleteUser): Bundle {
+        fun defaultArgs(incompleteUser: IncompleteUser): Bundle? {
             return Bundle(6).apply {
                 putBundle(KEY_ID, incompleteUser.id.bundle(UserId.serializer()))
                 putString(KEY_EMAIL, incompleteUser.email?.value)
@@ -198,7 +193,3 @@ internal class CompleteSignUpViewModel(
         }
     }
 }
-
-internal typealias CompleteSignUpViewModelFactoryFactory =
-        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards IncompleteUser) ->
-        @JvmSuppressWildcards AbstractSavedStateViewModelFactory

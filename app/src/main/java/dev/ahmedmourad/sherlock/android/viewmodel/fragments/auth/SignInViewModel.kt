@@ -1,16 +1,17 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validatePassword
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateUserCredentials
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
@@ -20,6 +21,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 internal class SignInViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -97,22 +99,21 @@ internal class SignInViewModel(
         }.orNull()
     }
 
-    class Factory(
-            owner: SavedStateRegistryOwner,
+    @Reusable
+    class Factory @Inject constructor(
             private val signInInteractor: SignInInteractor,
             private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
             private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
             private val signInWithTwitterInteractor: SignInWithTwitterInteractor
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    ) : AssistedViewModelFactory<SignInViewModel> {
+        override fun invoke(handle: SavedStateHandle): SignInViewModel {
             return SignInViewModel(
                     handle,
                     signInInteractor,
                     signInWithGoogleInteractor,
                     signInWithFacebookInteractor,
                     signInWithTwitterInteractor
-            ) as T
+            )
         }
     }
 
@@ -129,5 +130,7 @@ internal class SignInViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PASSWORD"
         private const val KEY_ERROR_CREDENTIALS =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_CREDENTIALS"
+
+        fun defaultArgs(): Bundle? = null
     }
 }

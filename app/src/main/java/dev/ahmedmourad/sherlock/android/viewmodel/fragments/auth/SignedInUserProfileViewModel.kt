@@ -1,17 +1,19 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.left
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 internal class SignedInUserProfileViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
@@ -23,17 +25,19 @@ internal class SignedInUserProfileViewModel(
                     .observeOn(AndroidSchedulers.mainThread())
                     .toLiveData()
 
-    class Factory(
-            owner: SavedStateRegistryOwner,
+    @Reusable
+    class Factory @Inject constructor(
             private val observeSignedInUserInteractor: ObserveSignedInUserInteractor
-    ) : AbstractSavedStateViewModelFactory(owner, null) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    ) : AssistedViewModelFactory<SignedInUserProfileViewModel> {
+        override fun invoke(handle: SavedStateHandle): SignedInUserProfileViewModel {
             return SignedInUserProfileViewModel(
                     handle,
                     observeSignedInUserInteractor
-            ) as T
-
+            )
         }
+    }
+
+    companion object {
+        fun defaultArgs(): Bundle? = null
     }
 }

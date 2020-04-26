@@ -2,28 +2,29 @@ package dev.ahmedmourad.sherlock.android.viewmodel.fragments.children
 
 import android.os.Bundle
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
-import dev.ahmedmourad.sherlock.android.di.modules.factories.SherlockServiceIntentFactory
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
+import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.constants.*
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.android.schedulers.AndroidSchedulers
 import splitties.init.appCtx
+import javax.inject.Inject
 
 internal class AddChildViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -283,19 +284,17 @@ internal class AddChildViewModel(
         }.orNull()
     }
 
-    class Factory(
-            owner: SavedStateRegistryOwner,
-            child: AppPublishedChild?,
+    @Reusable
+    class Factory @Inject constructor(
             private val serviceFactory: SherlockServiceIntentFactory,
             private val observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
-    ) : AbstractSavedStateViewModelFactory(owner, defaultArgs(child)) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
+    ) : AssistedViewModelFactory<AddChildViewModel> {
+        override fun invoke(handle: SavedStateHandle): AddChildViewModel {
             return AddChildViewModel(
                     handle,
                     serviceFactory,
                     observeChildPublishingStateInteractor
-            ) as T
+            )
         }
     }
 
@@ -353,7 +352,7 @@ internal class AddChildViewModel(
         private const val KEY_ERROR_CHILD =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_CHILD"
 
-        private fun defaultArgs(child: AppPublishedChild?): Bundle? {
+        fun defaultArgs(child: AppPublishedChild?): Bundle? {
             return child?.let { c ->
                 Bundle(12).apply {
 
@@ -394,7 +393,3 @@ internal class AddChildViewModel(
         }
     }
 }
-
-internal typealias AddChildViewModelFactoryFactory =
-        (@JvmSuppressWildcards SavedStateRegistryOwner, @JvmSuppressWildcards AppPublishedChild?) ->
-        @JvmSuppressWildcards AbstractSavedStateViewModelFactory
