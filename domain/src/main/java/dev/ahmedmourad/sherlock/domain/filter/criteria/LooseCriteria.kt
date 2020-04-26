@@ -4,12 +4,14 @@ import arrow.core.Tuple2
 import arrow.core.getOrHandle
 import arrow.core.toT
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.LocationManager
 import me.xdrop.fuzzywuzzy.FuzzySearch
+import javax.inject.Inject
 
 //TODO: date of losing and finding the child matters
 internal class LooseCriteria(
@@ -167,4 +169,15 @@ internal class LooseCriteria(
     }
 
     class MaxDistance(val value: Long, val factor: Long)
+}
+
+interface ChildrenCriteriaFactory : (ChildQuery) -> Criteria<RetrievedChild>
+
+@Reusable
+internal class ChildrenCriteriaFactoryImpl @Inject constructor(
+        private val locationManager: Lazy<LocationManager>
+) : ChildrenCriteriaFactory {
+    override fun invoke(query: ChildQuery): Criteria<RetrievedChild> {
+        return LooseCriteria(query, locationManager)
+    }
 }
