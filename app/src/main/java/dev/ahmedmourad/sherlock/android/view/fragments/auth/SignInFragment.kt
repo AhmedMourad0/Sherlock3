@@ -11,9 +11,9 @@ import arrow.core.Either
 import arrow.core.identity
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignInBinding
-import dev.ahmedmourad.sherlock.android.di.SignInViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignInViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -25,10 +25,15 @@ import javax.inject.Inject
 internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClickListener {
 
     @Inject
-    @field:SignInViewModelFactoryFactoryQualifier
-    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<SignInViewModel>
 
-    private val viewModel: SignInViewModel by viewModels { viewModelFactory(this) }
+    private val viewModel: SignInViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                SignInViewModel.defaultArgs()
+        )
+    }
 
     private var signInDisposable by disposable()
 

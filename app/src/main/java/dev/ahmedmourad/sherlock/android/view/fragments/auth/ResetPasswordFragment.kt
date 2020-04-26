@@ -12,8 +12,9 @@ import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentResetPasswordBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.common.disposable
 import timber.log.Timber
 import timber.log.error
@@ -23,9 +24,15 @@ import javax.inject.Inject
 internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: ResetPasswordViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<ResetPasswordViewModel>
 
-    private val viewModel: ResetPasswordViewModel by viewModels { viewModelFactory(this, args.email) }
+    private val viewModel: ResetPasswordViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                ResetPasswordViewModel.defaultArgs(args.email)
+        )
+    }
 
     private val args: ResetPasswordFragmentArgs by navArgs()
 

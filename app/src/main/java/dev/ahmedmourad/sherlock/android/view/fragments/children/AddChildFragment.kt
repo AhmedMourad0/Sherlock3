@@ -27,9 +27,10 @@ import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
-import dev.ahmedmourad.sherlock.android.viewmodel.common.GlobalViewModel
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.constants.*
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
@@ -44,7 +45,7 @@ import kotlin.math.roundToInt
 internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AddChildViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<AddChildViewModel>
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>
@@ -57,7 +58,11 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private val globalViewModel: GlobalViewModel by activityViewModels()
     private val viewModel: AddChildViewModel by viewModels {
-        viewModelFactory(this, args.child?.unbundle(AppPublishedChild.serializer()))
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                AddChildViewModel.defaultArgs(args.child?.unbundle(AppPublishedChild.serializer()))
+        )
     }
 
     private val args: AddChildFragmentArgs by navArgs()
@@ -66,6 +71,21 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentAddChildBinding.bind(view)
+
+        setUserInteractionsEnabled(args.child == null)
+
+        initializeSkinColorViews()
+        initializeHairColorViews()
+        initializeSeekBars()
+        initializeEditTexts()
+        initializeGenderRadioGroup()
+        initializePictureImageView()
+        initializeLocationTextView()
 
         globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
             when (either) {
@@ -89,22 +109,6 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 }
             }.exhaust()
         })
-
-        initializePictureImageView()
-        initializeLocationTextView()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentAddChildBinding.bind(view)
-
-        setUserInteractionsEnabled(args.child == null)
-
-        initializeSkinColorViews()
-        initializeHairColorViews()
-        initializeSeekBars()
-        initializeEditTexts()
-        initializeGenderRadioGroup()
 
         binding?.let { b ->
             arrayOf(b.locationImageView,

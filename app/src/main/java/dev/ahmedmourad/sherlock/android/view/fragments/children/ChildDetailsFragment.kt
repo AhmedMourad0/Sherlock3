@@ -18,8 +18,9 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -35,10 +36,14 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     internal lateinit var textFormatter: Lazy<TextFormatter>
 
     @Inject
-    internal lateinit var viewModelFactoryFactory: ChildDetailsViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<ChildDetailsViewModel>
 
     private val viewModel: ChildDetailsViewModel by viewModels {
-        viewModelFactoryFactory(this, args.childId.unbundle(ChildId.serializer()))
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                ChildDetailsViewModel.defaultArgs(args.childId.unbundle(ChildId.serializer()))
+        )
     }
 
     private val args: ChildDetailsFragmentArgs by navArgs()
@@ -47,6 +52,12 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentChildDetailsBinding.bind(view)
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
 
         //TODO: notify the user when the data is updated or deleted
         viewModel.result.observe(viewLifecycleOwner, Observer { resultEither ->
@@ -61,12 +72,6 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                 }
             }.exhaust()
         })
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentChildDetailsBinding.bind(view)
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
     }
 
     private fun populateUi(result: Tuple2<RetrievedChild, Weight?>?) {

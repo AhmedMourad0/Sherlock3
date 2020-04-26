@@ -19,8 +19,9 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.common.disposable
@@ -32,13 +33,17 @@ import javax.inject.Inject
 internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign_up), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactoryFactory: CompleteSignUpViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<CompleteSignUpViewModel>
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
     private val viewModel: CompleteSignUpViewModel by viewModels {
-        viewModelFactoryFactory(this, args.incompleteUser.unbundle(IncompleteUser.serializer()))
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                CompleteSignUpViewModel.defaultArgs(args.incompleteUser.unbundle(IncompleteUser.serializer()))
+        )
     }
 
     private var completeSignUpDisposable by disposable()
@@ -49,7 +54,6 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
-        initializePictureImageView()
     }
 
     //TODO: sign out button
@@ -58,6 +62,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         binding = FragmentCompleteSignUpBinding.bind(view)
 
         initializeEditTexts()
+        initializePictureImageView()
 
         binding?.let { b ->
             arrayOf(b.pictureImageView,

@@ -17,10 +17,10 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
-import dev.ahmedmourad.sherlock.android.di.SignUpViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
-import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignUpViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -33,13 +33,18 @@ import javax.inject.Inject
 internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClickListener {
 
     @Inject
-    @field:SignUpViewModelFactoryFactoryQualifier
-    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<SignUpViewModel>
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
-    private val viewModel: SignUpViewModel by viewModels { viewModelFactory(this) }
+    private val viewModel: SignUpViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                SignUpViewModel.defaultArgs()
+        )
+    }
 
     private var signUpDisposable by disposable()
 
@@ -48,13 +53,13 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
-        initializePictureImageView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignUpBinding.bind(view)
         initializeEditTexts()
+        initializePictureImageView()
         binding?.let { b ->
             arrayOf(b.pictureImageView,
                     b.pictureTextView,
@@ -74,7 +79,20 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
             b.emailEditText.setText(viewModel.email.value)
             b.passwordEditText.setText(viewModel.password.value)
             b.confirmPasswordEditText.setText(viewModel.passwordConfirmation.value)
-            b.phoneNumberEditText.setText(viewModel.phoneNumber.value)
+
+            val phoneNumber = viewModel.phoneNumber.value
+            val countryCode = viewModel.phoneNumberCountryCode.value
+            if (phoneNumber != null && countryCode != null) {
+                b.phoneNumberEditText.setText(
+                        getString(
+                                R.string.phone_number_with_country_code,
+                                countryCode,
+                                phoneNumber
+                        )
+                )
+            } else {
+                b.phoneNumberEditText.setText(null)
+            }
 
             b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
                 viewModel.onDisplayNameChange(text.toString())

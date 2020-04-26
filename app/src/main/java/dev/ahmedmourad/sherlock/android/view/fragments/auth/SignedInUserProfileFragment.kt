@@ -11,9 +11,9 @@ import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
-import dev.ahmedmourad.sherlock.android.di.SignedInUserProfileViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
@@ -28,17 +28,26 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     internal lateinit var dateManager: Lazy<DateManager>
 
     @Inject
-    @field:SignedInUserProfileViewModelFactoryFactoryQualifier
-    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<SignedInUserProfileViewModel>
 
-    private val viewModel: SignedInUserProfileViewModel by viewModels { viewModelFactory(this) }
+    private val viewModel: SignedInUserProfileViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                SignedInUserProfileViewModel.defaultArgs()
+        )
+    }
 
     private var binding: FragmentSignedInUserProfileBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentSignedInUserProfileBinding.bind(view)
         viewModel.signedInUser.observe(viewLifecycleOwner, Observer { resultEither ->
             resultEither.fold(ifLeft = {
                 Timber.error(it, it::toString)
@@ -47,11 +56,6 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
                 userEither.fold(ifLeft = ::identity, ifRight = this::populateUi)
             })
         })
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentSignedInUserProfileBinding.bind(view)
     }
 
     private fun populateUi(user: SignedInUser) {

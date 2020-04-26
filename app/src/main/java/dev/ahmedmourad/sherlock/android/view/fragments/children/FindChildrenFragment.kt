@@ -16,13 +16,13 @@ import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
-import dev.ahmedmourad.sherlock.android.di.FindChildrenViewModelFactoryFactoryQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
-import dev.ahmedmourad.sherlock.android.viewmodel.common.GlobalViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.FindChildrenViewModel
+import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
@@ -36,8 +36,7 @@ import javax.inject.Inject
 internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children), View.OnClickListener {
 
     @Inject
-    @field:FindChildrenViewModelFactoryFactoryQualifier
-    internal lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<FindChildrenViewModel>
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>
@@ -46,13 +45,31 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     private lateinit var hairColorSelector: ColorSelector<Hair>
 
     private val globalViewModel: GlobalViewModel by activityViewModels()
-    private val viewModel: FindChildrenViewModel by viewModels { viewModelFactory(this) }
+    private val viewModel: FindChildrenViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                FindChildrenViewModel.defaultArgs()
+        )
+    }
 
     private var binding: FragmentFindChildrenBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentFindChildrenBinding.bind(view)
+
+        createSkinColorViews()
+        createHairColorViews()
+        initializeEditTexts()
+        initializeGenderRadioGroup()
+        initializeNumberPickers()
+        initializeLocationTextView()
 
         globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
             when (either) {
@@ -65,19 +82,6 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 }
             }.exhaust()
         })
-
-        initializeLocationTextView()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentFindChildrenBinding.bind(view)
-
-        createSkinColorViews()
-        createHairColorViews()
-        initializeEditTexts()
-        initializeGenderRadioGroup()
-        initializeNumberPickers()
 
         binding?.let { b ->
             arrayOf(b.locationImageView,

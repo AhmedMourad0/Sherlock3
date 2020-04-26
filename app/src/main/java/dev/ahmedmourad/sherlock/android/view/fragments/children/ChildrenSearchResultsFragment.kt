@@ -12,15 +12,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.adapters.DynamicRecyclerAdapter
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModelFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
@@ -41,12 +42,16 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     internal lateinit var adapterFactory: ChildrenRecyclerAdapterFactory
 
     @Inject
-    internal lateinit var viewModelFactoryFactory: ChildrenSearchResultsViewModelFactoryFactory
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<ChildrenSearchResultsViewModel>
 
     private lateinit var adapter: DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
 
     private val viewModel: ChildrenSearchResultsViewModel by viewModels {
-        viewModelFactoryFactory(this, args.query.unbundle(ChildQuery.serializer()))
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                ChildrenSearchResultsViewModel.defaultArgs(args.query.unbundle(ChildQuery.serializer()))
+        )
     }
 
     private val args: ChildrenSearchResultsFragmentArgs by navArgs()
@@ -55,6 +60,12 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injector.inject(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentChildrenSearchResultsBinding.bind(view)
+        initializeRecyclerView()
 
         //TODO: either give the option to update or not, or onPublish new values to the bottom
         //TODO: paginate
@@ -64,12 +75,6 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
                 Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
             }, ifRight = adapter::update)
         })
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentChildrenSearchResultsBinding.bind(view)
-        initializeRecyclerView()
     }
 
     private fun initializeRecyclerView() {

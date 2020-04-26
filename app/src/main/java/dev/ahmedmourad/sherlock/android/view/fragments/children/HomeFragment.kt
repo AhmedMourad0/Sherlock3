@@ -1,17 +1,21 @@
-package dev.ahmedmourad.sherlock.android.view.fragments
+package dev.ahmedmourad.sherlock.android.view.fragments.children
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import arrow.syntax.function.partially1
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.databinding.FragmentHomeBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.factories.AppSectionsRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.HomeViewModel
 import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
@@ -19,7 +23,18 @@ import javax.inject.Inject
 internal class HomeFragment : Fragment(R.layout.fragment_home) {
 
     @Inject
+    internal lateinit var viewModelFactory: AssistedViewModelFactory<HomeViewModel>
+
+    @Inject
     internal lateinit var adapterFactory: AppSectionsRecyclerAdapterFactory
+
+    private val viewModel: HomeViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                HomeViewModel.defaultArgs()
+        )
+    }
 
     private var binding: FragmentHomeBinding? = null
 
