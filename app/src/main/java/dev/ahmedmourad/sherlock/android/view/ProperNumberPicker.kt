@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.view.views
+package dev.ahmedmourad.sherlock.android.view
 
 import android.content.Context
 import android.util.AttributeSet
