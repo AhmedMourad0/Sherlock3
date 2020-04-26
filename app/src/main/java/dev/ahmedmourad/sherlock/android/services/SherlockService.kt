@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDeepLinkBuilder
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
@@ -226,5 +227,14 @@ internal class SherlockService : Service() {
             action = ACTION_PUBLISH_CHILD
             putExtra(EXTRA_CHILD, child.bundle(AppPublishedChild.serializer()))
         }
+    }
+}
+
+internal interface SherlockServiceIntentFactory : (AppPublishedChild) -> Intent
+
+@Reusable
+internal class SherlockServiceIntentFactoryImpl @Inject constructor() : SherlockServiceIntentFactory {
+    override fun invoke(child: AppPublishedChild): Intent {
+        return SherlockService.createIntent(child)
     }
 }
