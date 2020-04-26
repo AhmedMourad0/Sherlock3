@@ -73,6 +73,13 @@
 		android:focusableInTouchMode="true"
 		app:shape_cutCorner_topLeftSize="@dimen/main_content_corner_cut">
 		
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:background="@android:color/white"
+			android:clickable="true"
+			android:focusable="true" />
+		
 		<fragment
 			android:id="@+id/app_nav_host_fragment"
 			android:name="androidx.navigation.fragment.NavHostFragment"
