@@ -4,6 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.bus.BusImpl
+import dev.ahmedmourad.sherlock.domain.filter.ChildrenFilterFactory
+import dev.ahmedmourad.sherlock.domain.filter.ChildrenFilterFactoryImpl
+import dev.ahmedmourad.sherlock.domain.filter.criteria.ChildrenCriteriaFactory
+import dev.ahmedmourad.sherlock.domain.filter.criteria.ChildrenCriteriaFactoryImpl
 import dev.ahmedmourad.sherlock.domain.interactors.auth.*
 import dev.ahmedmourad.sherlock.domain.interactors.children.*
 import dev.ahmedmourad.sherlock.domain.interactors.common.*
