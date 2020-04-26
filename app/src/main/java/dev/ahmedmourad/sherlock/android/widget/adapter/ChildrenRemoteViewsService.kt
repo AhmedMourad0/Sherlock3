@@ -5,10 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViewsService
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRemoteViewsFactoryFactory
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import kotlinx.serialization.builtins.MapSerializer
@@ -68,5 +68,16 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
         private fun getUniqueDataUri(appWidgetId: Int): Uri {
             return Uri.withAppendedPath(Uri.parse("sherlock://widget/id/"), "$appWidgetId${UUID.randomUUID()}")
         }
+    }
+}
+
+internal interface ChildrenRemoteViewsServiceIntentFactory :
+        (Int, Map<SimpleRetrievedChild, Weight>) -> Intent
+
+@Reusable
+internal class ChildrenRemoteViewsServiceIntentFactoryImpl @Inject constructor() :
+        ChildrenRemoteViewsServiceIntentFactory {
+    override fun invoke(appWidgetId: Int, results: Map<SimpleRetrievedChild, Weight>): Intent {
+        return ChildrenRemoteViewsService.create(appWidgetId, results)
     }
 }

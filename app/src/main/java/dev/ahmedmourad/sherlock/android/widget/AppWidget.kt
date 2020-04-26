@@ -7,8 +7,8 @@ import android.widget.RemoteViews
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.di.modules.factories.ChildrenRemoteViewsServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.utils.DisposablesSparseArray
+import dev.ahmedmourad.sherlock.android.widget.adapter.ChildrenRemoteViewsServiceIntentFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight

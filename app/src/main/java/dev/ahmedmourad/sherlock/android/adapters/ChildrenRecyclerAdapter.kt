@@ -9,6 +9,7 @@ import arrow.core.toT
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ItemResultBinding
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
@@ -17,6 +18,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import splitties.init.appCtx
 import java.util.*
+import javax.inject.Inject
 
 internal typealias OnChildSelectedListener = (Tuple2<SimpleRetrievedChild, Weight>) -> Unit
 
@@ -61,5 +63,18 @@ internal class ChildrenRecyclerAdapter(
 
             itemView.setOnClickListener { onChildSelectedListener(result) }
         }
+    }
+}
+
+internal interface ChildrenRecyclerAdapterFactory :
+        (OnChildSelectedListener) -> DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
+
+@Reusable
+internal class ChildrenRecyclerAdapterFactoryImpl @Inject constructor(
+        private val dateManager: Lazy<DateManager>,
+        private val textFormatter: Lazy<TextFormatter>
+) : ChildrenRecyclerAdapterFactory {
+    override fun invoke(onChildSelectedListener: OnChildSelectedListener): DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *> {
+        return ChildrenRecyclerAdapter(dateManager, textFormatter, onChildSelectedListener)
     }
 }

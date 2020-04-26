@@ -5,9 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ItemSectionBinding
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
+import javax.inject.Inject
 
 internal typealias OnSectionSelectedListener = (NavDirections?) -> Unit
 
@@ -33,5 +35,19 @@ internal class AppSectionsRecyclerAdapter(
             binding.imageView.setImageResource(section.imageDrawable)
             itemView.setOnClickListener { onSectionSelectedListener(section.navDirectionFactory?.invoke()) }
         }
+    }
+}
+
+internal interface AppSectionsRecyclerAdapterFactory :
+        (List<AppSection>, OnSectionSelectedListener) -> RecyclerView.Adapter<*>
+
+@Reusable
+internal class AppSectionsRecyclerAdapterFactoryImpl @Inject constructor() :
+        AppSectionsRecyclerAdapterFactory {
+    override fun invoke(
+            sectionsList: List<AppSection>,
+            onSectionSelectedListener: OnSectionSelectedListener
+    ): RecyclerView.Adapter<*> {
+        return AppSectionsRecyclerAdapter(sectionsList, onSectionSelectedListener)
     }
 }

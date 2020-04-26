@@ -7,6 +7,7 @@ import android.widget.RemoteViewsService
 import arrow.core.toT
 import com.bumptech.glide.Glide
 import dagger.Lazy
+import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
@@ -16,6 +17,7 @@ import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
+import javax.inject.Inject
 
 internal class ChildrenRemoteViewsFactory(
         private val context: Context,
@@ -102,5 +104,26 @@ internal class ChildrenRemoteViewsFactory(
 
     override fun onDestroy() {
 
+    }
+}
+
+internal interface ChildrenRemoteViewsFactoryFactory :
+        (Context, Map<SimpleRetrievedChild, Weight>) -> RemoteViewsService.RemoteViewsFactory
+
+@Reusable
+internal class ChildrenRemoteViewsFactoryFactoryImpl @Inject constructor(
+        private val textFormatter: Lazy<TextFormatter>,
+        private val dateManager: Lazy<DateManager>
+) : ChildrenRemoteViewsFactoryFactory {
+    override fun invoke(
+            context: Context,
+            results: Map<SimpleRetrievedChild, Weight>
+    ): RemoteViewsService.RemoteViewsFactory {
+        return ChildrenRemoteViewsFactory(
+                context,
+                results,
+                textFormatter,
+                dateManager
+        )
     }
 }
