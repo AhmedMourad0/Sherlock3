@@ -22,8 +22,6 @@ import com.google.android.material.snackbar.Snackbar
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
-import dev.ahmedmourad.sherlock.android.di.GlobalViewModelQualifier
-import dev.ahmedmourad.sherlock.android.di.MainActivityViewModelQualifier
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.findNavController
@@ -31,8 +29,9 @@ import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
 import dev.ahmedmourad.sherlock.android.utils.singleTop
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.common.GlobalViewModel
-import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleViewModelFactoryFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
+import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
@@ -44,12 +43,10 @@ import javax.inject.Inject
 internal class MainActivity : AppCompatActivity() {
 
     @Inject
-    @field:MainActivityViewModelQualifier
-    lateinit var viewModelFactory: SimpleViewModelFactoryFactory
+    lateinit var viewModelFactory: AssistedViewModelFactory<MainActivityViewModel>
 
     @Inject
-    @field:GlobalViewModelQualifier
-    lateinit var globalViewModelFactory: SimpleViewModelFactoryFactory
+    lateinit var globalViewModelFactory: AssistedViewModelFactory<GlobalViewModel>
 
     private var isContentShown = true
 
@@ -58,8 +55,21 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var appNavHostFragment: Fragment
     private lateinit var authNavHostFragment: Fragment
 
-    private val viewModel: MainActivityViewModel by viewModels { viewModelFactory(this) }
-    private val globalViewModel: GlobalViewModel by viewModels { globalViewModelFactory(this) }
+    private val viewModel: MainActivityViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                viewModelFactory,
+                MainActivityViewModel.defaultArgs()
+        )
+    }
+
+    private val globalViewModel: GlobalViewModel by viewModels {
+        SimpleSavedStateViewModelFactory(
+                this,
+                globalViewModelFactory,
+                GlobalViewModel.defaultArgs()
+        )
+    }
 
     private var signOutDisposable by disposable()
 
@@ -103,6 +113,7 @@ internal class MainActivity : AppCompatActivity() {
 
         globalViewModel.userAuthState.observe(this, Observer { either ->
             either.fold(ifLeft = {
+                invalidateOptionsMenu()
                 Timber.error(it, it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
@@ -112,6 +123,7 @@ internal class MainActivity : AppCompatActivity() {
 
         globalViewModel.signedInUser.observe(this, Observer { either ->
             either.fold(ifLeft = {
+                invalidateOptionsMenu()
                 Timber.error(it, it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
@@ -212,32 +224,45 @@ internal class MainActivity : AppCompatActivity() {
         val userEither = globalViewModel.signedInUser.value ?: return
 
         val authNavController = findNavController(R.id.auth_nav_host_fragment)
+        val authNeutralDestinations = arrayOf(
+                R.id.signInFragment,
+                R.id.signUpFragment,
+                R.id.resetPasswordFragment
+        )
 
         if (isUserSignedIn) {
 
             userEither.fold(ifLeft = {
 
-                if (it is NoSignedInUserException) {
-                    authNavController.navigate(R.id.signInFragment, null, singleTop())
-                } else {
-                    authNavController.navigate(R.id.signInFragment, null, singleTop())
-                    TODO("retry or sign out controller")
+                if (authNavController.currentDestination?.id !in authNeutralDestinations) {
+                    if (it is NoSignedInUserException) {
+                        authNavController.navigate(R.id.signInFragment, null, singleTop())
+                    } else {
+                        authNavController.navigate(R.id.signInFragment, null, singleTop())
+                        TODO("retry or sign out controller")
+                    }
                 }
 
             }, ifRight = { either ->
                 either.fold(ifLeft = {
-                    authNavController.navigate(
-                            R.id.completeSignUpFragment,
-                            CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
-                            singleTop()
-                    )
+                    if (authNavController.currentDestination?.id != R.id.completeSignUpFragment) {
+                        authNavController.navigate(
+                                R.id.completeSignUpFragment,
+                                CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
+                                singleTop()
+                        )
+                    }
                 }, ifRight = {
-                    authNavController.navigate(R.id.signedInUserProfileFragment, null, singleTop())
+                    if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
+                        authNavController.navigate(R.id.signedInUserProfileFragment, null, singleTop())
+                    }
                 })
             })
 
         } else {
-            authNavController.navigate(R.id.signInFragment, null, singleTop())
+            if (authNavController.currentDestination?.id !in authNeutralDestinations) {
+                authNavController.navigate(R.id.signInFragment, null, singleTop())
+            }
         }
     }
 
@@ -248,8 +273,16 @@ internal class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
-        val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
         val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
+        val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
+
+        menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
+
+        if (!isContentShown) {
+            item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
+            return super.onPrepareOptionsMenu(menu)
+        }
+
         val userEither = globalViewModel.signedInUser.value
         val isStateLoaded = isUserSignedIn != null && userEither != null
 
@@ -259,43 +292,35 @@ internal class MainActivity : AppCompatActivity() {
             return super.onPrepareOptionsMenu(menu)
         }
 
-        if (isContentShown) {
+        item?.icon = if (isUserSignedIn == true) {
 
-            item?.icon = if (isUserSignedIn!!) {
+            userEither!!.fold(ifLeft = {
 
-                userEither!!.fold(ifLeft = {
-
-                    when (it) {
-                        is NoInternetConnectionException -> {
-                            ContextCompat.getDrawable(this, R.drawable.ic_hair) // internet error icon
-                        }
-                        is NoSignedInUserException -> {
-                            ContextCompat.getDrawable(this, R.drawable.ic_hair) // no user error icon
-                        }
-                        else -> {
-                            //This should never happen
-                            Timber.error(it, it::toString)
-                            ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
-                        }
+                when (it) {
+                    is NoInternetConnectionException -> {
+                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // internet error icon
                     }
+                    is NoSignedInUserException -> {
+                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // no user error icon
+                    }
+                    else -> {
+                        //This should never happen
+                        Timber.error(it, it::toString)
+                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
+                    }
+                }
 
-                }, ifRight = { either ->
-                    either.fold(ifLeft = {
-                        ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
-                    }, ifRight = {
-                        ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
-                    })
+            }, ifRight = { either ->
+                either.fold(ifLeft = {
+                    ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
+                }, ifRight = {
+                    ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
                 })
-
-            } else {
-                ContextCompat.getDrawable(this, R.drawable.ic_location) // sign in icon
-            }
+            })
 
         } else {
-            ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
+            ContextCompat.getDrawable(this, R.drawable.ic_location) // sign in icon
         }
-
-        menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn!!
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -320,8 +345,7 @@ internal class MainActivity : AppCompatActivity() {
         binding.contentOverlay.visibility = View.VISIBLE
         binding.dummyView.requestFocusFromTouch()
         when {
-            foregroundAnimator.isStarted -> foregroundAnimator.reverse()
-            isContentShown -> foregroundAnimator.reverse()
+            isContentShown || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
             else -> foregroundAnimator.start()
         }
         if (isContentShown) {
