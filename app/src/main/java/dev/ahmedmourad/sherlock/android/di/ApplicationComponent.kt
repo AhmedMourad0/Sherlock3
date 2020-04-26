@@ -3,12 +3,8 @@ package dev.ahmedmourad.sherlock.android.di
 import dagger.Component
 import dev.ahmedmourad.sherlock.android.services.SherlockService
 import dev.ahmedmourad.sherlock.android.view.activity.MainActivity
-import dev.ahmedmourad.sherlock.android.view.fragments.HomeFragment
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.*
-import dev.ahmedmourad.sherlock.android.view.fragments.children.AddChildFragment
-import dev.ahmedmourad.sherlock.android.view.fragments.children.ChildDetailsFragment
-import dev.ahmedmourad.sherlock.android.view.fragments.children.ChildrenSearchResultsFragment
-import dev.ahmedmourad.sherlock.android.view.fragments.children.FindChildrenFragment
+import dev.ahmedmourad.sherlock.android.view.fragments.children.*
 import dev.ahmedmourad.sherlock.android.widget.AppWidget
 import dev.ahmedmourad.sherlock.android.widget.adapter.ChildrenRemoteViewsService
 import dev.ahmedmourad.sherlock.auth.di.AuthModule
