@@ -10,7 +10,7 @@ import com.esafirm.imagepicker.features.ImagePicker as DelegateImagePicker
 
 internal class EsafirmImagePicker @Inject constructor() : ImagePicker {
 
-    private val requestCode = (0..Int.MAX_VALUE).random()
+    private val requestCode = (0..65535).random()
 
     override fun start(activity: Activity, onError: OnError) {
         try {

@@ -10,7 +10,7 @@ import com.google.android.gms.location.places.ui.PlacePicker as DelegatePlacePic
 
 internal class GooglePlacePicker @Inject constructor() : PlacePicker {
 
-    private val requestCode = (0..Int.MAX_VALUE).random()
+    private val requestCode = (0..65535).random()
 
     override fun start(activity: Activity, onError: OnError) {
 
