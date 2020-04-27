@@ -16,7 +16,10 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.TwitterAuthProvider
-import com.twitter.sdk.android.core.*
+import com.twitter.sdk.android.core.Callback
+import com.twitter.sdk.android.core.Result
+import com.twitter.sdk.android.core.TwitterException
+import com.twitter.sdk.android.core.TwitterSession
 import com.twitter.sdk.android.core.identity.TwitterAuthClient
 import dev.ahmedmourad.sherlock.auth.authenticator.AuthActivityFactory
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
@@ -36,8 +39,20 @@ internal class AuthSignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_auth_sign_in)
+
+        //Subscription is done here instead of onStart because we need to catch
+        // cancellation as soon as possible but also because we expect onStop
+        // to be called immediately to do the actual sign in, which would
+        // dispose our observer if we do so
+        cancellationDisposable = AuthenticatorBus.signInCancellation.subscribe({
+            //I wish i could shut down activities started for result using the request
+            // code, welcome to Android
+            finish()
+        }, {
+            Timber.error(it, it::toString)
+        })
+
         signInStrategy = when (val action = intent.action) {
             ACTION_SIGN_IN_WITH_GOOGLE -> GoogleSignInStrategy()
             ACTION_SIGN_IN_WITH_FACEBOOK -> FacebookSignInStrategy()
@@ -47,23 +62,9 @@ internal class AuthSignInActivity : AppCompatActivity() {
         signInStrategy.initiate()
     }
 
-    override fun onStart() {
-        super.onStart()
-        cancellationDisposable = AuthenticatorBus.signInCancellation.subscribe({
-            finish()
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         signInStrategy.handleResult(requestCode, resultCode, data)
-    }
-
-    override fun onStop() {
-        cancellationDisposable?.dispose()
-        super.onStop()
     }
 
     private inner class GoogleSignInStrategy : SignInStrategy {
@@ -138,17 +139,6 @@ internal class AuthSignInActivity : AppCompatActivity() {
         private val authClient = TwitterAuthClient()
 
         override fun initiate() {
-
-            val authConfig = TwitterAuthConfig(
-                    getString(R.string.twitter_api_key),
-                    getString(R.string.twitter_api_key_secret)
-            )
-
-            val twitterConfig = TwitterConfig.Builder(appCtx)
-                    .twitterAuthConfig(authConfig)
-                    .build()
-
-            Twitter.initialize(twitterConfig)
 
             authClient.authorize(this@AuthSignInActivity, object : Callback<TwitterSession>() {
 
