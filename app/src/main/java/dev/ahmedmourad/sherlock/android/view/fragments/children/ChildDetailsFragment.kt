@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -18,6 +17,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
@@ -60,7 +60,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
         (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
 
         //TODO: notify the user when the data is updated or deleted
-        viewModel.result.observe(viewLifecycleOwner, Observer { resultEither ->
+        observe(viewModel.result) { resultEither ->
             when (resultEither) {
                 is Either.Left -> {
                     Toast.makeText(context, resultEither.a.localizedMessage, Toast.LENGTH_LONG).show()
@@ -71,7 +71,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                     populateUi(resultEither.b)
                 }
             }.exhaust()
-        })
+        }
     }
 
     private fun populateUi(result: Tuple2<RetrievedChild, Weight?>?) {

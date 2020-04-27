@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +18,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
@@ -69,12 +69,12 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
 
         //TODO: either give the option to update or not, or onPublish new values to the bottom
         //TODO: paginate
-        viewModel.searchResults.observe(viewLifecycleOwner, Observer { resultsEither ->
+        observe(viewModel.searchResults) { resultsEither ->
             resultsEither.fold(ifLeft = {
                 Timber.error(it, it::toString)
                 Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
             }, ifRight = adapter::update)
-        })
+        }
     }
 
     private fun initializeRecyclerView() {

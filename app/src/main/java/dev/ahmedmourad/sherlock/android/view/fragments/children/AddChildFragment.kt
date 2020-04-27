@@ -9,7 +9,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -24,6 +23,7 @@ import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
@@ -87,7 +87,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializePictureImageView()
         initializeLocationTextView()
 
-        globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
+        observe(globalViewModel.internetConnectivity) { either ->
             when (either) {
                 is Either.Left -> {
                     Timber.error(either.a, either.a::toString)
@@ -97,9 +97,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     handlePublishingStateValue(viewModel.publishingState.value?.orNull())
                 }
             }.exhaust()
-        })
+        }
 
-        viewModel.publishingState.observe(viewLifecycleOwner, Observer { either ->
+        observe(viewModel.publishingState) { either ->
             when (either) {
                 is Either.Left -> {
                     Timber.error(either.a, either.a::toString)
@@ -108,7 +108,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     handlePublishingStateValue(either.b)
                 }
             }.exhaust()
-        })
+        }
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
@@ -282,7 +282,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     }
 
     private fun initializePictureImageView() {
-        viewModel.picturePath.observe(viewLifecycleOwner, Observer {
+        observe(viewModel.picturePath) {
             binding?.let {
                 Glide.with(appCtx)
                         .load(it)
@@ -290,17 +290,17 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                         .error(R.drawable.placeholder)
                         .into(it.pictureImageView)
             }
-        })
+        }
     }
 
     private fun initializeLocationTextView() {
-        viewModel.location.observe(viewLifecycleOwner, Observer { location: PlacePicker.Location? ->
+        observe(viewModel.location) { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.locationTextView?.text = location.name
             } else {
                 binding?.locationTextView?.setText(R.string.no_location_specified)
             }
-        })
+        }
     }
 
     private fun startImagePicker() {

@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import arrow.core.identity
@@ -18,6 +17,7 @@ import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
@@ -118,7 +118,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     }
 
     private fun initializePictureImageView() {
-        viewModel.picturePath.observe(viewLifecycleOwner, Observer {
+        observe(viewModel.picturePath) {
             binding?.let { b ->
                 Glide.with(appCtx)
                         .load(it)
@@ -126,7 +126,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                         .error(R.drawable.placeholder)
                         .into(b.pictureImageView)
             }
-        })
+        }
     }
 
     private fun signUp() {

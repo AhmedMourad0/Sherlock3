@@ -9,7 +9,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import dagger.Lazy
@@ -17,6 +16,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -71,7 +71,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeNumberPickers()
         initializeLocationTextView()
 
-        globalViewModel.internetConnectivity.observe(viewLifecycleOwner, Observer { either ->
+        observe(globalViewModel.internetConnectivity) { either ->
             when (either) {
                 is Either.Left -> {
                     setInternetDependantViewsEnables(false)
@@ -81,7 +81,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     setInternetDependantViewsEnables(either.b)
                 }
             }.exhaust()
-        })
+        }
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
@@ -180,13 +180,13 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     }
 
     private fun initializeLocationTextView() {
-        viewModel.location.observe(viewLifecycleOwner, Observer { location: PlacePicker.Location? ->
+        observe(viewModel.location) { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.locationTextView?.text = location.name
             } else {
                 binding?.locationTextView?.setText(R.string.no_location_specified)
             }
-        })
+        }
     }
 
     private fun search() {
