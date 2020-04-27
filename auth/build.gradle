@@ -22,18 +22,18 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            resValue "string", "google_sign_in_id_token", sherlockGoogleSignInIdToken
-            resValue "string", "facebook_app_id", ""
-            resValue "string", "facebook_login_protocol_scheme", ""
-            resValue "string", "twitter_api_key", sherlockTwitterApiKey
-            resValue "string", "twitter_api_key_secret", sherlockTestTwitterApiKeySecret
+            resValue "string", "google_sign_in_id_token", sherlock3GoogleSignInIdToken
+            resValue "string", "facebook_app_id", sherlock3FacebookAppId
+            resValue "string", "facebook_login_protocol_scheme", sherlock3FacebookLoginProtocolScheme
+            resValue "string", "twitter_api_key", sherlock3TwitterApiKey
+            resValue "string", "twitter_api_key_secret", sherlock3TwitterApiKeySecret
         }
         debug {
-            resValue "string", "google_sign_in_id_token", sherlockTestGoogleSignInIdToken
-            resValue "string", "facebook_app_id", sherlockTestFacebookAppId
-            resValue "string", "facebook_login_protocol_scheme", sherlockTestFacebookLoginProtocolScheme
-            resValue "string", "twitter_api_key", sherlockTwitterApiKey
-            resValue "string", "twitter_api_key_secret", sherlockTestTwitterApiKeySecret
+            resValue "string", "google_sign_in_id_token", sherlock3TestGoogleSignInIdToken
+            resValue "string", "facebook_app_id", sherlock3TestFacebookAppId
+            resValue "string", "facebook_login_protocol_scheme", sherlock3TestFacebookLoginProtocolScheme
+            resValue "string", "twitter_api_key", sherlock3TestTwitterApiKey
+            resValue "string", "twitter_api_key_secret", sherlock3TestTwitterApiKeySecret
         }
     }
     compileOptions {
@@ -64,17 +64,15 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:1.1.0"
 
-    implementation "com.google.firebase:firebase-core:17.2.3"
+    implementation "com.google.firebase:firebase-core:17.4.0"
     api "com.google.firebase:firebase-storage:19.1.1"
-    api "com.google.firebase:firebase-firestore-ktx:21.4.1"
-    api "com.google.firebase:firebase-auth:19.3.0"
-    implementation "com.google.android.gms:play-services-auth:17.0.0"
+    api "com.google.firebase:firebase-firestore-ktx:21.4.3"
+    api "com.google.firebase:firebase-auth:19.3.1"
+    implementation "com.google.android.gms:play-services-auth:18.0.0"
+
     implementation "com.facebook.android:facebook-login:5.0.0"
     implementation "androidx.browser:browser:1.2.0"
 
-    // Twitter Android SDK (only required for Twitter Login)
-//    implementation "com.twitter.sdk.android:twitter-core:3.3.0"
-//    implementation "com.twitter.sdk.android:twitter:3.3.0"
     implementation("com.twitter.sdk.android:twitter-core:3.3.0@aar") { transitive = true }
 
     implementation "com.google.dagger:dagger:$daggerVersion"
