@@ -1,6 +1,7 @@
 package dev.ahmedmourad.sherlock.auth.authenticator
 
 import android.content.Intent
+import android.util.Log
 import arrow.core.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
@@ -8,8 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
-import com.twitter.sdk.android.core.TwitterAuthToken
-import com.twitter.sdk.android.core.TwitterCore
+import com.twitter.sdk.android.core.*
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
@@ -22,6 +22,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
+import inc.ahmedmourad.sherlock.auth.R
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -37,6 +38,16 @@ internal class FirebaseAuthenticator @Inject constructor(
         @InternalApi private val auth: Lazy<FirebaseAuth>,
         private val connectivityManager: Lazy<ConnectivityManager>
 ) : Authenticator {
+
+    init {
+        val config = TwitterConfig.Builder(appCtx)
+                .logger(DefaultLogger(Log.DEBUG))
+                .twitterAuthConfig(TwitterAuthConfig(
+                        appCtx.getString(R.string.twitter_api_key),
+                        appCtx.getString(R.string.twitter_api_key_secret)
+                )).debug(BuildConfig.DEBUG).build()
+        Twitter.initialize(config)
+    }
 
     override fun observeUserAuthState(): Flowable<Boolean> {
         return createObserveUserAuthState()
@@ -236,10 +247,11 @@ internal class FirebaseAuthenticator @Inject constructor(
         return accountOptional.fold(ifEmpty = {
             getAuthCredentials { it.signInWithGoogle() }
         }, ifSome = { googleSignInAccount ->
-            if (googleSignInAccount.isExpired)
+            if (googleSignInAccount.isExpired) {
                 getAuthCredentials { it.signInWithGoogle() }
-            else
+            } else {
                 Single.just(GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null).right())
+            }
         })
     }
 
@@ -298,12 +310,11 @@ internal class FirebaseAuthenticator @Inject constructor(
     }
 
     private fun createSignInWithTwitterSingle(): Single<Either<Throwable, IncompleteUser>> {
-
         return Single.create<Option<TwitterAuthToken>> { emitter ->
 
             emitter.setCancellable { AuthenticatorBus.signInCancellation.accept(Unit) }
 
-            emitter.onSuccess(TwitterCore.getInstance().sessionManager.activeSession.authToken.toOption())
+            emitter.onSuccess(TwitterCore.getInstance().sessionManager.activeSession?.authToken.toOption())
 
         }.flatMap(this::getTwitterAuthCredentials)
                 .flatMap(this::signInWithCredentials)
@@ -326,8 +337,7 @@ internal class FirebaseAuthenticator @Inject constructor(
     private fun getAuthCredentials(createIntent: (AuthActivityFactory) -> Intent): Single<Either<Throwable, AuthCredential>> {
         appCtx.startActivity(createIntent(AuthSignInActivity.Companion))
         return AuthenticatorBus.signInCompletion
-                .buffer(1)
-                .map(List<Either<Throwable, AuthCredential>>::first)
+                .take(1)
                 .single(NoSignedInUserException().left())
     }
 
@@ -452,7 +462,7 @@ internal class FirebaseAuthenticator @Inject constructor(
 
         return Single.create<Either<Throwable, Unit>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(Unit.right())
             }
 
