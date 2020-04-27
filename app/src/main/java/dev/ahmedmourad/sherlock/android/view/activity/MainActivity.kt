@@ -24,9 +24,9 @@ import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
+import dev.ahmedmourad.sherlock.android.utils.clearBackStack
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
-import dev.ahmedmourad.sherlock.android.utils.singleTop
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -48,7 +48,7 @@ internal class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var globalViewModelFactory: AssistedViewModelFactory<GlobalViewModel>
 
-    private var isContentShown = true
+    private var isInContentMode = true
 
     private val foregroundAnimator by lazy(::createForegroundAnimator)
 
@@ -105,6 +105,7 @@ internal class MainActivity : AppCompatActivity() {
         }
         globalViewModel.internetConnectivity.observe(this, Observer { either ->
             either.fold(ifLeft = {
+                showConnectivitySnackBar(Connectivity.CONNECTING)
                 Timber.error(it, it::toString)
             }, ifRight = {
                 showConnectivitySnackBar(getConnectivity(it))
@@ -117,7 +118,7 @@ internal class MainActivity : AppCompatActivity() {
                 Timber.error(it, it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
-                updateBackdropFragment()
+                updateBackdropDestination()
             })
         })
 
@@ -127,7 +128,7 @@ internal class MainActivity : AppCompatActivity() {
                 Timber.error(it, it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
-                updateBackdropFragment()
+                updateBackdropDestination()
             })
         })
     }
@@ -140,16 +141,20 @@ internal class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
 
-                if (foregroundAnimator.isRunning)
+                if (foregroundAnimator.isRunning) {
                     return
+                }
 
-                if (isContentShown) {
+                if (isInContentMode) {
                     if (!findNavController(R.id.app_nav_host_fragment).popBackStack()) {
                         finish()
                     }
                 } else {
-                    if (!findNavController(R.id.auth_nav_host_fragment).popBackStack()) {
-                        toggleBackdrop()
+                    val navController = findNavController(R.id.auth_nav_host_fragment)
+                    if (navController.previousBackStackEntry == null) {
+                        setInContentMode(true)
+                    } else {
+                        navController.popBackStack()
                     }
                 }
             }
@@ -178,7 +183,7 @@ internal class MainActivity : AppCompatActivity() {
 
         foregroundAnimator.doOnEnd {
             invalidateOptionsMenu()
-            binding.contentOverlay.visibility = if (isContentShown) View.GONE else View.VISIBLE
+            binding.contentOverlay.visibility = if (isInContentMode) View.GONE else View.VISIBLE
         }
 
         binding.dummyView.requestFocusFromTouch()
@@ -218,7 +223,7 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateBackdropFragment() {
+    private fun updateBackdropDestination() {
 
         val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false } ?: return
         val userEither = globalViewModel.signedInUser.value ?: return
@@ -236,9 +241,17 @@ internal class MainActivity : AppCompatActivity() {
 
                 if (authNavController.currentDestination?.id !in authNeutralDestinations) {
                     if (it is NoSignedInUserException) {
-                        authNavController.navigate(R.id.signInFragment, null, singleTop())
+                        authNavController.navigate(
+                                R.id.signInFragment,
+                                null,
+                                clearBackStack(authNavController)
+                        )
                     } else {
-                        authNavController.navigate(R.id.signInFragment, null, singleTop())
+                        authNavController.navigate(
+                                R.id.signInFragment,
+                                null,
+                                clearBackStack(authNavController)
+                        )
                         TODO("retry or sign out controller")
                     }
                 }
@@ -249,19 +262,27 @@ internal class MainActivity : AppCompatActivity() {
                         authNavController.navigate(
                                 R.id.completeSignUpFragment,
                                 CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
-                                singleTop()
+                                clearBackStack(authNavController)
                         )
                     }
                 }, ifRight = {
                     if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
-                        authNavController.navigate(R.id.signedInUserProfileFragment, null, singleTop())
+                        authNavController.navigate(
+                                R.id.signedInUserProfileFragment,
+                                null,
+                                clearBackStack(authNavController)
+                        )
                     }
                 })
             })
 
         } else {
             if (authNavController.currentDestination?.id !in authNeutralDestinations) {
-                authNavController.navigate(R.id.signInFragment, null, singleTop())
+                authNavController.navigate(
+                        R.id.signInFragment,
+                        null,
+                        clearBackStack(authNavController)
+                )
             }
         }
     }
@@ -278,7 +299,7 @@ internal class MainActivity : AppCompatActivity() {
 
         menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
-        if (!isContentShown) {
+        if (!isInContentMode) {
             item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
             return super.onPrepareOptionsMenu(menu)
         }
@@ -328,7 +349,7 @@ internal class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.main_menu_show_or_hide_backdrop -> {
-                toggleBackdrop()
+                setInContentMode(!isInContentMode)
                 true
             }
             R.id.main_menu_sign_out -> {
@@ -339,23 +360,32 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleBackdrop() {
-        isContentShown = !isContentShown
+    private fun setInContentMode(newValue: Boolean) {
+
+        if (newValue == isInContentMode) {
+            return
+        }
+
+        isInContentMode = newValue
         invalidateOptionsMenu()
         binding.contentOverlay.visibility = View.VISIBLE
         binding.dummyView.requestFocusFromTouch()
         when {
-            isContentShown || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
+            isInContentMode || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
             else -> foregroundAnimator.start()
         }
-        if (isContentShown) {
+        fixPrimaryNavigationFragment()
+    }
+
+    private fun fixPrimaryNavigationFragment() {
+        if (isInContentMode) {
             supportFragmentManager.beginTransaction()
                     .setPrimaryNavigationFragment(appNavHostFragment)
-                    .commit()
+                    .commitNow()
         } else {
             supportFragmentManager.beginTransaction()
                     .setPrimaryNavigationFragment(authNavHostFragment)
-                    .commit()
+                    .commitNow()
         }
     }
 
