@@ -91,7 +91,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                         )
                 )
             } else {
-                b.phoneNumberEditText.setText(null)
+                b.phoneNumberEditText.text = null
             }
 
             b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
@@ -181,8 +181,9 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
         setPictureEnabled(true)
 
-        if (resultCode != Activity.RESULT_OK)
+        if (resultCode != Activity.RESULT_OK) {
             return
+        }
 
         checkNotNull(data) {
             Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
