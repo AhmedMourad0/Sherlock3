@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.lifecycle.Observer
 import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
 import dev.ahmedmourad.sherlock.android.R
@@ -27,6 +26,8 @@ import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.clearBackStack
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
+import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -40,7 +41,7 @@ import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
 
-internal class MainActivity : AppCompatActivity() {
+internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
     @Inject
     lateinit var viewModelFactory: AssistedViewModelFactory<MainActivityViewModel>
@@ -48,7 +49,7 @@ internal class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var globalViewModelFactory: AssistedViewModelFactory<GlobalViewModel>
 
-    private var isInContentMode = true
+    private var isInPrimaryMode = true
 
     private val foregroundAnimator by lazy(::createForegroundAnimator)
 
@@ -92,7 +93,9 @@ internal class MainActivity : AppCompatActivity() {
         binding.dummyView.requestFocusFromTouch()
 
         binding.backdropScrollView.post {
-            binding.backdropScrollView.updatePadding(bottom = binding.contentRoot.height / CONTENT_COLLAPSE_FACTOR.toInt())
+            binding.backdropScrollView.updatePadding(
+                    bottom = binding.primaryContentRoot.height / PRIMARY_CONTENT_COLLAPSE_FACTOR.toInt()
+            )
         }
 
         appNavHostFragment = supportFragmentManager.findFragmentById(R.id.app_nav_host_fragment)!!
@@ -103,16 +106,17 @@ internal class MainActivity : AppCompatActivity() {
         binding.root.post {
             showConnectivitySnackBar(Connectivity.CONNECTING)
         }
-        globalViewModel.internetConnectivity.observe(this, Observer { either ->
+
+        observe(globalViewModel.internetConnectivity) { either ->
             either.fold(ifLeft = {
                 showConnectivitySnackBar(Connectivity.CONNECTING)
                 Timber.error(it, it::toString)
             }, ifRight = {
                 showConnectivitySnackBar(getConnectivity(it))
             })
-        })
+        }
 
-        globalViewModel.userAuthState.observe(this, Observer { either ->
+        observe(globalViewModel.userAuthState) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
                 Timber.error(it, it::toString)
@@ -120,9 +124,9 @@ internal class MainActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
             })
-        })
+        }
 
-        globalViewModel.signedInUser.observe(this, Observer { either ->
+        observe(globalViewModel.signedInUser) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
                 Timber.error(it, it::toString)
@@ -130,7 +134,7 @@ internal class MainActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
             })
-        })
+        }
     }
 
     private fun getConnectivity(isConnected: Boolean): Connectivity {
@@ -145,14 +149,14 @@ internal class MainActivity : AppCompatActivity() {
                     return
                 }
 
-                if (isInContentMode) {
+                if (isInPrimaryMode) {
                     if (!findNavController(R.id.app_nav_host_fragment).popBackStack()) {
                         finish()
                     }
                 } else {
                     val navController = findNavController(R.id.auth_nav_host_fragment)
                     if (navController.previousBackStackEntry == null) {
-                        setInContentMode(true)
+                        setInPrimaryContentMode(true)
                     } else {
                         navController.popBackStack()
                     }
@@ -168,8 +172,10 @@ internal class MainActivity : AppCompatActivity() {
 
             val animatedValue = it.animatedValue as Float
 
-            binding.contentRoot.translationY =
-                    animatedValue * (binding.contentRoot.height - binding.contentRoot.height / CONTENT_COLLAPSE_FACTOR)
+            val primaryContentHeight = binding.primaryContentRoot.height
+            val translationYMaxValue =
+                    primaryContentHeight - primaryContentHeight / PRIMARY_CONTENT_COLLAPSE_FACTOR
+            binding.primaryContentRoot.translationY = animatedValue * translationYMaxValue
 
             binding.appbar.elevation =
                     animatedValue * resources.getDimensionPixelSize(R.dimen.defaultAppBarElevation).toFloat()
@@ -177,13 +183,13 @@ internal class MainActivity : AppCompatActivity() {
             binding.backdropScrollView.translationY =
                     (1 - animatedValue) * resources.getDimensionPixelSize(R.dimen.backdropTranslationY).toFloat()
 
-            binding.contentOverlay.alpha =
+            binding.primaryContentOverlay.alpha =
                     animatedValue * 0.4f
         }
 
         foregroundAnimator.doOnEnd {
             invalidateOptionsMenu()
-            binding.contentOverlay.visibility = if (isInContentMode) View.GONE else View.VISIBLE
+            binding.primaryContentOverlay.visibility = if (isInPrimaryMode) View.GONE else View.VISIBLE
         }
 
         binding.dummyView.requestFocusFromTouch()
@@ -272,6 +278,7 @@ internal class MainActivity : AppCompatActivity() {
                                 null,
                                 clearBackStack(authNavController)
                         )
+                        setInPrimaryContentMode(true)
                     }
                 })
             })
@@ -299,7 +306,7 @@ internal class MainActivity : AppCompatActivity() {
 
         menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
-        if (!isInContentMode) {
+        if (!isInPrimaryMode) {
             item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
             return super.onPrepareOptionsMenu(menu)
         }
@@ -349,7 +356,7 @@ internal class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.main_menu_show_or_hide_backdrop -> {
-                setInContentMode(!isInContentMode)
+                setInPrimaryContentMode(!isInPrimaryMode)
                 true
             }
             R.id.main_menu_sign_out -> {
@@ -360,25 +367,25 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setInContentMode(newValue: Boolean) {
+    override fun setInPrimaryContentMode(newValue: Boolean) {
 
-        if (newValue == isInContentMode) {
+        if (newValue == isInPrimaryMode) {
             return
         }
 
-        isInContentMode = newValue
+        isInPrimaryMode = newValue
         invalidateOptionsMenu()
-        binding.contentOverlay.visibility = View.VISIBLE
+        binding.primaryContentOverlay.visibility = View.VISIBLE
         binding.dummyView.requestFocusFromTouch()
         when {
-            isInContentMode || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
+            isInPrimaryMode || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
             else -> foregroundAnimator.start()
         }
-        fixPrimaryNavigationFragment()
+        updatePrimaryNavigationFragment()
     }
 
-    private fun fixPrimaryNavigationFragment() {
-        if (isInContentMode) {
+    private fun updatePrimaryNavigationFragment() {
+        if (isInPrimaryMode) {
             supportFragmentManager.beginTransaction()
                     .setPrimaryNavigationFragment(appNavHostFragment)
                     .commitNow()
@@ -411,6 +418,6 @@ internal class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val CONTENT_COLLAPSE_FACTOR = 6f
+        private const val PRIMARY_CONTENT_COLLAPSE_FACTOR = 6f
     }
 }
