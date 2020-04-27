@@ -11,4 +11,12 @@ internal fun FragmentActivity.findNavController(@IdRes viewId: Int): NavControll
     return navHostFragment.navController
 }
 
-internal fun singleTop(): NavOptions = NavOptions.Builder().setLaunchSingleTop(true).build()
+internal fun clearBackStack(navController: NavController): NavOptions {
+    return NavOptions.Builder().setLaunchSingleTop(true).run {
+        val backstackHead = navController.currentBackStackEntry?.destination?.id
+        if (backstackHead != null) {
+            setPopUpTo(backstackHead, true)
+        }
+        build()
+    }
+}
