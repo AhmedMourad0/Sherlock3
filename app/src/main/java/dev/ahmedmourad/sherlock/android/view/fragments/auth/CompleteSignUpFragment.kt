@@ -77,13 +77,20 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
             b.displayNameEditText.setText(viewModel.displayName.value)
             b.emailEditText.setText(viewModel.email.value)
-            b.phoneNumberEditText.setText(
-                    appCtx.getString(
-                            R.string.phone_number_with_country_code,
-                            viewModel.phoneNumberCountryCode.value,
-                            viewModel.phoneNumber.value
-                    )
-            )
+
+            val phoneNumber = viewModel.phoneNumber.value
+            val countryCode = viewModel.phoneNumberCountryCode.value
+            if (phoneNumber != null && countryCode != null) {
+                b.phoneNumberEditText.setText(
+                        getString(
+                                R.string.phone_number_with_country_code,
+                                countryCode,
+                                phoneNumber
+                        )
+                )
+            } else {
+                b.phoneNumberEditText.text = null
+            }
 
             b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
                 viewModel.onDisplayNameChange(text.toString())
