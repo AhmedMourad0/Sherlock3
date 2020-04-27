@@ -64,7 +64,7 @@
 	</androidx.coordinatorlayout.widget.CoordinatorLayout>
 	
 	<com.github.florent37.shapeofview.shapes.CutCornerView
-		android:id="@+id/content_root"
+		android:id="@+id/primary_content_root"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_marginTop="?attr/actionBarSize"
@@ -89,7 +89,7 @@
 			app:navGraph="@navigation/app_nav_graph" />
 		
 		<View
-			android:id="@+id/content_overlay"
+			android:id="@+id/primary_content_overlay"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:alpha="0"
