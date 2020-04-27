@@ -101,13 +101,11 @@ internal class SherlockService : Service() {
                 .createPendingIntent()
 
         val name = child.name
-        val contentText = name?.fold(
-                ifLeft = {
-                    getString(R.string.publishing_child_data_with_name, it.value.trim())
-                }, ifRight = {
+        val contentText = name?.fold(ifLeft = {
+            getString(R.string.publishing_child_data_with_name, it.value.trim())
+        }, ifRight = {
             getString(R.string.publishing_child_data_with_name, "${it.first.value} ${it.last.value}".trim())
-        }
-        ) ?: getString(R.string.publishing_child_data)
+        }) ?: getString(R.string.publishing_child_data)
 
         return NotificationCompat.Builder(applicationContext, backgroundContextChannelId(applicationContext))
                 .setContentTitle(getString(R.string.publishing))
@@ -133,13 +131,11 @@ internal class SherlockService : Service() {
         }
 
         val name = child?.name
-        val contentText = name?.fold(
-                ifLeft = {
-                    getString(R.string.published_child_data_successfully_with_name, it.value.trim())
-                }, ifRight = {
+        val contentText = name?.fold(ifLeft = {
+            getString(R.string.published_child_data_successfully_with_name, it.value.trim())
+        }, ifRight = {
             getString(R.string.published_child_data_successfully_with_name, "${it.first.value} ${it.last.value}".trim())
-        }
-        ) ?: getString(R.string.published_child_data_successfully)
+        }) ?: getString(R.string.published_child_data_successfully)
 
         val notification = NotificationCompat.Builder(applicationContext, backgroundContextChannelId(applicationContext))
                 .setContentTitle(getString(R.string.success))
@@ -159,10 +155,11 @@ internal class SherlockService : Service() {
     private fun showPublishingFailedNotification(throwable: Throwable, child: AppPublishedChild, isRecoverable: Boolean) {
 
         val name = child.name
-        val contentTitle = name?.fold(
-                ifLeft = { getString(R.string.publishing_failed_with_name, it.value.trim()) },
-                ifRight = { getString(R.string.publishing_failed_with_name, "${it.first.value} ${it.last.value}".trim()) }
-        ) ?: getString(R.string.publishing_failed)
+        val contentTitle = name?.fold(ifLeft = {
+            getString(R.string.publishing_failed_with_name, it.value.trim())
+        }, ifRight = {
+            getString(R.string.publishing_failed_with_name, "${it.first.value} ${it.last.value}".trim())
+        }) ?: getString(R.string.publishing_failed)
 
         val notificationBuilder = NotificationCompat.Builder(applicationContext, backgroundContextChannelId(applicationContext))
                 .setContentTitle(contentTitle)
