@@ -35,6 +35,9 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         )
     }
 
+    //This's intentionally not disposed in onStop, the reason being that signing in with
+    // a provider starts a new activity which causes the current activity to be stopped
+    // and thus the observable being disposed before we receive the authentication result
     private var signInDisposable by disposable()
 
     private var binding: FragmentSignInBinding? = null
@@ -85,14 +88,12 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         signInDisposable = viewModel.onSignInWithGoogle().subscribe(::onSignInSuccess) {
             Timber.error(it, it::toString)
         }
-
     }
 
     private fun signInWithFacebook() {
         signInDisposable = viewModel.onSignInWithFacebook().subscribe(::onSignInSuccess) {
             Timber.error(it, it::toString)
         }
-
     }
 
     private fun signInWithTwitter() {
@@ -108,12 +109,8 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         }, ifRight = ::identity)
     }
 
-    override fun onStop() {
-        signInDisposable?.dispose()
-        super.onStop()
-    }
-
     override fun onDestroyView() {
+        signInDisposable?.dispose()
         binding = null
         super.onDestroyView()
     }
