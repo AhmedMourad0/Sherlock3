@@ -177,11 +177,7 @@ internal data class RoomChildEntity(
 
             val (last) = Name.of(lastName).mapLeft { ModelConversionException(it.toString()) }
 
-            FullName.of(first, last)
-                    .bimap(
-                            leftOperation = { ModelConversionException(it.toString()) },
-                            rightOperation = FullName::right
-                    ).bind()
+            FullName.of(first, last).right().right().bind()
         }
     }
 
@@ -250,7 +246,7 @@ internal data class RoomChildEntity(
                     name,
                     address,
                     coordinates
-            ).mapLeft { ModelConversionException(it.toString()) }.bind()
+            ).right().bind()
         }
     }
 

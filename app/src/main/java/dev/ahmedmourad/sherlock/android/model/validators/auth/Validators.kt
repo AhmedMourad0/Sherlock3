@@ -7,7 +7,6 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.localizedMessage
-import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
@@ -80,7 +79,7 @@ internal fun validateAppCompletedUser(
             displayName,
             phoneNumber,
             picturePath
-    ).mapLeft(CompletedUser.Exception::localizedMessage)
+    ).right()
 }
 
 internal fun validateUserCredentials(

@@ -1,8 +1,5 @@
 package dev.ahmedmourad.sherlock.domain.model.auth
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
@@ -85,27 +82,13 @@ class CompletedUser private constructor(
     }
 
     companion object {
-
         fun of(id: UserId,
                email: Email,
                displayName: DisplayName,
                phoneNumber: PhoneNumber,
                picture: ByteArray?
-        ): Either<Exception, CompletedUser> {
-            return validate(id, email, displayName, phoneNumber, picture)?.left()
-                    ?: CompletedUser(id, email, displayName, phoneNumber, picture).right()
-        }
-
-        @Suppress("UNUSED_PARAMETER")
-        fun validate(id: UserId,
-                     email: Email,
-                     displayName: DisplayName,
-                     phoneNumber: PhoneNumber,
-                     picture: ByteArray?
-        ): Exception? {
-            return null
+        ): CompletedUser {
+            return CompletedUser(id, email, displayName, phoneNumber, picture)
         }
     }
-
-    sealed class Exception
 }

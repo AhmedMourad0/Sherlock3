@@ -1,10 +1,8 @@
 package dev.ahmedmourad.sherlock.android.model
 
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
-import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
@@ -23,11 +21,6 @@ internal fun Name.Exception.localizedMessage(): String {
         Name.Exception.NameContainsNumbersOrSymbolsException ->
             appCtx.getString(R.string.name_contains_numbers_or_symbols)
     }
-}
-
-@Suppress("unused")
-internal fun FullName.Exception.localizedMessage(): String {
-    return appCtx.getString(R.string.invalid_first_and_last_name)
 }
 
 internal fun Age.Exception.localizedMessage(): String {
@@ -69,11 +62,6 @@ internal fun Coordinates.Exception.localizedMessage(): String {
     }
 }
 
-@Suppress("unused")
-internal fun Location.Exception.localizedMessage(): String {
-    return appCtx.getString(R.string.invalid_location)
-}
-
 internal fun ApproximateAppearance.Exception.localizedMessage(): String {
     return when (this) {
         ApproximateAppearance.Exception.NotEnoughDetailsException ->
@@ -81,21 +69,11 @@ internal fun ApproximateAppearance.Exception.localizedMessage(): String {
     }
 }
 
-@Suppress("unused")
-internal fun ExactAppearance.Exception.localizedMessage(): String {
-    return appCtx.getString(R.string.incomplete_child_appearance)
-}
-
 internal fun PublishedChild.Exception.localizedMessage(): String {
     return when (this) {
         PublishedChild.Exception.NotEnoughDetailsException ->
             appCtx.getString(R.string.child_not_enough_details)
     }
-}
-
-@Suppress("unused")
-internal fun ChildQuery.Exception.localizedMessage(): String {
-    return appCtx.getString(R.string.incomplete_child_query)
 }
 
 internal fun Email.Exception.localizedMessage(): String {
@@ -178,9 +156,4 @@ internal fun SignUpUser.Exception.localizedMessage(): String {
         SignUpUser.Exception.PhoneNumberIsUsedAsPasswordException ->
             appCtx.getString(R.string.phone_number_used_as_password)
     }
-}
-
-@Suppress("unused")
-internal fun CompletedUser.Exception.localizedMessage(): String {
-    return appCtx.getString(R.string.invalid_user)
 }

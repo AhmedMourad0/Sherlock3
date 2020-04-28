@@ -338,11 +338,7 @@ private fun extractName(snapshot: DocumentSnapshot): Either<Throwable, Either<Na
 
         val (lastName) = Name.of(last).mapLeft { ModelCreationException(it.toString()) }
 
-        FullName.of(firstName, lastName)
-                .bimap(
-                        leftOperation = { ModelCreationException(it.toString()) },
-                        rightOperation = FullName::right
-                ).bind()
+        FullName.of(firstName, lastName).right().right().bind()
     }
 }
 
@@ -419,7 +415,7 @@ private fun extractLocation(snapshot: DocumentSnapshot): Either<Throwable, Locat
                 locationName,
                 locationAddress,
                 coordinates
-        ).mapLeft { ModelCreationException(it.toString()) }.bind()
+        ).right().bind()
     }
 }
 

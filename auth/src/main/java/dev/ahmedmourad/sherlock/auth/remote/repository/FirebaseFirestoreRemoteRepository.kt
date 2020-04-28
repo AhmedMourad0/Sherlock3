@@ -252,6 +252,6 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
                 username,
                 phoneNumber,
                 pictureUrl
-        ).mapLeft { ModelCreationException(it.toString()) }.bind()
+        ).right().bind()
     }
 }

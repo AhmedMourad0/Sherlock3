@@ -1,8 +1,5 @@
 package dev.ahmedmourad.sherlock.domain.model.children.submodel
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
@@ -69,18 +66,9 @@ class ExactAppearance private constructor(
     }
 
     companion object {
-
-        fun of(gender: Gender, skin: Skin, hair: Hair, age: Age, height: Height): Either<Exception, ExactAppearance> {
-            return validate(gender, skin, hair, age, height)?.left()
-                    ?: ExactAppearance(gender, skin, hair, age, height).right()
-        }
-
-        @Suppress("UNUSED_PARAMETER")
-        fun validate(gender: Gender, skin: Skin, hair: Hair, age: Age, height: Height): Exception? {
-            return null
+        fun of(gender: Gender, skin: Skin, hair: Hair, age: Age, height: Height): ExactAppearance {
+            return ExactAppearance(gender, skin, hair, age, height)
         }
     }
-
-    sealed class Exception
 }
 

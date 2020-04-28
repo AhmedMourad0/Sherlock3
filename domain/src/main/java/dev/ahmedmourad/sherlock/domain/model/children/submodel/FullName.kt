@@ -1,8 +1,5 @@
 package dev.ahmedmourad.sherlock.domain.model.children.submodel
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import kotlinx.serialization.Serializable
 
@@ -43,16 +40,8 @@ class FullName private constructor(val first: Name, val last: Name) {
     }
 
     companion object {
-
-        fun of(first: Name, last: Name): Either<Exception, FullName> {
-            return validate(first, last)?.left() ?: FullName(first, last).right()
-        }
-
-        @Suppress("UNUSED_PARAMETER")
-        fun validate(first: Name, last: Name): Exception? {
-            return null
+        fun of(first: Name, last: Name): FullName {
+            return FullName(first, last)
         }
     }
-
-    sealed class Exception
 }

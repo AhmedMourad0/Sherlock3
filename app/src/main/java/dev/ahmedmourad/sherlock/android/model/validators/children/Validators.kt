@@ -20,7 +20,7 @@ internal fun validateFullName(
         firstName: Name,
         lastName: Name
 ): Either<String, FullName> {
-    return FullName.of(firstName, lastName).mapLeft(FullName.Exception::localizedMessage)
+    return FullName.of(firstName, lastName).right()
 }
 
 internal fun validateNameEitherNullable(
@@ -166,7 +166,7 @@ internal fun validateLocation(
             name.trim(),
             address.trim(),
             coordinates
-    ).mapLeft(Location.Exception::localizedMessage)
+    ).right()
 }
 
 internal fun validateApproximateAppearance(
@@ -198,7 +198,7 @@ internal fun validateExactAppearance(
             hair,
             age,
             height
-    ).mapLeft(ExactAppearance.Exception::localizedMessage)
+    ).right()
 }
 
 internal fun validateAppPublishedChild(
@@ -226,5 +226,5 @@ internal fun validateChildQuery(
             fullName,
             location,
             appearance
-    ).mapLeft(ChildQuery.Exception::localizedMessage)
+    ).right()
 }
