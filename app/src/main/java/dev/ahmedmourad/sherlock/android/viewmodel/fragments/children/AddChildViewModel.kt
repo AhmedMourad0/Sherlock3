@@ -10,6 +10,7 @@ import arrow.core.extensions.fx
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
@@ -19,9 +20,10 @@ import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.*
-import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveChildPublishingStateInteractor
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
+import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import splitties.init.appCtx
 import javax.inject.Inject
@@ -29,7 +31,7 @@ import javax.inject.Inject
 internal class AddChildViewModel(
         private val savedStateHandle: SavedStateHandle,
         private val serviceFactory: SherlockServiceIntentFactory,
-        observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
+        bus: Lazy<Bus>
 ) : ViewModel() {
 
     val firstName: LiveData<String?>
@@ -184,11 +186,12 @@ internal class AddChildViewModel(
         savedStateHandle.set(KEY_ERROR_CHILD, null)
     }
 
-    val publishingState: LiveData<Either<Throwable, PublishingState>> = observeChildPublishingStateInteractor()
+    val publishingState: LiveData<Either<Throwable, PublishingState>> = bus.get().childPublishingState
             .retry()
             .map<Either<Throwable, PublishingState>> { it.right() }
             .onErrorReturn { it.left() }
             .observeOn(AndroidSchedulers.mainThread())
+            .toFlowable(BackpressureStrategy.LATEST)
             .toLiveData()
 
     fun onPublish() {
@@ -287,13 +290,13 @@ internal class AddChildViewModel(
     @Reusable
     class Factory @Inject constructor(
             private val serviceFactory: SherlockServiceIntentFactory,
-            private val observeChildPublishingStateInteractor: ObserveChildPublishingStateInteractor
+            private val bus: Lazy<Bus>
     ) : AssistedViewModelFactory<AddChildViewModel> {
         override fun invoke(handle: SavedStateHandle): AddChildViewModel {
             return AddChildViewModel(
                     handle,
                     serviceFactory,
-                    observeChildPublishingStateInteractor
+                    bus
             )
         }
     }
