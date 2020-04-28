@@ -4,7 +4,7 @@ import com.jakewharton.rxrelay2.Relay
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 
-internal interface Bus {
+interface Bus {
     val childPublishingState: Relay<PublishingState>
     val childFindingState: Relay<BackgroundState>
     val childrenFindingState: Relay<BackgroundState>

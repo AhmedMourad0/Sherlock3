@@ -7,13 +7,11 @@ import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
+import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
 import dev.ahmedmourad.sherlock.domain.filter.Filter
-import dev.ahmedmourad.sherlock.domain.interactors.common.NotifyChildFindingStateChangeInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.common.NotifyChildPublishingStateChangeInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.common.NotifyChildrenFindingStateChangeInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
@@ -33,9 +31,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
         @InternalApi private val localRepository: Lazy<LocalRepository>,
         @InternalApi private val remoteRepository: Lazy<RemoteRepository>,
         @InternalApi private val imageRepository: Lazy<ImageRepository>,
-        private val notifyChildPublishingStateChangeInteractor: NotifyChildPublishingStateChangeInteractor,
-        private val notifyChildFindingStateChangeInteractor: NotifyChildFindingStateChangeInteractor,
-        private val notifyChildrenFindingStateChangeInteractor: NotifyChildrenFindingStateChangeInteractor
+        private val bus: Lazy<Bus>
 ) : ChildrenRepository {
 
     private val tester by lazy { SherlockTester(remoteRepository, localRepository) }
@@ -55,12 +51,12 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     })
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
-                        notifyChildPublishingStateChangeInteractor(PublishingState.Failure(child))
+                        bus.get().childPublishingState.accept(PublishingState.Failure(child))
                     }, ifRight = {
-                        notifyChildPublishingStateChangeInteractor(PublishingState.Success(it))
+                        bus.get().childPublishingState.accept(PublishingState.Success(it))
                     })
-                }.doOnSubscribe { notifyChildPublishingStateChangeInteractor(PublishingState.Ongoing(child)) }
-                .doOnError { notifyChildPublishingStateChangeInteractor(PublishingState.Failure(child)) }
+                }.doOnSubscribe { bus.get().childPublishingState.accept(PublishingState.Ongoing(child)) }
+                .doOnError { bus.get().childPublishingState.accept(PublishingState.Failure(child)) }
     }
 
     override fun find(
@@ -85,9 +81,9 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     .toFlowable()
                         }
                     })
-                }.doOnSubscribe { notifyChildFindingStateChangeInteractor(BackgroundState.ONGOING) }
-                .doOnNext { notifyChildFindingStateChangeInteractor(BackgroundState.SUCCESS) }
-                .doOnError { notifyChildFindingStateChangeInteractor(BackgroundState.FAILURE) }
+                }.doOnSubscribe { bus.get().childFindingState.accept(BackgroundState.ONGOING) }
+                .doOnNext { bus.get().childFindingState.accept(BackgroundState.SUCCESS) }
+                .doOnError { bus.get().childFindingState.accept(BackgroundState.FAILURE) }
     }
 
     override fun findAll(
@@ -111,9 +107,9 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                             .right()
                                 }.toFlowable()
                     })
-                }.doOnSubscribe { notifyChildrenFindingStateChangeInteractor(BackgroundState.ONGOING) }
-                .doOnNext { notifyChildrenFindingStateChangeInteractor(BackgroundState.SUCCESS) }
-                .doOnError { notifyChildrenFindingStateChangeInteractor(BackgroundState.FAILURE) }
+                }.doOnSubscribe { bus.get().childrenFindingState.accept(BackgroundState.ONGOING) }
+                .doOnNext { bus.get().childrenFindingState.accept(BackgroundState.SUCCESS) }
+                .doOnError { bus.get().childrenFindingState.accept(BackgroundState.FAILURE) }
     }
 
     override fun findLastSearchResults(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {

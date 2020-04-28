@@ -10,7 +10,8 @@ import dev.ahmedmourad.sherlock.domain.filter.criteria.ChildrenCriteriaFactory
 import dev.ahmedmourad.sherlock.domain.filter.criteria.ChildrenCriteriaFactoryImpl
 import dev.ahmedmourad.sherlock.domain.interactors.auth.*
 import dev.ahmedmourad.sherlock.domain.interactors.children.*
-import dev.ahmedmourad.sherlock.domain.interactors.common.*
+import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractorImpl
 
 @Module
 internal interface AuthBindingsModule {
@@ -90,26 +91,6 @@ internal interface ChildrenBindingsModule {
     ): FindLastSearchResultsInteractor
 
     @Binds
-    fun bindObserveChildPublishingStateInteractor(
-            interactor: ObserveChildPublishingStateInteractorImpl
-    ): ObserveChildPublishingStateInteractor
-
-    @Binds
-    fun bindNotifyChildPublishingStateChangeInteractor(
-            interactor: NotifyChildPublishingStateChangeInteractorImpl
-    ): NotifyChildPublishingStateChangeInteractor
-
-    @Binds
-    fun bindNotifyChildFindingStateChangeInteractor(
-            interactor: NotifyChildFindingStateChangeInteractorImpl
-    ): NotifyChildFindingStateChangeInteractor
-
-    @Binds
-    fun bindNotifyChildrenFindingStateChangeInteractor(
-            interactor: NotifyChildrenFindingStateChangeInteractorImpl
-    ): NotifyChildrenFindingStateChangeInteractor
-
-    @Binds
     @InternalApi
     fun bindChildrenCriteriaFactory(
             factory: ChildrenCriteriaFactoryImpl
@@ -130,7 +111,6 @@ internal interface CommonBindingsModule {
     ): ObserveInternetConnectivityInteractor
 
     @Binds
-    @InternalApi
     fun bindBus(
             bus: BusImpl
     ): Bus
