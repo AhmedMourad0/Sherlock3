@@ -3,6 +3,7 @@ package dev.ahmedmourad.sherlock.android.utils.pickers.images
 import android.app.Activity
 import android.content.Intent
 import android.os.Parcelable
+import androidx.fragment.app.Fragment
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import kotlinx.android.parcel.Parcelize
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath as DomainPicturePath
@@ -13,6 +14,8 @@ internal typealias OnError = (Throwable) -> Unit
 internal interface ImagePicker {
 
     fun start(activity: Activity, onError: OnError = { })
+
+    fun start(fragment: Fragment, onError: OnError = { })
 
     fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect)
 

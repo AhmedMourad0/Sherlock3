@@ -3,6 +3,7 @@ package dev.ahmedmourad.sherlock.android.utils.pickers.places
 import android.app.Activity
 import android.content.Intent
 import android.os.Parcelable
+import androidx.fragment.app.Fragment
 import kotlinx.android.parcel.Parcelize
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location as DomainLocation
 
@@ -12,6 +13,8 @@ internal typealias OnSelect = (PlacePicker.Location) -> Unit
 internal interface PlacePicker {
 
     fun start(activity: Activity, onError: OnError = { })
+
+    fun start(fragment: Fragment, onError: OnError = { })
 
     fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect)
 
