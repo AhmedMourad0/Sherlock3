@@ -305,7 +305,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(requireActivity()) {
+        imagePicker.get().start(this) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }
@@ -314,7 +314,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     //TODO: should only start when connected to the internet, not the only one though
     private fun startPlacePicker() {
         setLocationEnabled(false)
-        placePicker.get().start(requireActivity()) {
+        placePicker.get().start(this) {
             setLocationEnabled(true)
             Timber.error(it, it::toString)
         }

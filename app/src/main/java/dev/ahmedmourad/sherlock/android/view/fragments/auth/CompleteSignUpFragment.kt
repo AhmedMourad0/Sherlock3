@@ -142,7 +142,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(requireActivity()) {
+        imagePicker.get().start(this) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }

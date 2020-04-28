@@ -164,7 +164,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
     private fun startImagePicker() {
         setPictureEnabled(false)
-        imagePicker.get().start(requireActivity()) {
+        imagePicker.get().start(this) {
             setPictureEnabled(true)
             Timber.error(it, it::toString)
         }

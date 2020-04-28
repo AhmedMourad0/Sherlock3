@@ -200,7 +200,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
     private fun startPlacePicker() {
         setLocationEnabled(false)
-        placePicker.get().start(requireActivity()) {
+        placePicker.get().start(this) {
             setLocationEnabled(true)
             Timber.error(it, it::toString)
         }
