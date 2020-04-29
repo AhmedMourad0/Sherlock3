@@ -18,6 +18,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
@@ -64,12 +65,32 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
         initializeEditTexts()
         initializePictureImageView()
+        addErrorObservers()
 
         binding?.let { b ->
             arrayOf(b.pictureImageView,
                     b.pictureTextView,
                     b.completeButton
             ).forEach { it.setOnClickListener(this) }
+        }
+    }
+
+    //This's temporary and is here for debugging purposes
+    private fun addErrorObservers() {
+        observeAll(viewModel.emailError,
+                viewModel.displayNameError,
+                viewModel.phoneNumberError,
+                viewModel.picturePathError,
+                viewModel.userError
+        ) { msg ->
+            msg?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+            viewModel.onEmailErrorDismissed()
+            viewModel.onDisplayNameErrorDismissed()
+            viewModel.onPhoneNumberErrorDismissed()
+            viewModel.onPicturePathErrorDismissed()
+            viewModel.onUserErrorDismissed()
         }
     }
 

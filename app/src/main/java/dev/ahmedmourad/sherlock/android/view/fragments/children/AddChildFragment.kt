@@ -24,6 +24,7 @@ import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
@@ -87,6 +88,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializeGenderRadioGroup()
         initializePictureImageView()
         initializeLocationTextView()
+        addErrorObservers()
 
         observe(globalViewModel.internetConnectivity) { either ->
             when (either) {
@@ -125,6 +127,41 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     b.pictureTextView,
                     b.pictureTextView
             ).forEach { it.setOnClickListener(this) }
+        }
+    }
+
+    //This's temporary and is here for debugging purposes
+    private fun addErrorObservers() {
+        observeAll(viewModel.firstNameError,
+                viewModel.lastNameError,
+                viewModel.nameError,
+                viewModel.minAgeError,
+                viewModel.maxAgeError,
+                viewModel.locationError,
+                viewModel.ageError,
+                viewModel.minHeightError,
+                viewModel.maxHeightError,
+                viewModel.heightError,
+                viewModel.appearanceError,
+                viewModel.picturePathError,
+                viewModel.childError
+        ) { msg ->
+            msg?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+            viewModel.onFirstNameErrorDismissed()
+            viewModel.onLastNameErrorDismissed()
+            viewModel.onNameErrorDismissed()
+            viewModel.onMinAgeErrorDismissed()
+            viewModel.onMaxAgeErrorDismissed()
+            viewModel.onLocationErrorDismissed()
+            viewModel.onAgeErrorDismissed()
+            viewModel.onMinHeightErrorDismissed()
+            viewModel.onMaxHeightErrorDismissed()
+            viewModel.onHeightErrorDismissed()
+            viewModel.onAppearanceErrorDismissed()
+            viewModel.onPicturePathErrorDismissed()
+            viewModel.onChildErrorDismissed()
         }
     }
 

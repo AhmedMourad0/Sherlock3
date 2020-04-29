@@ -12,6 +12,7 @@ import arrow.core.identity
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignInBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignInViewModel
@@ -52,6 +53,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignInBinding.bind(view)
         initializeEditTexts()
+        addErrorObservers()
         binding?.let { b ->
             arrayOf(b.signInButton,
                     b.forgotPasswordTextView,
@@ -60,6 +62,21 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
                     b.signInWithFacebookImageView,
                     b.signInWithTwitterImageView
             ).forEach { it.setOnClickListener(this) }
+        }
+    }
+
+    //This's temporary and is here for debugging purposes
+    private fun addErrorObservers() {
+        observeAll(viewModel.emailError,
+                viewModel.passwordError,
+                viewModel.credentialsError
+        ) { msg ->
+            msg?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+            viewModel.onEmailErrorDismissed()
+            viewModel.onPasswordErrorDismissed()
+            viewModel.onCredentialsErrorDismissed()
         }
     }
 

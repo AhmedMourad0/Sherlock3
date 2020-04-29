@@ -12,6 +12,7 @@ import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentResetPasswordBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
@@ -50,8 +51,20 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentResetPasswordBinding.bind(view)
         initializeEditTexts()
+        addErrorObservers()
         binding?.let { b ->
             arrayOf(b.sendEmailButton).forEach { it.setOnClickListener(this) }
+        }
+    }
+
+    //This's temporary and is here for debugging purposes
+    private fun addErrorObservers() {
+        observe(viewModel.emailError
+        ) { msg ->
+            msg?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+            viewModel.onEmailErrorDismissed()
         }
     }
 

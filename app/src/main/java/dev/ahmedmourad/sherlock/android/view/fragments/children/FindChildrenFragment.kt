@@ -17,6 +17,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -71,15 +72,16 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeGenderRadioGroup()
         initializeNumberPickers()
         initializeLocationTextView()
+        addErrorObservers()
 
         observe(globalViewModel.internetConnectivity) { either ->
             when (either) {
                 is Either.Left -> {
-                    setInternetDependantViewsEnables(false)
+                    setInternetDependantViewsEnabled(false)
                     Timber.error(either.a, either.a::toString)
                 }
                 is Either.Right -> {
-                    setInternetDependantViewsEnables(either.b)
+                    setInternetDependantViewsEnabled(either.b)
                 }
             }.exhaust()
         }
@@ -97,7 +99,38 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         }
     }
 
-    private fun setInternetDependantViewsEnables(enabled: Boolean) {
+    //This's temporary and is here for debugging purposes
+    private fun addErrorObservers() {
+        observeAll(viewModel.firstNameError,
+                viewModel.lastNameError,
+                viewModel.nameError,
+                viewModel.locationError,
+                viewModel.ageError,
+                viewModel.heightError,
+                viewModel.genderError,
+                viewModel.skinError,
+                viewModel.hairError,
+                viewModel.appearanceError,
+                viewModel.queryError
+        ) { msg ->
+            msg?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+            viewModel.onFirstNameErrorDismissed()
+            viewModel.onLastNameErrorDismissed()
+            viewModel.onNameErrorDismissed()
+            viewModel.onLocationErrorDismissed()
+            viewModel.onAgeErrorDismissed()
+            viewModel.onHeightErrorDismissed()
+            viewModel.onGenderErrorDismissed()
+            viewModel.onSkinErrorDismissed()
+            viewModel.onHairErrorDismissed()
+            viewModel.onAppearanceErrorDismissed()
+            viewModel.onQueryErrorDismissed()
+        }
+    }
+
+    private fun setInternetDependantViewsEnabled(enabled: Boolean) {
         setLocationEnabled(enabled)
     }
 
