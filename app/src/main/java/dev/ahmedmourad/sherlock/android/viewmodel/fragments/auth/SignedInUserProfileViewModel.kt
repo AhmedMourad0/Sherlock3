@@ -14,6 +14,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class SignedInUserProfileViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
@@ -27,12 +28,12 @@ internal class SignedInUserProfileViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val observeSignedInUserInteractor: ObserveSignedInUserInteractor
+            private val observeSignedInUserInteractor: Provider<ObserveSignedInUserInteractor>
     ) : AssistedViewModelFactory<SignedInUserProfileViewModel> {
         override fun invoke(handle: SavedStateHandle): SignedInUserProfileViewModel {
             return SignedInUserProfileViewModel(
                     handle,
-                    observeSignedInUserInteractor
+                    observeSignedInUserInteractor.get()
             )
         }
     }

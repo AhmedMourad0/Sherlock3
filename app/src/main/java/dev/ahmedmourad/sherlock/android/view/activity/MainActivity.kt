@@ -37,14 +37,15 @@ import dev.ahmedmourad.sherlock.domain.model.common.disposable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
     @Inject
-    lateinit var viewModelFactory: AssistedViewModelFactory<MainActivityViewModel>
+    lateinit var viewModelFactory: Provider<AssistedViewModelFactory<MainActivityViewModel>>
 
     @Inject
-    lateinit var globalViewModelFactory: AssistedViewModelFactory<GlobalViewModel>
+    lateinit var globalViewModelFactory: Provider<AssistedViewModelFactory<GlobalViewModel>>
 
     private val foregroundAnimator by lazy(::createForegroundAnimator)
 

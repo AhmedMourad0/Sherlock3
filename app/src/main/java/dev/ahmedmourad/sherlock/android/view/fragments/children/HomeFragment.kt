@@ -19,11 +19,12 @@ import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.HomeViewMod
 import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class HomeFragment : Fragment(R.layout.fragment_home) {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<HomeViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<HomeViewModel>>
 
     @Inject
     internal lateinit var adapterFactory: AppSectionsRecyclerAdapterFactory

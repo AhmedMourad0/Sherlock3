@@ -29,6 +29,7 @@ import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_children_search_results) {
 
@@ -42,7 +43,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     internal lateinit var adapterFactory: ChildrenRecyclerAdapterFactory
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<ChildrenSearchResultsViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<ChildrenSearchResultsViewModel>>
 
     private lateinit var adapter: DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *>
 

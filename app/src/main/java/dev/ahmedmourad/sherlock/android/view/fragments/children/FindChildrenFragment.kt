@@ -32,11 +32,12 @@ import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<FindChildrenViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<FindChildrenViewModel>>
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>

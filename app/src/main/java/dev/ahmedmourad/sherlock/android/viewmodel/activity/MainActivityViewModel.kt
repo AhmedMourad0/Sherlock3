@@ -9,6 +9,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFacto
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignOutInteractor
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class MainActivityViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -28,12 +29,12 @@ internal class MainActivityViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val signOutInteractor: SignOutInteractor
+            private val signOutInteractor: Provider<SignOutInteractor>
     ) : AssistedViewModelFactory<MainActivityViewModel> {
         override fun invoke(handle: SavedStateHandle): MainActivityViewModel {
             return MainActivityViewModel(
                     handle,
-                    signOutInteractor
+                    signOutInteractor.get()
             )
         }
     }

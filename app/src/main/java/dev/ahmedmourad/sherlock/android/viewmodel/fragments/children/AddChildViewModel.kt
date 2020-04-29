@@ -10,7 +10,6 @@ import arrow.core.extensions.fx
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
-import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
@@ -27,11 +26,12 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import splitties.init.appCtx
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class AddChildViewModel(
         private val savedStateHandle: SavedStateHandle,
         private val serviceFactory: SherlockServiceIntentFactory,
-        bus: Lazy<Bus>
+        bus: Bus
 ) : ViewModel() {
 
     val firstName: LiveData<String?>
@@ -186,7 +186,7 @@ internal class AddChildViewModel(
         savedStateHandle.set(KEY_ERROR_CHILD, null)
     }
 
-    val publishingState: LiveData<Either<Throwable, PublishingState>> = bus.get().childPublishingState
+    val publishingState: LiveData<Either<Throwable, PublishingState>> = bus.childPublishingState
             .retry()
             .map<Either<Throwable, PublishingState>> { it.right() }
             .onErrorReturn { it.left() }
@@ -289,14 +289,14 @@ internal class AddChildViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val serviceFactory: SherlockServiceIntentFactory,
-            private val bus: Lazy<Bus>
+            private val serviceFactory: Provider<SherlockServiceIntentFactory>,
+            private val bus: Provider<Bus>
     ) : AssistedViewModelFactory<AddChildViewModel> {
         override fun invoke(handle: SavedStateHandle): AddChildViewModel {
             return AddChildViewModel(
                     handle,
-                    serviceFactory,
-                    bus
+                    serviceFactory.get(),
+                    bus.get()
             )
         }
     }

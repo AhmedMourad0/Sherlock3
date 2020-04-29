@@ -19,6 +19,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class ChildDetailsViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
@@ -39,10 +40,10 @@ internal class ChildDetailsViewModel(
     fun onRefresh() = refreshSubject.onNext(Unit)
 
     internal class Factory @Inject constructor(
-            private val interactor: FindChildInteractor
+            private val interactor: Provider<FindChildInteractor>
     ) : AssistedViewModelFactory<ChildDetailsViewModel> {
         override fun invoke(handle: SavedStateHandle): ChildDetailsViewModel {
-            return ChildDetailsViewModel(handle, interactor)
+            return ChildDetailsViewModel(handle, interactor.get())
         }
     }
 

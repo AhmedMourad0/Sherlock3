@@ -26,6 +26,7 @@ import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class CompleteSignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -141,12 +142,12 @@ internal class CompleteSignUpViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val completeSignUpInteractor: CompleteSignUpInteractor
+            private val completeSignUpInteractor: Provider<CompleteSignUpInteractor>
     ) : AssistedViewModelFactory<CompleteSignUpViewModel> {
         override fun invoke(handle: SavedStateHandle): CompleteSignUpViewModel {
             return CompleteSignUpViewModel(
                     handle,
-                    completeSignUpInteractor
+                    completeSignUpInteractor.get()
             )
         }
     }

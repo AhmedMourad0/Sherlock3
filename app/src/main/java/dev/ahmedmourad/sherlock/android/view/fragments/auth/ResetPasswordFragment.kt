@@ -19,12 +19,13 @@ import dev.ahmedmourad.sherlock.domain.model.common.disposable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 //TODO: take email as an optional argument
 internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<ResetPasswordViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<ResetPasswordViewModel>>
 
     private val viewModel: ResetPasswordViewModel by viewModels {
         SimpleSavedStateViewModelFactory(

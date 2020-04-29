@@ -21,11 +21,12 @@ import dev.ahmedmourad.sherlock.domain.model.common.disposable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<SignInViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignInViewModel>>
 
     private val viewModel: SignInViewModel by viewModels {
         SimpleSavedStateViewModelFactory(

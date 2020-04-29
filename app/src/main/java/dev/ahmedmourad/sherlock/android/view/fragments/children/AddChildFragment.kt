@@ -39,13 +39,14 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlin.math.roundToInt
 
 //TODO: maybe never allow publishing until all publishing operations and finished?
 internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<AddChildViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<AddChildViewModel>>
 
     @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>

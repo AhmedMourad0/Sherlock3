@@ -17,6 +17,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class GlobalViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
@@ -47,16 +48,16 @@ internal class GlobalViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
-            private val observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
-            private val observeSignedInUserInteractor: ObserveSignedInUserInteractor
+            private val observeInternetConnectivityInteractor: Provider<ObserveInternetConnectivityInteractor>,
+            private val observeUserAuthStateInteractor: Provider<ObserveUserAuthStateInteractor>,
+            private val observeSignedInUserInteractor: Provider<ObserveSignedInUserInteractor>
     ) : AssistedViewModelFactory<GlobalViewModel> {
         override fun invoke(handle: SavedStateHandle): GlobalViewModel {
             return GlobalViewModel(
                     handle,
-                    observeInternetConnectivityInteractor,
-                    observeUserAuthStateInteractor,
-                    observeSignedInUserInteractor
+                    observeInternetConnectivityInteractor.get(),
+                    observeUserAuthStateInteractor.get(),
+                    observeSignedInUserInteractor.get()
             )
         }
     }

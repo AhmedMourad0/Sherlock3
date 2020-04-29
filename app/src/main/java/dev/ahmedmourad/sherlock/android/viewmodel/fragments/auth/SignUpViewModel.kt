@@ -22,6 +22,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class SignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -188,18 +189,18 @@ internal class SignUpViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val signUpInteractor: SignUpInteractor,
-            private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
-            private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
-            private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
+            private val signUpInteractor: Provider<SignUpInteractor>,
+            private val signUpWithGoogleInteractor: Provider<SignInWithGoogleInteractor>,
+            private val signUpWithFacebookInteractor: Provider<SignInWithFacebookInteractor>,
+            private val signUpWithTwitterInteractor: Provider<SignInWithTwitterInteractor>
     ) : AssistedViewModelFactory<SignUpViewModel> {
         override fun invoke(handle: SavedStateHandle): SignUpViewModel {
             return SignUpViewModel(
                     handle,
-                    signUpInteractor,
-                    signUpWithGoogleInteractor,
-                    signUpWithFacebookInteractor,
-                    signUpWithTwitterInteractor
+                    signUpInteractor.get(),
+                    signUpWithGoogleInteractor.get(),
+                    signUpWithFacebookInteractor.get(),
+                    signUpWithTwitterInteractor.get()
             )
         }
     }

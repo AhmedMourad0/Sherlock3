@@ -22,6 +22,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class SignInViewModel(
         private val savedStateHandle: SavedStateHandle,
@@ -101,18 +102,18 @@ internal class SignInViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val signInInteractor: SignInInteractor,
-            private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
-            private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
-            private val signInWithTwitterInteractor: SignInWithTwitterInteractor
+            private val signInInteractor: Provider<SignInInteractor>,
+            private val signInWithGoogleInteractor: Provider<SignInWithGoogleInteractor>,
+            private val signInWithFacebookInteractor: Provider<SignInWithFacebookInteractor>,
+            private val signInWithTwitterInteractor: Provider<SignInWithTwitterInteractor>
     ) : AssistedViewModelFactory<SignInViewModel> {
         override fun invoke(handle: SavedStateHandle): SignInViewModel {
             return SignInViewModel(
                     handle,
-                    signInInteractor,
-                    signInWithGoogleInteractor,
-                    signInWithFacebookInteractor,
-                    signInWithTwitterInteractor
+                    signInInteractor.get(),
+                    signInWithGoogleInteractor.get(),
+                    signInWithFacebookInteractor.get(),
+                    signInWithTwitterInteractor.get()
             )
         }
     }

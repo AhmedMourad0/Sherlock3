@@ -21,6 +21,7 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_in_user_profile) {
 
@@ -28,7 +29,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     internal lateinit var dateManager: Lazy<DateManager>
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<SignedInUserProfileViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignedInUserProfileViewModel>>
 
     private val viewModel: SignedInUserProfileViewModel by viewModels {
         SimpleSavedStateViewModelFactory(

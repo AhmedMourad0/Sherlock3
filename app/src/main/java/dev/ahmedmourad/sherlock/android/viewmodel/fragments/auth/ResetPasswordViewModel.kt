@@ -13,6 +13,7 @@ import dev.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailIn
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class ResetPasswordViewModel(
         private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
@@ -46,11 +47,11 @@ internal class ResetPasswordViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor
+            private val sendPasswordResetEmailInteractor: Provider<SendPasswordResetEmailInteractor>
     ) : AssistedViewModelFactory<ResetPasswordViewModel> {
         override fun invoke(handle: SavedStateHandle): ResetPasswordViewModel {
             return ResetPasswordViewModel(
-                    sendPasswordResetEmailInteractor,
+                    sendPasswordResetEmailInteractor.get(),
                     handle
             )
         }

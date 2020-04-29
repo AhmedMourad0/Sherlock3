@@ -29,11 +29,12 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign_up), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<CompleteSignUpViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<CompleteSignUpViewModel>>
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>

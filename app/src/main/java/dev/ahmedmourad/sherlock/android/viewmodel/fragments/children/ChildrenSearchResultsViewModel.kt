@@ -20,6 +20,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class ChildrenSearchResultsViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
@@ -43,11 +44,11 @@ internal class ChildrenSearchResultsViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val interactor: FindChildrenInteractor,
-            private val filterFactory: ChildrenFilterFactory
+            private val interactor: Provider<FindChildrenInteractor>,
+                    private val filterFactory: Provider<ChildrenFilterFactory>
     ) : AssistedViewModelFactory<ChildrenSearchResultsViewModel> {
         override fun invoke(handle: SavedStateHandle): ChildrenSearchResultsViewModel {
-            return ChildrenSearchResultsViewModel(handle, interactor, filterFactory)
+            return ChildrenSearchResultsViewModel(handle, interactor.get(), filterFactory.get())
         }
     }
 

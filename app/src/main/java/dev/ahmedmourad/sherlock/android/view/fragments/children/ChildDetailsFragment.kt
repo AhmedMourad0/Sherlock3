@@ -29,6 +29,7 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+import javax.inject.Provider
 
 internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) {
 
@@ -36,7 +37,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     internal lateinit var textFormatter: Lazy<TextFormatter>
 
     @Inject
-    internal lateinit var viewModelFactory: AssistedViewModelFactory<ChildDetailsViewModel>
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<ChildDetailsViewModel>>
 
     private val viewModel: ChildDetailsViewModel by viewModels {
         SimpleSavedStateViewModelFactory(
