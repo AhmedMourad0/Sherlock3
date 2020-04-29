@@ -23,10 +23,7 @@ import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
-import dev.ahmedmourad.sherlock.android.utils.clearBackStack
-import dev.ahmedmourad.sherlock.android.utils.findNavController
-import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
-import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.utils.*
 import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
@@ -49,8 +46,6 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
     @Inject
     lateinit var globalViewModelFactory: AssistedViewModelFactory<GlobalViewModel>
 
-    private var isInPrimaryMode = true
-
     private val foregroundAnimator by lazy(::createForegroundAnimator)
 
     private lateinit var appNavHostFragment: Fragment
@@ -60,7 +55,7 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
         SimpleSavedStateViewModelFactory(
                 this,
                 viewModelFactory,
-                MainActivityViewModel.defaultArgs()
+                MainActivityViewModel.defaultArgs(true)
         )
     }
 
@@ -84,24 +79,8 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
         setSupportActionBar(binding.toolbar)
 
-        binding.dummyView.setOnFocusChangeListener { v, hasFocus ->
-            if (hasFocus) {
-                v.post(this@MainActivity::hideSoftKeyboard)
-            }
-        }
-
-        binding.dummyView.requestFocusFromTouch()
-
-        binding.backdropScrollView.post {
-            binding.backdropScrollView.updatePadding(
-                    bottom = binding.primaryContentRoot.height / PRIMARY_CONTENT_COLLAPSE_FACTOR.toInt()
-            )
-        }
-
-        appNavHostFragment = supportFragmentManager.findFragmentById(R.id.app_nav_host_fragment)!!
-        authNavHostFragment = supportFragmentManager.findFragmentById(R.id.auth_nav_host_fragment)!!
-
-        addOnBackPressedCallback()
+        setupBackdrop()
+        setupNavigation()
 
         binding.root.post {
             showConnectivitySnackBar(Connectivity.CONNECTING)
@@ -116,7 +95,7 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
             })
         }
 
-        observe(globalViewModel.userAuthState) { either ->
+        observeAll(globalViewModel.userAuthState, globalViewModel.signedInUser) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
                 Timber.error(it, it::toString)
@@ -126,15 +105,39 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
             })
         }
 
-        observe(globalViewModel.signedInUser) { either ->
-            either.fold(ifLeft = {
-                invalidateOptionsMenu()
-                Timber.error(it, it::toString)
-            }, ifRight = {
-                invalidateOptionsMenu()
-                updateBackdropDestination()
-            })
+        observe(viewModel.isInPrimaryContentMode) { newValue ->
+            invalidateOptionsMenu()
+            binding.primaryContentOverlay.visibility = View.VISIBLE
+            binding.dummyView.requestFocusFromTouch()
+            when {
+                newValue || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
+                else -> foregroundAnimator.start()
+            }
+            refreshPrimaryNavigationFragment()
         }
+    }
+
+    private fun setupBackdrop() {
+
+        binding.dummyView.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                v.post(this@MainActivity::hideSoftKeyboard)
+            }
+        }
+
+        binding.dummyView.requestFocusFromTouch()
+
+        binding.backdropScrollView.post {
+            binding.backdropScrollView.updatePadding(
+                    bottom = binding.primaryContentRoot.height / PRIMARY_CONTENT_COLLAPSE_FACTOR.toInt()
+            )
+        }
+    }
+
+    private fun setupNavigation() {
+        appNavHostFragment = supportFragmentManager.findFragmentById(R.id.app_nav_host_fragment)!!
+        authNavHostFragment = supportFragmentManager.findFragmentById(R.id.auth_nav_host_fragment)!!
+        addOnBackPressedCallback()
     }
 
     private fun getConnectivity(isConnected: Boolean): Connectivity {
@@ -149,7 +152,7 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
                     return
                 }
 
-                if (isInPrimaryMode) {
+                if (viewModel.isInPrimaryContentMode.value!!) {
                     if (!findNavController(R.id.app_nav_host_fragment).popBackStack()) {
                         finish()
                     }
@@ -189,7 +192,11 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
         foregroundAnimator.doOnEnd {
             invalidateOptionsMenu()
-            binding.primaryContentOverlay.visibility = if (isInPrimaryMode) View.GONE else View.VISIBLE
+            binding.primaryContentOverlay.visibility = if (viewModel.isInPrimaryContentMode.value!!) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
         }
 
         binding.dummyView.requestFocusFromTouch()
@@ -246,20 +253,11 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
             userEither.fold(ifLeft = {
 
                 if (authNavController.currentDestination?.id !in authNeutralDestinations) {
-                    if (it is NoSignedInUserException) {
-                        authNavController.navigate(
-                                R.id.signInFragment,
-                                null,
-                                clearBackStack(authNavController)
-                        )
-                    } else {
-                        authNavController.navigate(
-                                R.id.signInFragment,
-                                null,
-                                clearBackStack(authNavController)
-                        )
-                        TODO("retry or sign out controller")
-                    }
+                    authNavController.navigate(
+                            R.id.signInFragment,
+                            null,
+                            clearBackStack(authNavController)
+                    )
                 }
 
             }, ifRight = { either ->
@@ -306,7 +304,7 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
         menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
-        if (!isInPrimaryMode) {
+        if (!viewModel.isInPrimaryContentMode.value!!) {
             item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
             return super.onPrepareOptionsMenu(menu)
         }
@@ -356,7 +354,7 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.main_menu_show_or_hide_backdrop -> {
-                setInPrimaryContentMode(!isInPrimaryMode)
+                setInPrimaryContentMode(!viewModel.isInPrimaryContentMode.value!!)
                 true
             }
             R.id.main_menu_sign_out -> {
@@ -368,24 +366,11 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
     }
 
     override fun setInPrimaryContentMode(newValue: Boolean) {
-
-        if (newValue == isInPrimaryMode) {
-            return
-        }
-
-        isInPrimaryMode = newValue
-        invalidateOptionsMenu()
-        binding.primaryContentOverlay.visibility = View.VISIBLE
-        binding.dummyView.requestFocusFromTouch()
-        when {
-            isInPrimaryMode || foregroundAnimator.isStarted -> foregroundAnimator.reverse()
-            else -> foregroundAnimator.start()
-        }
-        updatePrimaryNavigationFragment()
+        viewModel.onIsInPrimaryModeChange(newValue)
     }
 
-    private fun updatePrimaryNavigationFragment() {
-        if (isInPrimaryMode) {
+    private fun refreshPrimaryNavigationFragment() {
+        if (viewModel.isInPrimaryContentMode.value!!) {
             supportFragmentManager.beginTransaction()
                     .setPrimaryNavigationFragment(appNavHostFragment)
                     .commitNow()
