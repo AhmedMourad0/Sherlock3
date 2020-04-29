@@ -115,18 +115,18 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onFirstNameErrorDismissed()
+                viewModel.onLastNameErrorDismissed()
+                viewModel.onNameErrorDismissed()
+                viewModel.onLocationErrorDismissed()
+                viewModel.onAgeErrorDismissed()
+                viewModel.onHeightErrorDismissed()
+                viewModel.onGenderErrorDismissed()
+                viewModel.onSkinErrorDismissed()
+                viewModel.onHairErrorDismissed()
+                viewModel.onAppearanceErrorDismissed()
+                viewModel.onQueryErrorDismissed()
             }
-            viewModel.onFirstNameErrorDismissed()
-            viewModel.onLastNameErrorDismissed()
-            viewModel.onNameErrorDismissed()
-            viewModel.onLocationErrorDismissed()
-            viewModel.onAgeErrorDismissed()
-            viewModel.onHeightErrorDismissed()
-            viewModel.onGenderErrorDismissed()
-            viewModel.onSkinErrorDismissed()
-            viewModel.onHairErrorDismissed()
-            viewModel.onAppearanceErrorDismissed()
-            viewModel.onQueryErrorDismissed()
         }
     }
 

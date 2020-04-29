@@ -85,12 +85,12 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onEmailErrorDismissed()
+                viewModel.onDisplayNameErrorDismissed()
+                viewModel.onPhoneNumberErrorDismissed()
+                viewModel.onPicturePathErrorDismissed()
+                viewModel.onUserErrorDismissed()
             }
-            viewModel.onEmailErrorDismissed()
-            viewModel.onDisplayNameErrorDismissed()
-            viewModel.onPhoneNumberErrorDismissed()
-            viewModel.onPicturePathErrorDismissed()
-            viewModel.onUserErrorDismissed()
         }
     }
 

@@ -63,8 +63,8 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onEmailErrorDismissed()
             }
-            viewModel.onEmailErrorDismissed()
         }
     }
 

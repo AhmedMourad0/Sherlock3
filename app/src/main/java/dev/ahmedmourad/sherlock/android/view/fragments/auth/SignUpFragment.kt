@@ -88,15 +88,15 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onPasswordErrorDismissed()
+                viewModel.onPasswordConfirmationErrorDismissed()
+                viewModel.onEmailErrorDismissed()
+                viewModel.onCredentialsErrorDismissed()
+                viewModel.onDisplayNameErrorDismissed()
+                viewModel.onPhoneNumberErrorDismissed()
+                viewModel.onPicturePathErrorDismissed()
+                viewModel.onUserErrorDismissed()
             }
-            viewModel.onPasswordErrorDismissed()
-            viewModel.onPasswordConfirmationErrorDismissed()
-            viewModel.onEmailErrorDismissed()
-            viewModel.onCredentialsErrorDismissed()
-            viewModel.onDisplayNameErrorDismissed()
-            viewModel.onPhoneNumberErrorDismissed()
-            viewModel.onPicturePathErrorDismissed()
-            viewModel.onUserErrorDismissed()
         }
     }
 

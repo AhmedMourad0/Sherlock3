@@ -148,20 +148,20 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onFirstNameErrorDismissed()
+                viewModel.onLastNameErrorDismissed()
+                viewModel.onNameErrorDismissed()
+                viewModel.onMinAgeErrorDismissed()
+                viewModel.onMaxAgeErrorDismissed()
+                viewModel.onLocationErrorDismissed()
+                viewModel.onAgeErrorDismissed()
+                viewModel.onMinHeightErrorDismissed()
+                viewModel.onMaxHeightErrorDismissed()
+                viewModel.onHeightErrorDismissed()
+                viewModel.onAppearanceErrorDismissed()
+                viewModel.onPicturePathErrorDismissed()
+                viewModel.onChildErrorDismissed()
             }
-            viewModel.onFirstNameErrorDismissed()
-            viewModel.onLastNameErrorDismissed()
-            viewModel.onNameErrorDismissed()
-            viewModel.onMinAgeErrorDismissed()
-            viewModel.onMaxAgeErrorDismissed()
-            viewModel.onLocationErrorDismissed()
-            viewModel.onAgeErrorDismissed()
-            viewModel.onMinHeightErrorDismissed()
-            viewModel.onMaxHeightErrorDismissed()
-            viewModel.onHeightErrorDismissed()
-            viewModel.onAppearanceErrorDismissed()
-            viewModel.onPicturePathErrorDismissed()
-            viewModel.onChildErrorDismissed()
         }
     }
 

@@ -73,10 +73,10 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
         ) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onEmailErrorDismissed()
+                viewModel.onPasswordErrorDismissed()
+                viewModel.onCredentialsErrorDismissed()
             }
-            viewModel.onEmailErrorDismissed()
-            viewModel.onPasswordErrorDismissed()
-            viewModel.onCredentialsErrorDismissed()
         }
     }
 
