@@ -1,0 +1,49 @@
+# Sherlock
+
+## Project Overview
+
+Sherlock is a mobile app that aims to help families find their
+lost/kidnapped children (Under development).
+
+## Key Concepts
+
+- Clean Architecture.
+- MVVM.
+- Modularization.
+- Functional Programming paradigm using Arrow-kt.
+- OOP.
+- Dagger2.
+- AAC (Room, Navigation, ViewModel, SavedState, LiveData).
+- AndroidX Fragments.
+- Firebase (Firestore, Storage, Authentication).
+- Authentication with (Email, Google, Facebook and Twitter).
+- RxJava.
+- KotlinX Serialization.
+- Glide.
+- Fragment navigation pattern (Single Activity, multiple fragments).
+- Reactive Event Bus.
+- ViewBinding.
+- Services.
+- Backdrop.
+- Timber.
+- Home screen widgets.
+
+## TODO:
+
+- Improve UI, maybe wait for Compose? We also need many spinners.
+- Testing.
+- Firebase Crashlytics.
+- Package per feature?
+- Replace Throwable for interactors failures with ADTs for better error
+  handling and documentation.
+- Use Monads to abstract over data types (RxJava, Coroutines,...) in
+  data modules.
+- Replace RxJava with Kotlin Coroutines and Flow.
+- Firebase Cloud Functions.
+- LiveQuery (allowing users to register their search parameters for live
+  updates and sending them notifications when a child with high
+  likelihood for a match is found).
+- Timeline (shows a live feed of newly missing or found children near
+  you)
+- Go Multiplatform (hopefully Dagger2 will be ported by then, I need
+  compile-time dependency graph validation).
