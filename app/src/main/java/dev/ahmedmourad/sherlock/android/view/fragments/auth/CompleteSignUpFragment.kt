@@ -138,10 +138,10 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) {
+        observe(viewModel.picturePath) { picturePath ->
             binding?.let { b ->
                 Glide.with(appCtx)
-                        .load(it)
+                        .load(picturePath)
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder)
                         .into(b.pictureImageView)

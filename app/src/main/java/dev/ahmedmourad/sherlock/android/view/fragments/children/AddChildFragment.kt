@@ -161,6 +161,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 viewModel.onAppearanceErrorDismissed()
                 viewModel.onPicturePathErrorDismissed()
                 viewModel.onChildErrorDismissed()
+                setUserInteractionsEnabled(true)
             }
         }
     }
@@ -320,13 +321,13 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) {
-            binding?.let {
+        observe(viewModel.picturePath) { picturePath ->
+            binding?.let { b ->
                 Glide.with(appCtx)
-                        .load(it)
+                        .load(picturePath)
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder)
-                        .into(it.pictureImageView)
+                        .into(b.pictureImageView)
             }
         }
     }

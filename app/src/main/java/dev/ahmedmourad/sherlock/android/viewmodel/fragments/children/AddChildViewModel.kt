@@ -204,39 +204,39 @@ internal class AddChildViewModel(
         return Either.fx<Unit, AppPublishedChild> {
 
             val (firstName) = validateName(firstName.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_FIRST_NAME, null)
+                savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
             }
 
             val (lastName) = validateNameNullable(lastName.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_LAST_NAME, null)
+                savedStateHandle.set(KEY_ERROR_LAST_NAME, it)
             }
 
             val (name) = validateNameEitherNullable(firstName, lastName).mapLeft {
-                savedStateHandle.set(KEY_ERROR_NAME, null)
+                savedStateHandle.set(KEY_ERROR_NAME, it)
             }
 
             val (minAge) = validateAgeNullable(minAge.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_MIN_AGE, null)
+                savedStateHandle.set(KEY_ERROR_MIN_AGE, it)
             }
 
             val (maxAge) = validateAgeNullable(maxAge.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_MAX_AGE, null)
+                savedStateHandle.set(KEY_ERROR_MAX_AGE, it)
             }
 
             val (ageRange) = validateAgeRange(minAge, maxAge).mapLeft {
-                savedStateHandle.set(KEY_ERROR_AGE, null)
+                savedStateHandle.set(KEY_ERROR_AGE, it)
             }
 
             val (minHeight) = validateHeightNullable(minHeight.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_MIN_HEIGHT, null)
+                savedStateHandle.set(KEY_ERROR_MIN_HEIGHT, it)
             }
 
             val (maxHeight) = validateHeightNullable(maxHeight.value).mapLeft {
-                savedStateHandle.set(KEY_ERROR_MAX_HEIGHT, null)
+                savedStateHandle.set(KEY_ERROR_MAX_HEIGHT, it)
             }
 
             val (heightRange) = validateHeightRange(minHeight, maxHeight).mapLeft {
-                savedStateHandle.set(KEY_ERROR_HEIGHT, null)
+                savedStateHandle.set(KEY_ERROR_HEIGHT, it)
             }
 
             val (appearance) = validateApproximateAppearance(
@@ -246,12 +246,12 @@ internal class AddChildViewModel(
                     skin.value?.let { findEnum(it, Skin.values()) },
                     hair.value?.let { findEnum(it, Hair.values()) }
             ).mapLeft {
-                savedStateHandle.set(KEY_ERROR_APPEARANCE, null)
+                savedStateHandle.set(KEY_ERROR_APPEARANCE, it)
             }
 
-            val coordinates = location.value?.let {
-                validateCoordinates(it.latitude, it.longitude).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_LOCATION, null)
+            val coordinates = location.value?.let { placePicker ->
+                validateCoordinates(placePicker.latitude, placePicker.longitude).mapLeft {
+                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
                 }.bind()
             }
 
@@ -263,14 +263,14 @@ internal class AddChildViewModel(
                             it.address,
                             c
                     ).mapLeft {
-                        savedStateHandle.set(KEY_ERROR_LOCATION, null)
+                        savedStateHandle.set(KEY_ERROR_LOCATION, it)
                     }.bind()
                 }
             }
 
-            val (picturePath) = picturePath.value?.let {
-                validatePicturePath(it.value).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
+            val (picturePath) = picturePath.value?.let { picturePath ->
+                validatePicturePath(picturePath.value).mapLeft {
+                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
                 }
             } ?: null.right()
 
@@ -281,7 +281,7 @@ internal class AddChildViewModel(
                     appearance,
                     picturePath
             ).mapLeft {
-                savedStateHandle.set(KEY_ERROR_CHILD, null)
+                savedStateHandle.set(KEY_ERROR_CHILD, it)
             }.bind()
 
         }.orNull()

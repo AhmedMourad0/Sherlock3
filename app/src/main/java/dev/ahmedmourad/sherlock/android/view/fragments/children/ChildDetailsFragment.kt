@@ -84,33 +84,33 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
             return
         }
 
-        binding?.let {
+        binding?.let { b ->
 
             //TODO: we should inject glide
             Glide.with(appCtx)
                     .load(result.a.pictureUrl)
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.placeholder)
-                    .into(it.childPicture)
+                    .into(b.childPicture)
 
 
             val name = textFormatter.get().formatName(result.a.name)
-            it.toolbar.title = name
-            it.childName.text = name
+            b.toolbar.title = name
+            b.childName.text = name
 
-            it.childAge.text = textFormatter.get().formatAge(result.a.appearance.ageRange)
+            b.childAge.text = textFormatter.get().formatAge(result.a.appearance.ageRange)
 
-            it.childGender.text = textFormatter.get().formatGender(result.a.appearance.gender)
+            b.childGender.text = textFormatter.get().formatGender(result.a.appearance.gender)
 
-            it.childHeight.text = textFormatter.get().formatHeight(result.a.appearance.heightRange)
+            b.childHeight.text = textFormatter.get().formatHeight(result.a.appearance.heightRange)
 
-            it.childSkin.text = textFormatter.get().formatSkin(result.a.appearance.skin)
+            b.childSkin.text = textFormatter.get().formatSkin(result.a.appearance.skin)
 
-            it.childHair.text = textFormatter.get().formatHair(result.a.appearance.hair)
+            b.childHair.text = textFormatter.get().formatHair(result.a.appearance.hair)
 
-            it.childLocation.text = textFormatter.get().formatLocation(result.a.location)
+            b.childLocation.text = textFormatter.get().formatLocation(result.a.location)
 
-            it.notes.text = textFormatter.get().formatNotes(result.a.notes)
+            b.notes.text = textFormatter.get().formatNotes(result.a.notes)
         }
     }
 

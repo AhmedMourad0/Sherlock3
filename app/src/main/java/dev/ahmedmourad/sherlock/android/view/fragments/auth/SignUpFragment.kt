@@ -146,10 +146,10 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) {
+        observe(viewModel.picturePath) { picturePath ->
             binding?.let { b ->
                 Glide.with(appCtx)
-                        .load(it)
+                        .load(picturePath)
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder)
                         .into(b.pictureImageView)
