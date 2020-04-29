@@ -11,6 +11,7 @@ lost/kidnapped children (Under development).
 - MVVM.
 - Modularization.
 - Functional Programming paradigm using Arrow-kt.
+- Repository Pattern.
 - OOP.
 - Dagger2.
 - AAC (Room, Navigation, ViewModel, SavedState, LiveData).
