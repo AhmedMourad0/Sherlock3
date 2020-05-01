@@ -9,6 +9,8 @@ apply plugin: "kotlin-kapt"
 apply plugin: "de.mannodermaus.android-junit5"
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: "kotlinx-serialization"
+apply plugin: "com.google.gms.google-services"
+apply plugin: 'dev.ahmedmourad.nocopy.nocopy-gradle-plugin'
 
 android {
 //    signingConfigs {
@@ -140,5 +142,3 @@ dependencies {
     implementation project(":children")
     implementation project(":auth")
 }
-
-apply plugin: "com.google.gms.google-services"

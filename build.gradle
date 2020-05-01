@@ -5,6 +5,7 @@ buildscript {
     }
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -14,16 +15,17 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.4.2.0"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath "dev.ahmedmourad.nocopy:nocopy-gradle-plugin:0.1.0"
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        jcenter()
     }
     ext {
         butterKnifeVersion = "10.1.0"
