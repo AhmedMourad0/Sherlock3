@@ -10,9 +10,10 @@ lost/kidnapped children (Under development).
 - Clean Architecture.
 - MVVM.
 - Modularization.
-- Functional Programming paradigm using Arrow-kt.
+- Functional Programming using Arrow-kt.
 - Repository Pattern.
 - OOP.
+- Functional Reactive Programming.
 - Dagger2.
 - AAC (Room, Navigation, ViewModel, SavedState, LiveData).
 - AndroidX Fragments.
@@ -37,6 +38,8 @@ lost/kidnapped children (Under development).
 - Package per feature?
 - Replace Throwable for interactors failures with ADTs for better error
   handling and documentation.
+- Anonymous authentication as a firestore fallback strategy when the
+  user is signed but not with Firebase.
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
   data modules.
 - Replace RxJava with Kotlin Coroutines and Flow.
