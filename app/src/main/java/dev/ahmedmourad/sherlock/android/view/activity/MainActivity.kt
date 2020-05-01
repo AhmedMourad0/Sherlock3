@@ -18,8 +18,8 @@ import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
+import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity

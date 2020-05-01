@@ -12,8 +12,8 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import com.bumptech.glide.Glide
 import dagger.Lazy
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter

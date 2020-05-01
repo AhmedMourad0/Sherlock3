@@ -6,8 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViewsService
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.android.bundlizer.bundle
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
+import dev.ahmedmourad.bundlizer.bundle
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight

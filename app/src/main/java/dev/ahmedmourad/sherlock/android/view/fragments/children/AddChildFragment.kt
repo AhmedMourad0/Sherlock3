@@ -16,9 +16,9 @@ import arrow.core.orNull
 import com.bumptech.glide.Glide
 import com.jaygoo.widget.RangeSeekBar
 import dagger.Lazy
+import dev.ahmedmourad.bundlizer.bundle
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.bundlizer.bundle
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild

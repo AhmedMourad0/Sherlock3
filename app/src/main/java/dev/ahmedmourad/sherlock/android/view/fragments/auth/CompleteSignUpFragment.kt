@@ -13,8 +13,8 @@ import arrow.core.Either
 import arrow.core.identity
 import com.bumptech.glide.Glide
 import dagger.Lazy
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.utils.observe

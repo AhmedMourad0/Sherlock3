@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.left
-import dev.ahmedmourad.sherlock.android.bundlizer.bundle
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
+import dev.ahmedmourad.bundlizer.bundle
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor

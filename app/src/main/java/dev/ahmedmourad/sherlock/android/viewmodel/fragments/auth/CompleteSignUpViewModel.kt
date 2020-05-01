@@ -9,8 +9,8 @@ import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
 import dagger.Reusable
-import dev.ahmedmourad.sherlock.android.bundlizer.bundle
-import dev.ahmedmourad.sherlock.android.bundlizer.unbundle
+import dev.ahmedmourad.bundlizer.bundle
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateAppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateDisplayName
