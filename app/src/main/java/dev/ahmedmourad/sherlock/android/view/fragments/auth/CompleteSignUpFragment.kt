@@ -25,7 +25,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewMo
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import dev.ahmedmourad.sherlock.domain.model.common.disposable
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error

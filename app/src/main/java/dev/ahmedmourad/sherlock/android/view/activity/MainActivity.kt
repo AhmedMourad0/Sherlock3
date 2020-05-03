@@ -33,7 +33,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
 import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.common.disposable
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject

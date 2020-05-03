@@ -16,7 +16,7 @@ import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
-import dev.ahmedmourad.sherlock.domain.model.common.disposable
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject

@@ -23,7 +23,7 @@ import dev.ahmedmourad.sherlock.android.view.fragments.children.AddChildFragment
 import dev.ahmedmourad.sherlock.android.view.fragments.children.ChildDetailsFragmentArgs
 import dev.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.common.disposable
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

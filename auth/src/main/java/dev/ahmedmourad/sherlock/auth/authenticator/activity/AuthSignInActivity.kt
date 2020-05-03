@@ -24,7 +24,7 @@ import com.twitter.sdk.android.core.identity.TwitterAuthClient
 import dev.ahmedmourad.sherlock.auth.authenticator.AuthActivityFactory
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
 import dev.ahmedmourad.sherlock.domain.exceptions.SignInCancelledException
-import dev.ahmedmourad.sherlock.domain.model.common.disposable
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import inc.ahmedmourad.sherlock.auth.R
 import splitties.init.appCtx
 import timber.log.Timber
