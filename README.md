@@ -29,10 +29,12 @@ lost/kidnapped children (Under development).
 - Backdrop.
 - Timber.
 - Home screen widgets.
+- Bundlizer and NoCopy
 
 ## TODO:
 
-- Improve UI, maybe wait for Compose? We also need many spinners.
+- Improve UI, maybe wait for Compose? It's a mess. We also need many
+  spinners.
 - Testing.
 - Firebase Crashlytics.
 - Package per feature?
