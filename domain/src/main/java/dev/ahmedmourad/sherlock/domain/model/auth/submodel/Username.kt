@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import kotlinx.serialization.Serializable
 import timber.log.Timber
@@ -11,33 +12,8 @@ import timber.log.error
 import kotlin.math.pow
 
 @Serializable
-class Username private constructor(val value: String) {
-
-    fun component1() = value
-
-    override fun equals(other: Any?): Boolean {
-
-        if (this === other)
-            return true
-
-        if (javaClass != other?.javaClass)
-            return false
-
-        other as Username
-
-        if (value != other.value)
-            return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Username(value='$value')"
-    }
+@NoCopy
+data class Username private constructor(val value: String) {
 
     companion object {
 

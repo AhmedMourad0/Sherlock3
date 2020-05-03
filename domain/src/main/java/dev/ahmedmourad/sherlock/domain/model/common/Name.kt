@@ -3,36 +3,12 @@ package dev.ahmedmourad.sherlock.domain.model.common
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Name private constructor(val value: String) {
-
-    fun component1() = value
-
-    override fun equals(other: Any?): Boolean {
-
-        if (this === other)
-            return true
-
-        if (javaClass != other?.javaClass)
-            return false
-
-        other as Name
-
-        if (value != other.value)
-            return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Name(value='$value')"
-    }
+@NoCopy
+data class Name private constructor(val value: String) {
 
     companion object {
 

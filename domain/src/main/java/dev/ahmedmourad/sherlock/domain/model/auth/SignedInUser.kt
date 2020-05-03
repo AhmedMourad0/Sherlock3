@@ -1,5 +1,6 @@
 package dev.ahmedmourad.sherlock.domain.model.auth
 
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
@@ -9,7 +10,8 @@ import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import kotlinx.serialization.Serializable
 
 @Serializable
-class SignedInUser private constructor(
+@NoCopy
+data class SignedInUser private constructor(
         val id: UserId,
         val registrationDate: Long,
         val email: Email,
@@ -18,77 +20,6 @@ class SignedInUser private constructor(
         val phoneNumber: PhoneNumber,
         val pictureUrl: Url?
 ) {
-
-    fun component1() = id
-
-    fun component2() = registrationDate
-
-    fun component3() = email
-
-    fun component4() = displayName
-
-    fun component5() = username
-
-    fun component6() = phoneNumber
-
-    fun component7() = pictureUrl
-
-    override fun equals(other: Any?): Boolean {
-
-        if (this === other)
-            return true
-
-        if (javaClass != other?.javaClass)
-            return false
-
-        other as SignedInUser
-
-        if (id != other.id)
-            return false
-
-        if (registrationDate != other.registrationDate)
-            return false
-
-        if (email != other.email)
-            return false
-
-        if (displayName != other.displayName)
-            return false
-
-        if (username != other.username)
-            return false
-
-        if (phoneNumber != other.phoneNumber)
-            return false
-
-        if (pictureUrl != other.pictureUrl)
-            return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + registrationDate.hashCode()
-        result = 31 * result + email.hashCode()
-        result = 31 * result + displayName.hashCode()
-        result = 31 * result + username.hashCode()
-        result = 31 * result + phoneNumber.hashCode()
-        result = 31 * result + pictureUrl.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "SignedInUser(" +
-                "id=$id, " +
-                "registrationDate=$registrationDate, " +
-                "email=$email, " +
-                "displayName=$displayName, " +
-                "username=$username, " +
-                "phoneNumber=$phoneNumber, " +
-                "pictureUrl=$pictureUrl" +
-                ")"
-    }
 
     companion object {
         fun of(id: UserId,

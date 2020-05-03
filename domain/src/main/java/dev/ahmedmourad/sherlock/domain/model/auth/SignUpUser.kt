@@ -3,52 +3,54 @@ package dev.ahmedmourad.sherlock.domain.model.auth
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import kotlinx.serialization.Serializable
 
 @Serializable
-class SignUpUser private constructor(
+@NoCopy
+data class SignUpUser private constructor(
         val credentials: UserCredentials,
         val displayName: DisplayName,
         val phoneNumber: PhoneNumber,
         val picture: ByteArray?
 ) {
-    fun component1() = credentials
-
-    fun component2() = displayName
-
-    fun component3() = phoneNumber
-
-    fun component4() = picture
 
     override fun equals(other: Any?): Boolean {
 
-        if (this === other)
+        if (this === other) {
             return true
+        }
 
-        if (javaClass != other?.javaClass)
+        if (javaClass != other?.javaClass) {
             return false
+        }
 
         other as SignUpUser
 
-        if (credentials != other.credentials)
+        if (credentials != other.credentials) {
             return false
+        }
 
-        if (displayName != other.displayName)
+        if (displayName != other.displayName) {
             return false
+        }
 
-        if (phoneNumber != other.phoneNumber)
+        if (phoneNumber != other.phoneNumber) {
             return false
+        }
 
         if (picture != null) {
 
-            if (other.picture == null)
+            if (other.picture == null) {
                 return false
+            }
 
-            if (!picture.contentEquals(other.picture))
+            if (!picture.contentEquals(other.picture)) {
                 return false
+            }
 
         } else if (other.picture != null) {
             return false
@@ -63,15 +65,6 @@ class SignUpUser private constructor(
         result = 31 * result + phoneNumber.hashCode()
         result = 31 * result + (picture?.contentHashCode() ?: 0)
         return result
-    }
-
-    override fun toString(): String {
-        return "SignUpUser(" +
-                "credentials=$credentials, " +
-                "displayName=$displayName, " +
-                "phoneNumber=$phoneNumber, " +
-                "picture=${picture?.contentToString()}" +
-                ")"
     }
 
     companion object {

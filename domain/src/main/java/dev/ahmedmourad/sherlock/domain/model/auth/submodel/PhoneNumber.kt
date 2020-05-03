@@ -5,42 +5,12 @@ import arrow.core.left
 import arrow.core.right
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import kotlinx.serialization.Serializable
 
 @Serializable
-class PhoneNumber private constructor(val number: String, val countryCode: String) {
-
-    fun component1() = number
-
-    fun component2() = countryCode
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other)
-            return true
-
-        if (javaClass != other?.javaClass)
-            return false
-
-        other as PhoneNumber
-
-        if (number != other.number)
-            return false
-
-        if (countryCode != other.countryCode)
-            return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = number.hashCode()
-        result = 31 * result + countryCode.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "PhoneNumber(number='$number', countryCode='$countryCode')"
-    }
+@NoCopy
+data class PhoneNumber private constructor(val number: String, val countryCode: String) {
 
     companion object {
 
