@@ -3,11 +3,11 @@ package dev.ahmedmourad.sherlock.domain.model.children.submodel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import dev.ahmedmourad.nocopy.annotations.LeastVisibleCopy
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import kotlinx.serialization.Serializable
 
 @Serializable
-@LeastVisibleCopy
+@NoCopy
 data class Weight private constructor(val value: Double) {
 
     companion object {
@@ -16,7 +16,7 @@ data class Weight private constructor(val value: Double) {
         private const val MAX_VALUE = 1.0
 
         fun of(value: Double): Either<Exception, Weight> {
-            return validate(value)?.left() ?: Weight(value).copy(value = value).right()
+            return validate(value)?.left() ?: Weight(value).right()
         }
 
         fun validate(value: Double): Exception? {
