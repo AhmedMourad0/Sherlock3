@@ -53,3 +53,4 @@ lost/kidnapped children (Under development).
   you)
 - Go Multiplatform (hopefully Dagger2 will be ported by then, I need
   compile-time dependency graph validation).
+- Redux?
