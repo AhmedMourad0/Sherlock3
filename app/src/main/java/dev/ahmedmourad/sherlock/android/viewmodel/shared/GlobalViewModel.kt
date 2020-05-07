@@ -1,56 +1,61 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.shared
 
 import android.os.Bundle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveUserAuthStateInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
-import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 import javax.inject.Provider
 
 internal class GlobalViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
-        observeInternetConnectivityInteractor: ObserveInternetConnectivityInteractor,
-        observeUserAuthStateInteractor: ObserveUserAuthStateInteractor,
-        observeSignedInUserInteractor: ObserveSignedInUserInteractor
+        observeInternetConnectivityInteractor: Lazy<ObserveInternetConnectivityInteractor>,
+        observeUserAuthStateInteractor: Lazy<ObserveUserAuthStateInteractor>,
+        observeSignedInUserInteractor: Lazy<ObserveSignedInUserInteractor>
 ) : ViewModel() {
 
-    val internetConnectivity: LiveData<Either<Throwable, Boolean>> =
-            observeInternetConnectivityInteractor()
-                    .retry()
-                    .map<Either<Throwable, Boolean>> { it.right() }
-                    .onErrorReturn { it.left() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .toLiveData()
+    val internetConnectivity by lazy {
+        observeInternetConnectivityInteractor.get()
+                .invoke()
+                .retry()
+                .map<Either<Throwable, Boolean>> { it.right() }
+                .onErrorReturn { it.left() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .toLiveData()
+    }
 
-    val userAuthState: LiveData<Either<Throwable, Boolean>> = observeUserAuthStateInteractor()
-            .map<Either<Throwable, Boolean>> { it.right() }
-            .onErrorReturn { it.left() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .toLiveData()
+    val userAuthState by lazy {
+        observeUserAuthStateInteractor.get()
+                .invoke()
+                .map<Either<Throwable, Boolean>> { it.right() }
+                .onErrorReturn { it.left() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .toLiveData()
+    }
 
-    val signedInUser: LiveData<Either<Throwable, Either<IncompleteUser, SignedInUser>>> =
-            observeSignedInUserInteractor()
-                    .onErrorReturn { it.left() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .toLiveData()
+    val signedInUser by lazy {
+        observeSignedInUserInteractor.get()
+                .invoke()
+                .onErrorReturn { it.left() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .toLiveData()
+    }
 
     @Reusable
     class Factory @Inject constructor(
-            private val observeInternetConnectivityInteractor: Provider<ObserveInternetConnectivityInteractor>,
-            private val observeUserAuthStateInteractor: Provider<ObserveUserAuthStateInteractor>,
-            private val observeSignedInUserInteractor: Provider<ObserveSignedInUserInteractor>
+            private val observeInternetConnectivityInteractor: Provider<Lazy<ObserveInternetConnectivityInteractor>>,
+            private val observeUserAuthStateInteractor: Provider<Lazy<ObserveUserAuthStateInteractor>>,
+            private val observeSignedInUserInteractor: Provider<Lazy<ObserveSignedInUserInteractor>>
     ) : AssistedViewModelFactory<GlobalViewModel> {
         override fun invoke(handle: SavedStateHandle): GlobalViewModel {
             return GlobalViewModel(

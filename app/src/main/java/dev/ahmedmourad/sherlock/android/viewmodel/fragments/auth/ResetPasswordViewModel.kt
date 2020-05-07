@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.orNull
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -16,7 +17,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 internal class ResetPasswordViewModel(
-        private val sendPasswordResetEmailInteractor: SendPasswordResetEmailInteractor,
+        private val sendPasswordResetEmailInteractor: Lazy<SendPasswordResetEmailInteractor>,
         private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,7 +40,8 @@ internal class ResetPasswordViewModel(
                 leftOperation = {
                     savedStateHandle.set(KEY_ERROR_EMAIL, it)
                 }, rightOperation = {
-                    sendPasswordResetEmailInteractor(it)
+            sendPasswordResetEmailInteractor.get()
+                    .invoke(it)
                             .observeOn(AndroidSchedulers.mainThread())
                 }
         ).orNull()
@@ -47,7 +49,7 @@ internal class ResetPasswordViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val sendPasswordResetEmailInteractor: Provider<SendPasswordResetEmailInteractor>
+            private val sendPasswordResetEmailInteractor: Provider<Lazy<SendPasswordResetEmailInteractor>>
     ) : AssistedViewModelFactory<ResetPasswordViewModel> {
         override fun invoke(handle: SavedStateHandle): ResetPasswordViewModel {
             return ResetPasswordViewModel(

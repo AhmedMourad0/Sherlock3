@@ -1,11 +1,10 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.fragments.children
 
 import android.os.Bundle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import arrow.core.Either
 import arrow.core.left
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
@@ -14,8 +13,6 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFacto
 import dev.ahmedmourad.sherlock.domain.filter.ChildrenFilterFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
@@ -24,8 +21,8 @@ import javax.inject.Provider
 
 internal class ChildrenSearchResultsViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
-        interactor: FindChildrenInteractor,
-        filterFactory: ChildrenFilterFactory
+        interactor: Lazy<FindChildrenInteractor>,
+        filterFactory: Lazy<ChildrenFilterFactory>
 ) : ViewModel() {
 
     private val query: ChildQuery =
@@ -33,19 +30,21 @@ internal class ChildrenSearchResultsViewModel(
 
     private val refreshSubject = PublishSubject.create<Unit>()
 
-    val searchResults: LiveData<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> =
-            interactor(query, filterFactory(query))
-                    .retryWhen { refreshSubject.toFlowable(BackpressureStrategy.LATEST) }
-                    .onErrorReturn { it.left() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .toLiveData()
+    val searchResults by lazy {
+        interactor.get()
+                .invoke(query, filterFactory.get().invoke(query))
+                .retryWhen { refreshSubject.toFlowable(BackpressureStrategy.LATEST) }
+                .onErrorReturn { it.left() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .toLiveData()
+    }
 
     fun onRefresh() = refreshSubject.onNext(Unit)
 
     @Reusable
     class Factory @Inject constructor(
-            private val interactor: Provider<FindChildrenInteractor>,
-                    private val filterFactory: Provider<ChildrenFilterFactory>
+            private val interactor: Provider<Lazy<FindChildrenInteractor>>,
+            private val filterFactory: Provider<Lazy<ChildrenFilterFactory>>
     ) : AssistedViewModelFactory<ChildrenSearchResultsViewModel> {
         override fun invoke(handle: SavedStateHandle): ChildrenSearchResultsViewModel {
             return ChildrenSearchResultsViewModel(handle, interactor.get(), filterFactory.get())

@@ -9,7 +9,7 @@ import arrow.core.extensions.fx
 import arrow.core.orNull
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
-import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import javax.inject.Inject

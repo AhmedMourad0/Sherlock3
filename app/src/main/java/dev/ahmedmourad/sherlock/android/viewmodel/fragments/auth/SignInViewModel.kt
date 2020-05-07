@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validatePassword
@@ -26,10 +27,10 @@ import javax.inject.Provider
 
 internal class SignInViewModel(
         private val savedStateHandle: SavedStateHandle,
-        private val signInInteractor: SignInInteractor,
-        private val signInWithGoogleInteractor: SignInWithGoogleInteractor,
-        private val signInWithFacebookInteractor: SignInWithFacebookInteractor,
-        private val signInWithTwitterInteractor: SignInWithTwitterInteractor
+        private val signInInteractor: Lazy<SignInInteractor>,
+        private val signInWithGoogleInteractor: Lazy<SignInWithGoogleInteractor>,
+        private val signInWithFacebookInteractor: Lazy<SignInWithFacebookInteractor>,
+        private val signInWithTwitterInteractor: Lazy<SignInWithTwitterInteractor>
 ) : ViewModel() {
 
     val email: LiveData<String?>
@@ -64,18 +65,27 @@ internal class SignInViewModel(
         savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
     }
 
-    fun onSignInWithGoogle() = signInWithGoogleInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignInWithGoogle(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signInWithGoogleInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
-    fun onSignInWithFacebook() = signInWithFacebookInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignInWithFacebook(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signInWithFacebookInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
-    fun onSignInWithTwitter() = signInWithTwitterInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignInWithTwitter(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signInWithTwitterInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
     fun onSignIn(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>? {
         return toUserCredentials()?.let {
-            signInInteractor(it).observeOn(AndroidSchedulers.mainThread())
+            signInInteractor.get().invoke(it).observeOn(AndroidSchedulers.mainThread())
         }
     }
 
@@ -102,10 +112,10 @@ internal class SignInViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val signInInteractor: Provider<SignInInteractor>,
-            private val signInWithGoogleInteractor: Provider<SignInWithGoogleInteractor>,
-            private val signInWithFacebookInteractor: Provider<SignInWithFacebookInteractor>,
-            private val signInWithTwitterInteractor: Provider<SignInWithTwitterInteractor>
+            private val signInInteractor: Provider<Lazy<SignInInteractor>>,
+            private val signInWithGoogleInteractor: Provider<Lazy<SignInWithGoogleInteractor>>,
+            private val signInWithFacebookInteractor: Provider<Lazy<SignInWithFacebookInteractor>>,
+            private val signInWithTwitterInteractor: Provider<Lazy<SignInWithTwitterInteractor>>
     ) : AssistedViewModelFactory<SignInViewModel> {
         override fun invoke(handle: SavedStateHandle): SignInViewModel {
             return SignInViewModel(

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignOutInteractor
@@ -13,7 +14,7 @@ import javax.inject.Provider
 
 internal class MainActivityViewModel(
         private val savedStateHandle: SavedStateHandle,
-        signOutInteractor: SignOutInteractor
+        signOutInteractor: Lazy<SignOutInteractor>
 ) : ViewModel() {
 
     val isInPrimaryContentMode: LiveData<Boolean>
@@ -25,11 +26,13 @@ internal class MainActivityViewModel(
         }
     }
 
-    val signOutSingle = signOutInteractor().observeOn(AndroidSchedulers.mainThread())
+    val signOutSingle by lazy {
+        signOutInteractor.get().invoke().observeOn(AndroidSchedulers.mainThread())
+    }
 
     @Reusable
     class Factory @Inject constructor(
-            private val signOutInteractor: Provider<SignOutInteractor>
+            private val signOutInteractor: Provider<Lazy<SignOutInteractor>>
     ) : AssistedViewModelFactory<MainActivityViewModel> {
         override fun invoke(handle: SavedStateHandle): MainActivityViewModel {
             return MainActivityViewModel(
