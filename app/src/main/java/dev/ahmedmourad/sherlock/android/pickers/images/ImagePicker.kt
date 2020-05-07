@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.utils.pickers.images
+package dev.ahmedmourad.sherlock.android.pickers.images
 
 import android.app.Activity
 import android.content.Intent

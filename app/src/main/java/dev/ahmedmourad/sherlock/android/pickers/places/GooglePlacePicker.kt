@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.utils.pickers.places
+package dev.ahmedmourad.sherlock.android.pickers.places
 
 import android.app.Activity
 import android.content.Intent

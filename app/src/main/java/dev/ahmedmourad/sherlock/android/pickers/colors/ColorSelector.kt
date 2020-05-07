@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.utils.pickers.colors
+package dev.ahmedmourad.sherlock.android.pickers.colors
 
 import android.graphics.drawable.GradientDrawable
 import android.view.View
