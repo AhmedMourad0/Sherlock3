@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.localizedMessage
@@ -96,12 +97,14 @@ internal fun validateAppSignUpUser(
         credentials: UserCredentials,
         displayName: DisplayName,
         phoneNumber: PhoneNumber,
-        picturePath: PicturePath?
+        picturePath: PicturePath?,
+        imageLoader: ImageLoader
 ): Either<String, AppSignUpUser> {
     return AppSignUpUser.of(
             credentials,
             displayName,
             phoneNumber,
-            picturePath
+            picturePath,
+            imageLoader
     ).mapLeft(SignUpUser.Exception::localizedMessage)
 }

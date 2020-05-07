@@ -6,11 +6,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import arrow.core.identity
-import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
@@ -24,6 +24,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_in_user_profile) {
+
+    @Inject
+    internal lateinit var imageLoader: Lazy<ImageLoader>
 
     @Inject
     internal lateinit var dateManager: Lazy<DateManager>
@@ -62,11 +65,12 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     private fun populateUi(user: SignedInUser) {
         binding?.let { b ->
 
-            Glide.with(appCtx)
-                    .load(user.pictureUrl?.value)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .into(b.profilePicture)
+            imageLoader.get().load(
+                    user.pictureUrl?.value,
+                    b.profilePicture,
+                    R.drawable.placeholder,
+                    R.drawable.placeholder
+            )
 
             b.name.text = user.displayName.value
 

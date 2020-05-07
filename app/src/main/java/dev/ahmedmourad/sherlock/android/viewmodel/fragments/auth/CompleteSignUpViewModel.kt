@@ -8,16 +8,18 @@ import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateAppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateDisplayName
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
 import dev.ahmedmourad.sherlock.android.model.validators.auth.validatePhoneNumber
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
@@ -30,7 +32,8 @@ import javax.inject.Provider
 
 internal class CompleteSignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
-        private val completeSignUpInteractor: CompleteSignUpInteractor
+        private val completeSignUpInteractor: Lazy<CompleteSignUpInteractor>,
+        private val imageLoader: Lazy<ImageLoader>
 ) : ViewModel() {
 
     private val id: UserId = savedStateHandle.get<Bundle>(KEY_ID)?.unbundle(UserId.serializer())!!
@@ -99,7 +102,9 @@ internal class CompleteSignUpViewModel(
 
     fun onCompleteSignUp(): Single<Either<Throwable, SignedInUser>>? {
         return toCompletedUser()?.let {
-            completeSignUpInteractor(it.toCompletedUser()).observeOn(AndroidSchedulers.mainThread())
+            completeSignUpInteractor.get().invoke(
+                    it.toCompletedUser(imageLoader.get())
+            ).observeOn(AndroidSchedulers.mainThread())
         }
     }
 
@@ -142,12 +147,14 @@ internal class CompleteSignUpViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val completeSignUpInteractor: Provider<CompleteSignUpInteractor>
+            private val completeSignUpInteractor: Provider<Lazy<CompleteSignUpInteractor>>,
+            private val imageLoader: Provider<Lazy<ImageLoader>>
     ) : AssistedViewModelFactory<CompleteSignUpViewModel> {
         override fun invoke(handle: SavedStateHandle): CompleteSignUpViewModel {
             return CompleteSignUpViewModel(
                     handle,
-                    completeSignUpInteractor.get()
+                    completeSignUpInteractor.get(),
+                    imageLoader.get()
             )
         }
     }

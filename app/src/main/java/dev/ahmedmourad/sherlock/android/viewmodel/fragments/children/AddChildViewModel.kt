@@ -10,13 +10,15 @@ import arrow.core.extensions.fx
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Lazy
 import dagger.Reusable
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
-import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.bus.Bus
@@ -30,8 +32,9 @@ import javax.inject.Provider
 
 internal class AddChildViewModel(
         private val savedStateHandle: SavedStateHandle,
-        private val serviceFactory: SherlockServiceIntentFactory,
-        bus: Bus
+        private val serviceFactory: Lazy<SherlockServiceIntentFactory>,
+        private val imageLoader: Lazy<ImageLoader>,
+        bus: Lazy<Bus>
 ) : ViewModel() {
 
     val firstName: LiveData<String?>
@@ -186,17 +189,20 @@ internal class AddChildViewModel(
         savedStateHandle.set(KEY_ERROR_CHILD, null)
     }
 
-    val publishingState: LiveData<Either<Throwable, PublishingState>> = bus.childPublishingState
-            .retry()
-            .map<Either<Throwable, PublishingState>> { it.right() }
-            .onErrorReturn { it.left() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .toFlowable(BackpressureStrategy.LATEST)
-            .toLiveData()
+    val publishingState by lazy {
+        bus.get()
+                .childPublishingState
+                .retry()
+                .map<Either<Throwable, PublishingState>> { it.right() }
+                .onErrorReturn { it.left() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .toFlowable(BackpressureStrategy.LATEST)
+                .toLiveData()
+    }
 
     fun onPublish() {
         toPublishedChild()?.let {
-            ContextCompat.startForegroundService(appCtx, serviceFactory(it))
+            ContextCompat.startForegroundService(appCtx, serviceFactory.get().invoke(it))
         }
     }
 
@@ -255,13 +261,13 @@ internal class AddChildViewModel(
                 }.bind()
             }
 
-            val location = coordinates?.let { c ->
-                location.value?.let {
+            val location = coordinates?.let { coords ->
+                location.value?.let { loc ->
                     validateLocation(
-                            it.id,
-                            it.name,
-                            it.address,
-                            c
+                            loc.id,
+                            loc.name,
+                            loc.address,
+                            coords
                     ).mapLeft {
                         savedStateHandle.set(KEY_ERROR_LOCATION, it)
                     }.bind()
@@ -279,7 +285,8 @@ internal class AddChildViewModel(
                     notes.value,
                     location,
                     appearance,
-                    picturePath
+                    picturePath,
+                    imageLoader.get()
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_CHILD, it)
             }.bind()
@@ -289,13 +296,15 @@ internal class AddChildViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val serviceFactory: Provider<SherlockServiceIntentFactory>,
-            private val bus: Provider<Bus>
+            private val serviceFactory: Provider<Lazy<SherlockServiceIntentFactory>>,
+            private val imageLoader: Provider<Lazy<ImageLoader>>,
+            private val bus: Provider<Lazy<Bus>>
     ) : AssistedViewModelFactory<AddChildViewModel> {
         override fun invoke(handle: SavedStateHandle): AddChildViewModel {
             return AddChildViewModel(
                     handle,
                     serviceFactory.get(),
+                    imageLoader.get(),
                     bus.get()
             )
         }

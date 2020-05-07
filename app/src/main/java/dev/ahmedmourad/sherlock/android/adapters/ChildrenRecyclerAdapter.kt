@@ -6,17 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Tuple2
 import arrow.core.toT
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ItemResultBinding
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
-import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
 
@@ -25,6 +23,7 @@ internal typealias OnChildSelectedListener = (Tuple2<SimpleRetrievedChild, Weigh
 internal class ChildrenRecyclerAdapter(
         private val dateManager: Lazy<DateManager>,
         private val textFormatter: Lazy<TextFormatter>,
+        private val imageLoader: Lazy<ImageLoader>,
         private val onChildSelectedListener: OnChildSelectedListener
 ) : DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, ChildrenRecyclerAdapter.ViewHolder>() {
 
@@ -47,14 +46,15 @@ internal class ChildrenRecyclerAdapter(
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val binding: ItemResultBinding = ItemResultBinding.bind(view)
-        private val glide: RequestManager = Glide.with(appCtx)
 
         internal fun bind(result: Tuple2<SimpleRetrievedChild, Weight>) {
 
-            glide.load(result.a.pictureUrl)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .into(binding.pictureImageView)
+            imageLoader.get().load(
+                    result.a.pictureUrl?.value,
+                    binding.pictureImageView,
+                    R.drawable.placeholder,
+                    R.drawable.placeholder
+            )
 
             //TODO: this needs to change with time
             binding.dateTextView.text = dateManager.get().getRelativeDateTimeString(result.a.publicationDate)
@@ -72,9 +72,17 @@ internal interface ChildrenRecyclerAdapterFactory :
 @Reusable
 internal class ChildrenRecyclerAdapterFactoryImpl @Inject constructor(
         private val dateManager: Lazy<DateManager>,
-        private val textFormatter: Lazy<TextFormatter>
+        private val textFormatter: Lazy<TextFormatter>,
+        private val imageLoader: Lazy<ImageLoader>
 ) : ChildrenRecyclerAdapterFactory {
-    override fun invoke(onChildSelectedListener: OnChildSelectedListener): DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *> {
-        return ChildrenRecyclerAdapter(dateManager, textFormatter, onChildSelectedListener)
+    override fun invoke(
+            onChildSelectedListener: OnChildSelectedListener
+    ): DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, *> {
+        return ChildrenRecyclerAdapter(
+                dateManager,
+                textFormatter,
+                imageLoader,
+                onChildSelectedListener
+        )
     }
 }

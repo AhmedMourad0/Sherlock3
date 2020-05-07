@@ -11,22 +11,21 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import arrow.core.identity
-import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -35,10 +34,13 @@ import javax.inject.Provider
 internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign_up), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<CompleteSignUpViewModel>>
+    internal lateinit var imagePicker: Lazy<ImagePicker>
 
     @Inject
-    internal lateinit var imagePicker: Lazy<ImagePicker>
+    internal lateinit var imageLoader: Lazy<ImageLoader>
+
+    @Inject
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<CompleteSignUpViewModel>>
 
     private val viewModel: CompleteSignUpViewModel by viewModels {
         SimpleSavedStateViewModelFactory(
@@ -128,11 +130,12 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             }
 
             if (viewModel.picturePath.value != null) {
-                Glide.with(appCtx)
-                        .load(viewModel.picturePath.value)
-                        .placeholder(R.drawable.placeholder)
-                        .error(R.drawable.placeholder)
-                        .into(b.pictureImageView)
+                imageLoader.get().load(
+                        viewModel.picturePath.value?.value,
+                        b.pictureImageView,
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+                )
             }
         }
     }
@@ -140,11 +143,12 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     private fun initializePictureImageView() {
         observe(viewModel.picturePath) { picturePath ->
             binding?.let { b ->
-                Glide.with(appCtx)
-                        .load(picturePath)
-                        .placeholder(R.drawable.placeholder)
-                        .error(R.drawable.placeholder)
-                        .into(b.pictureImageView)
+                imageLoader.get().load(
+                        picturePath?.value,
+                        b.pictureImageView,
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+                )
             }
         }
     }

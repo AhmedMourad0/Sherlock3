@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import arrow.core.orNull
-import com.bumptech.glide.Glide
 import com.jaygoo.widget.RangeSeekBar
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
@@ -21,13 +20,14 @@ import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
+import dev.ahmedmourad.sherlock.android.pickers.colors.ColorSelector
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
-import dev.ahmedmourad.sherlock.android.utils.pickers.colors.ColorSelector
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
-import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModel
@@ -36,7 +36,6 @@ import dev.ahmedmourad.sherlock.domain.constants.*
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -47,16 +46,17 @@ import kotlin.math.roundToInt
 internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<AddChildViewModel>>
-
-    @Inject
     internal lateinit var placePicker: Lazy<PlacePicker>
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
 
-    private lateinit var skinColorSelector: ColorSelector<Skin>
-    private lateinit var hairColorSelector: ColorSelector<Hair>
+
+    @Inject
+    internal lateinit var imageLoader: Lazy<ImageLoader>
+
+    @Inject
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<AddChildViewModel>>
 
     private val globalViewModel: GlobalViewModel by activityViewModels()
     private val viewModel: AddChildViewModel by viewModels {
@@ -66,6 +66,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 AddChildViewModel.defaultArgs(args.child?.unbundle(AppPublishedChild.serializer()))
         )
     }
+
+    private lateinit var skinColorSelector: ColorSelector<Skin>
+    private lateinit var hairColorSelector: ColorSelector<Hair>
 
     private val args: AddChildFragmentArgs by navArgs()
     private var binding: FragmentAddChildBinding? = null
@@ -322,11 +325,12 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private fun initializePictureImageView() {
         observe(viewModel.picturePath) { picturePath ->
             binding?.let { b ->
-                Glide.with(appCtx)
-                        .load(picturePath)
-                        .placeholder(R.drawable.placeholder)
-                        .error(R.drawable.placeholder)
-                        .into(b.pictureImageView)
+                imageLoader.get().load(
+                        picturePath?.value,
+                        b.pictureImageView,
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+                )
             }
         }
     }

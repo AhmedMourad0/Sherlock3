@@ -1,20 +1,18 @@
 package dev.ahmedmourad.sherlock.android.widget.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import arrow.core.toT
-import com.bumptech.glide.Glide
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -23,7 +21,8 @@ internal class ChildrenRemoteViewsFactory(
         private val context: Context,
         results: Map<SimpleRetrievedChild, Weight>,
         private val textFormatter: Lazy<TextFormatter>,
-        private val dateManager: Lazy<DateManager>
+        private val dateManager: Lazy<DateManager>,
+        private val imageLoader: Lazy<ImageLoader>
 ) : RemoteViewsService.RemoteViewsFactory {
 
     private val results = results.entries
@@ -74,24 +73,12 @@ internal class ChildrenRemoteViewsFactory(
     }
 
     private fun setPicture(views: RemoteViews, pictureUrl: Url?) {
-
-        var bitmap: Bitmap?
-
-        try {
-            bitmap = Glide.with(appCtx)
-                    .asBitmap()
-                    .load(pictureUrl)
-                    .submit()
-                    .get()
-        } catch (e: Exception) {
-            bitmap = null
-            Timber.error(e, e::toString)
-        }
-
-        if (bitmap != null)
-            views.setImageViewBitmap(R.id.widget_result_picture, bitmap)
-        else
+        imageLoader.get().fetch(pictureUrl?.value).fold(ifLeft = {
+            Timber.error(it, it::toString)
             views.setImageViewResource(R.id.widget_result_picture, R.drawable.placeholder)
+        }, ifRight = {
+            views.setImageViewBitmap(R.id.widget_result_picture, it)
+        })
     }
 
     override fun getLoadingView() = null
@@ -113,7 +100,8 @@ internal interface ChildrenRemoteViewsFactoryFactory :
 @Reusable
 internal class ChildrenRemoteViewsFactoryFactoryImpl @Inject constructor(
         private val textFormatter: Lazy<TextFormatter>,
-        private val dateManager: Lazy<DateManager>
+        private val dateManager: Lazy<DateManager>,
+        private val imageLoader: Lazy<ImageLoader>
 ) : ChildrenRemoteViewsFactoryFactory {
     override fun invoke(
             context: Context,
@@ -123,7 +111,8 @@ internal class ChildrenRemoteViewsFactoryFactoryImpl @Inject constructor(
                 context,
                 results,
                 textFormatter,
-                dateManager
+                dateManager,
+                imageLoader
         )
     }
 }

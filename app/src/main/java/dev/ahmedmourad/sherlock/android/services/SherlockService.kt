@@ -11,11 +11,13 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDeepLinkBuilder
+import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.backgroundContextChannelId
 import dev.ahmedmourad.sherlock.android.view.activity.MainActivity
@@ -23,8 +25,8 @@ import dev.ahmedmourad.sherlock.android.view.fragments.children.AddChildFragment
 import dev.ahmedmourad.sherlock.android.view.fragments.children.ChildDetailsFragmentArgs
 import dev.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
-import dev.ahmedmourad.sherlock.domain.utils.disposable
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
+import dev.ahmedmourad.sherlock.domain.utils.disposable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
@@ -37,7 +39,10 @@ import javax.inject.Inject
 internal class SherlockService : Service() {
 
     @Inject
-    lateinit var addChildInteractor: AddChildInteractor
+    lateinit var addChildInteractor: Lazy<AddChildInteractor>
+
+    @Inject
+    lateinit var imageLoader: Lazy<ImageLoader>
 
     private var addChildDisposable by disposable()
 
@@ -64,11 +69,11 @@ internal class SherlockService : Service() {
 
     private fun handleActionPublishFound(appChild: AppPublishedChild) {
 
-        val child = appChild.toPublishedChild()
+        val child = appChild.toPublishedChild(imageLoader.get())
 
         startForeground(NOTIFICATION_ID_PUBLISH_CHILD, createPublishingNotification(appChild))
 
-        addChildDisposable = addChildInteractor(child)
+        addChildDisposable = addChildInteractor.get().invoke(child)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess {

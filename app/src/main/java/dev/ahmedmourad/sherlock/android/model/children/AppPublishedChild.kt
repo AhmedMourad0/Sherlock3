@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
-import dev.ahmedmourad.sherlock.android.utils.getImageBytes
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import dev.ahmedmourad.sherlock.domain.model.EitherSerializer
 import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
@@ -26,13 +26,13 @@ internal class AppPublishedChild private constructor(
         val picturePath: PicturePath?
 ) {
 
-    fun toPublishedChild(): PublishedChild {
+    fun toPublishedChild(imageLoader: ImageLoader): PublishedChild {
         return PublishedChild.of(
                 name,
                 notes,
                 location,
                 appearance,
-                getImageBytes(picturePath)
+                imageLoader.getBytesOrNull(picturePath?.value)
         ).getOrHandle {
             Timber.error(ModelConversionException(it.toString()), it::toString)
             null
@@ -101,14 +101,15 @@ internal class AppPublishedChild private constructor(
                notes: String?,
                location: Location?,
                appearance: ApproximateAppearance,
-               picturePath: PicturePath?
+               picturePath: PicturePath?,
+               imageLoader: ImageLoader
         ): Either<PublishedChild.Exception, AppPublishedChild> {
             return PublishedChild.validate(
                     name,
                     notes,
                     location,
                     appearance,
-                    getImageBytes(picturePath)
+                    imageLoader.getBytesOrNull(picturePath?.value)
             )?.left() ?: AppPublishedChild(name, notes, location, appearance, picturePath).right()
         }
     }

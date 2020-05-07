@@ -8,16 +8,19 @@ import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.right
+import dagger.Lazy
 import dagger.Reusable
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
+import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,10 +29,11 @@ import javax.inject.Provider
 
 internal class SignUpViewModel(
         private val savedStateHandle: SavedStateHandle,
-        private val signUpInteractor: SignUpInteractor,
-        private val signUpWithGoogleInteractor: SignInWithGoogleInteractor,
-        private val signUpWithFacebookInteractor: SignInWithFacebookInteractor,
-        private val signUpWithTwitterInteractor: SignInWithTwitterInteractor
+        private val signUpInteractor: Lazy<SignUpInteractor>,
+        private val signUpWithGoogleInteractor: Lazy<SignInWithGoogleInteractor>,
+        private val signUpWithFacebookInteractor: Lazy<SignInWithFacebookInteractor>,
+        private val signUpWithTwitterInteractor: Lazy<SignInWithTwitterInteractor>,
+        private val imageLoader: Lazy<ImageLoader>
 ) : ViewModel() {
 
     val password: LiveData<String?>
@@ -124,18 +128,27 @@ internal class SignUpViewModel(
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onSignUpWithGoogle() = signUpWithGoogleInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignUpWithGoogle(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signUpWithGoogleInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
-    fun onSignUpWithFacebook() = signUpWithFacebookInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignUpWithFacebook(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signUpWithFacebookInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
-    fun onSignUpWithTwitter() = signUpWithTwitterInteractor()
-            .observeOn(AndroidSchedulers.mainThread())
+    fun onSignUpWithTwitter(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+        return signUpWithTwitterInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
     fun onSignUp(): Single<Either<Throwable, SignedInUser>>? {
-        return toAppSignUpUser()?.toSignUpUser()?.let {
-            signUpInteractor(it).observeOn(AndroidSchedulers.mainThread())
+        return toAppSignUpUser()?.toSignUpUser(imageLoader.get())?.let {
+            signUpInteractor.get().invoke(it).observeOn(AndroidSchedulers.mainThread())
         }
     }
 
@@ -179,7 +192,8 @@ internal class SignUpViewModel(
                     credentials,
                     displayName,
                     phoneNumber,
-                    picturePath
+                    picturePath,
+                    imageLoader.get()
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_USER, it)
             }.bind()
@@ -189,10 +203,11 @@ internal class SignUpViewModel(
 
     @Reusable
     class Factory @Inject constructor(
-            private val signUpInteractor: Provider<SignUpInteractor>,
-            private val signUpWithGoogleInteractor: Provider<SignInWithGoogleInteractor>,
-            private val signUpWithFacebookInteractor: Provider<SignInWithFacebookInteractor>,
-            private val signUpWithTwitterInteractor: Provider<SignInWithTwitterInteractor>
+            private val signUpInteractor: Provider<Lazy<SignUpInteractor>>,
+            private val signUpWithGoogleInteractor: Provider<Lazy<SignInWithGoogleInteractor>>,
+            private val signUpWithFacebookInteractor: Provider<Lazy<SignInWithFacebookInteractor>>,
+            private val signUpWithTwitterInteractor: Provider<Lazy<SignInWithTwitterInteractor>>,
+            private val imageLoader: Provider<Lazy<ImageLoader>>
     ) : AssistedViewModelFactory<SignUpViewModel> {
         override fun invoke(handle: SavedStateHandle): SignUpViewModel {
             return SignUpViewModel(
@@ -200,7 +215,8 @@ internal class SignUpViewModel(
                     signUpInteractor.get(),
                     signUpWithGoogleInteractor.get(),
                     signUpWithFacebookInteractor.get(),
-                    signUpWithTwitterInteractor.get()
+                    signUpWithTwitterInteractor.get(),
+                    imageLoader.get()
             )
         }
     }

@@ -1,6 +1,6 @@
 package dev.ahmedmourad.sherlock.android.model.auth
 
-import dev.ahmedmourad.sherlock.android.utils.getImageBytes
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
@@ -16,13 +16,13 @@ internal class AppCompletedUser private constructor(
         val picturePath: PicturePath?
 ) {
 
-    fun toCompletedUser(): CompletedUser {
+    fun toCompletedUser(imageLoader: ImageLoader): CompletedUser {
         return CompletedUser.of(
                 id,
                 email,
                 displayName,
                 phoneNumber,
-                getImageBytes(picturePath)
+                imageLoader.getBytesOrNull(picturePath?.value)
         )
     }
 

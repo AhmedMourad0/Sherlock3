@@ -12,21 +12,20 @@ import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.right
-import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignUpViewModel
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -35,10 +34,13 @@ import javax.inject.Provider
 internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClickListener {
 
     @Inject
-    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignUpViewModel>>
+    internal lateinit var imagePicker: Lazy<ImagePicker>
 
     @Inject
-    internal lateinit var imagePicker: Lazy<ImagePicker>
+    internal lateinit var imageLoader: Lazy<ImageLoader>
+
+    @Inject
+    internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignUpViewModel>>
 
     private val viewModel: SignUpViewModel by viewModels {
         SimpleSavedStateViewModelFactory(
@@ -148,11 +150,13 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     private fun initializePictureImageView() {
         observe(viewModel.picturePath) { picturePath ->
             binding?.let { b ->
-                Glide.with(appCtx)
-                        .load(picturePath)
-                        .placeholder(R.drawable.placeholder)
-                        .error(R.drawable.placeholder)
-                        .into(b.pictureImageView)
+                imageLoader.get().load(
+                        picturePath?.value,
+                        b.pictureImageView,
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+
+                )
             }
         }
     }

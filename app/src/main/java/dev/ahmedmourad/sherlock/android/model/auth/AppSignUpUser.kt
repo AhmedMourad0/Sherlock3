@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
-import dev.ahmedmourad.sherlock.android.utils.getImageBytes
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
@@ -29,12 +29,12 @@ internal class AppSignUpUser private constructor(
 
     fun component4() = picturePath
 
-    fun toSignUpUser(): SignUpUser {
+    fun toSignUpUser(imageLoader: ImageLoader): SignUpUser {
         return SignUpUser.of(
                 credentials,
                 displayName,
                 phoneNumber,
-                getImageBytes(picturePath)
+                imageLoader.getBytesOrNull(picturePath?.value)
         ).getOrHandle {
             Timber.error(ModelConversionException(it.toString()), it::toString)
             null
@@ -87,13 +87,14 @@ internal class AppSignUpUser private constructor(
         fun of(credentials: UserCredentials,
                displayName: DisplayName,
                phoneNumber: PhoneNumber,
-               picturePath: PicturePath?
+               picturePath: PicturePath?,
+               imageLoader: ImageLoader
         ): Either<SignUpUser.Exception, AppSignUpUser> {
             return SignUpUser.validate(
                     credentials,
                     displayName,
                     phoneNumber,
-                    getImageBytes(picturePath)
+                    imageLoader.getBytesOrNull(picturePath?.value)
             )?.left() ?: AppSignUpUser(credentials, displayName, phoneNumber, picturePath).right()
         }
     }

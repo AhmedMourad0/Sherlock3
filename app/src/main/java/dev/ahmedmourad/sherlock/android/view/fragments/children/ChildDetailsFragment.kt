@@ -10,13 +10,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import arrow.core.Tuple2
-import com.bumptech.glide.Glide
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
@@ -25,7 +25,6 @@ import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -35,6 +34,9 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
 
     @Inject
     internal lateinit var textFormatter: Lazy<TextFormatter>
+
+    @Inject
+    internal lateinit var imageLoader: Lazy<ImageLoader>
 
     @Inject
     internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<ChildDetailsViewModel>>
@@ -86,13 +88,12 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
 
         binding?.let { b ->
 
-            //TODO: we should inject glide
-            Glide.with(appCtx)
-                    .load(result.a.pictureUrl)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .into(b.childPicture)
-
+            imageLoader.get().load(
+                    result.a.pictureUrl?.value,
+                    b.childPicture,
+                    R.drawable.placeholder,
+                    R.drawable.placeholder
+            )
 
             val name = textFormatter.get().formatName(result.a.name)
             b.toolbar.title = name

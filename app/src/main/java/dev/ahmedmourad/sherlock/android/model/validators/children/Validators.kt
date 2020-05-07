@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.localizedMessage
 import dev.ahmedmourad.sherlock.domain.constants.Gender
@@ -206,14 +207,16 @@ internal fun validateAppPublishedChild(
         notes: String?,
         location: Location?,
         appearance: ApproximateAppearance,
-        picturePath: PicturePath?
+        picturePath: PicturePath?,
+        imageLoader: ImageLoader
 ): Either<String, AppPublishedChild> {
     return AppPublishedChild.of(
             name,
             notes?.trim(),
             location,
             appearance,
-            picturePath
+            picturePath,
+            imageLoader
     ).mapLeft(PublishedChild.Exception::localizedMessage)
 }
 

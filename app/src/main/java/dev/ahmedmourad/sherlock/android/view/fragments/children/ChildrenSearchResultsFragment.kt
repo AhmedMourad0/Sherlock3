@@ -17,7 +17,7 @@ import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.adapters.DynamicRecyclerAdapter
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
