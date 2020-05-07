@@ -73,6 +73,9 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                 is Either.Right -> {
                     populateUi(resultEither.b)
                 }
+                null -> {
+                    //TODO: show loading, hide when date is received
+                }
             }.exhaust()
         }
     }
