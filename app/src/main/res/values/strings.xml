@@ -154,6 +154,7 @@
 	<string name="password_no_small_letters">Password must contain at least one small letter</string>
 	<string name="password_no_digits">Password must contain at least one digit</string>
 	<string name="password_no_symbols">Password must contain at least one symbol</string>
+	<string name="password_contains_only_sequential_chars_or_digits">Password cannot only consist of sequential characters or digits</string>
 	<string name="password_few_distinct_characters">Password must contain at least %1$d distinct characters</string>
 	<string name="email_used_as_password">You cannot use your email as a password</string>
 	<string name="display_name_used_as_password">You cannot use your display name as a password</string>
