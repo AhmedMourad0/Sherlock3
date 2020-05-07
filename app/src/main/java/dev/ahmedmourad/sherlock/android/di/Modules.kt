@@ -6,14 +6,16 @@ import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFacto
 import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFactoryImpl
 import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactoryImpl
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatterImpl
+import dev.ahmedmourad.sherlock.android.loader.GlideImageLoader
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
+import dev.ahmedmourad.sherlock.android.pickers.images.EsafirmImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.GooglePlacePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactoryImpl
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatter
-import dev.ahmedmourad.sherlock.android.utils.formatter.TextFormatterImpl
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.EsafirmImagePicker
-import dev.ahmedmourad.sherlock.android.utils.pickers.images.ImagePicker
-import dev.ahmedmourad.sherlock.android.utils.pickers.places.GooglePlacePicker
-import dev.ahmedmourad.sherlock.android.utils.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.*
@@ -56,6 +58,11 @@ internal interface AppBindingsModule {
     fun bindTextFormatter(
             impl: TextFormatterImpl
     ): TextFormatter
+
+    @Binds
+    fun bindImageLoader(
+            impl: GlideImageLoader
+    ): ImageLoader
 
     @Binds
     fun bindChildrenRemoteViewsServiceIntentFactory(
