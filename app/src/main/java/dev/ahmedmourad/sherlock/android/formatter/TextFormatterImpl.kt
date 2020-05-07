@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.utils.formatter
+package dev.ahmedmourad.sherlock.android.formatter
 
 import android.annotation.SuppressLint
 import arrow.core.Either

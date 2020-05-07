@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.utils.formatter
+package dev.ahmedmourad.sherlock.android.formatter
 
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.domain.constants.Gender
