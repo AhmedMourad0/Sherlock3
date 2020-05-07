@@ -18,52 +18,52 @@ internal interface AuthBindingsModule {
 
     @Binds
     fun bindObserveUserAuthStateInteractor(
-            interactor: ObserveUserAuthStateInteractorImpl
+            impl: ObserveUserAuthStateInteractorImpl
     ): ObserveUserAuthStateInteractor
 
     @Binds
     fun bindObserveSignedInUserInteractor(
-            interactor: ObserveSignedInUserInteractorImpl
+            impl: ObserveSignedInUserInteractorImpl
     ): ObserveSignedInUserInteractor
 
     @Binds
     fun bindSendPasswordResetEmailInteractor(
-            interactor: SendPasswordResetEmailInteractorImpl
+            impl: SendPasswordResetEmailInteractorImpl
     ): SendPasswordResetEmailInteractor
 
     @Binds
     fun bindSignInInteractor(
-            interactor: SignInInteractorImpl
+            impl: SignInInteractorImpl
     ): SignInInteractor
 
     @Binds
     fun bindSignInWithFacebookInteractor(
-            interactor: SignInWithFacebookInteractorImpl
+            impl: SignInWithFacebookInteractorImpl
     ): SignInWithFacebookInteractor
 
     @Binds
     fun bindSignInWithGoogleInteractor(
-            interactor: SignInWithGoogleInteractorImpl
+            impl: SignInWithGoogleInteractorImpl
     ): SignInWithGoogleInteractor
 
     @Binds
     fun bindSignInWithTwitterInteractor(
-            interactor: SignInWithTwitterInteractorImpl
+            impl: SignInWithTwitterInteractorImpl
     ): SignInWithTwitterInteractor
 
     @Binds
     fun bindSignOutInteractor(
-            interactor: SignOutInteractorImpl
+            impl: SignOutInteractorImpl
     ): SignOutInteractor
 
     @Binds
     fun bindSignUpInteractor(
-            interactor: SignUpInteractorImpl
+            impl: SignUpInteractorImpl
     ): SignUpInteractor
 
     @Binds
     fun bindCompleteSignUpInteractor(
-            interactor: CompleteSignUpInteractorImpl
+            impl: CompleteSignUpInteractorImpl
     ): CompleteSignUpInteractor
 }
 
@@ -72,33 +72,33 @@ internal interface ChildrenBindingsModule {
 
     @Binds
     fun bindAddChildInteractor(
-            interactor: AddChildInteractorImpl
+            impl: AddChildInteractorImpl
     ): AddChildInteractor
 
     @Binds
     fun bindFindChildrenInteractor(
-            interactor: FindChildrenInteractorImpl
+            impl: FindChildrenInteractorImpl
     ): FindChildrenInteractor
 
     @Binds
     fun bindFindChildInteractor(
-            interactor: FindChildInteractorImpl
+            impl: FindChildInteractorImpl
     ): FindChildInteractor
 
     @Binds
     fun bindFindLastSearchResultsInteractor(
-            interactor: FindLastSearchResultsInteractorImpl
+            impl: FindLastSearchResultsInteractorImpl
     ): FindLastSearchResultsInteractor
 
     @Binds
     @InternalApi
     fun bindChildrenCriteriaFactory(
-            factory: ChildrenCriteriaFactoryImpl
+            impl: ChildrenCriteriaFactoryImpl
     ): ChildrenCriteriaFactory
 
     @Binds
     fun bindChildrenFilterFactory(
-            factory: ChildrenFilterFactoryImpl
+            impl: ChildrenFilterFactoryImpl
     ): ChildrenFilterFactory
 }
 
@@ -107,11 +107,11 @@ internal interface CommonBindingsModule {
 
     @Binds
     fun bindObserveInternetConnectivityInteractor(
-            interactor: ObserveInternetConnectivityInteractorImpl
+            impl: ObserveInternetConnectivityInteractorImpl
     ): ObserveInternetConnectivityInteractor
 
     @Binds
     fun bindBus(
-            bus: BusImpl
+            impl: BusImpl
     ): Bus
 }

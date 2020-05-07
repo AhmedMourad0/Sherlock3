@@ -25,25 +25,25 @@ internal interface ChildrenBindingsModule {
 
     @Binds
     fun bindChildrenRepository(
-            repository: ChildrenRepositoryImpl
+            impl: ChildrenRepositoryImpl
     ): ChildrenRepository
 
     @Binds
     @InternalApi
     fun bindRemoteRepository(
-            repository: FirebaseFirestoreRemoteRepository
+            impl: FirebaseFirestoreRemoteRepository
     ): RemoteRepository
 
     @Binds
     @InternalApi
     fun bindImageRepository(
-            repository: FirebaseStorageImageRepository
+            impl: FirebaseStorageImageRepository
     ): ImageRepository
 
     @Binds
     @InternalApi
     fun bindLocalRepository(
-            repository: RoomLocalRepository
+            impl: RoomLocalRepository
     ): LocalRepository
 }
 

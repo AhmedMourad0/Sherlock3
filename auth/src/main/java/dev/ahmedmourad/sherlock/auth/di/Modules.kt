@@ -26,31 +26,31 @@ internal interface AuthBindingsModule {
 
     @Binds
     fun bindAuthManager(
-            manager: AuthManagerImpl
+            impl: AuthManagerImpl
     ): AuthManager
 
     @Binds
     @InternalApi
     fun bindAuthenticator(
-            authenticator: FirebaseAuthenticator
+            impl: FirebaseAuthenticator
     ): Authenticator
 
     @Binds
     @InternalApi
     fun bindUserAuthStateObservable(
-            @InternalApi authenticator: Authenticator
+            @InternalApi impl: Authenticator
     ): UserAuthStateObservable
 
     @Binds
     @InternalApi
     fun bindRemoteRepository(
-            remoteRepository: FirebaseFirestoreRemoteRepository
+            impl: FirebaseFirestoreRemoteRepository
     ): RemoteRepository
 
     @Binds
     @InternalApi
     fun bindImageRepository(
-            imageRepository: FirebaseStorageImageRepository
+            impl: FirebaseStorageImageRepository
     ): ImageRepository
 }
 

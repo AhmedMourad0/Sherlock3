@@ -16,21 +16,21 @@ internal interface PlatformBindingsModule {
 
     @Binds
     fun bindDateManager(
-            dateManager: AndroidDateManager
+            impl: AndroidDateManager
     ): DateManager
 
     @Binds
     fun bindLocationManager(
-            locationManager: AndroidLocationManager
+            impl: AndroidLocationManager
     ): LocationManager
 
     @Binds
     fun bindTextManager(
-            textManager: AndroidTextManager
+            impl: AndroidTextManager
     ): TextManager
 
     @Binds
     fun bindConnectivityManager(
-            connectivityManager: AndroidConnectivityManager
+            impl: AndroidConnectivityManager
     ): ConnectivityManager
 }

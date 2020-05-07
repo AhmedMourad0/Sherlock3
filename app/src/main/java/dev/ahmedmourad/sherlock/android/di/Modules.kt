@@ -29,101 +29,101 @@ internal interface AppBindingsModule {
 
     @Binds
     fun bindChildrenRecyclerAdapterFactory(
-            factory: ChildrenRecyclerAdapterFactoryImpl
+            impl: ChildrenRecyclerAdapterFactoryImpl
     ): ChildrenRecyclerAdapterFactory
 
     @Binds
     fun bindAppSectionsRecyclerAdapterFactory(
-            factory: AppSectionsRecyclerAdapterFactoryImpl
+            impl: AppSectionsRecyclerAdapterFactoryImpl
     ): AppSectionsRecyclerAdapterFactory
 
     @Binds
     fun bindSherlockServiceIntentFactory(
-            factory: SherlockServiceIntentFactoryImpl
+            impl: SherlockServiceIntentFactoryImpl
     ): SherlockServiceIntentFactory
 
     @Binds
     fun bindPlacePicker(
-            picker: GooglePlacePicker
+            impl: GooglePlacePicker
     ): PlacePicker
 
     @Binds
     fun bindImagePicker(
-            picker: EsafirmImagePicker
+            impl: EsafirmImagePicker
     ): ImagePicker
 
     @Binds
     fun bindTextFormatter(
-            formatter: TextFormatterImpl
+            impl: TextFormatterImpl
     ): TextFormatter
 
     @Binds
     fun bindChildrenRemoteViewsServiceIntentFactory(
-            factory: ChildrenRemoteViewsServiceIntentFactoryImpl
+            impl: ChildrenRemoteViewsServiceIntentFactoryImpl
     ): ChildrenRemoteViewsServiceIntentFactory
 
     @Binds
     fun bindChildrenRemoteViewsFactoryFactory(
-            factory: ChildrenRemoteViewsFactoryFactoryImpl
+            impl: ChildrenRemoteViewsFactoryFactoryImpl
     ): ChildrenRemoteViewsFactoryFactory
 
     @Binds
     fun bindGlobalViewModel(
-            factory: GlobalViewModel.Factory
+            impl: GlobalViewModel.Factory
     ): AssistedViewModelFactory<GlobalViewModel>
 
     @Binds
     fun bindMainActivityViewModel(
-            factory: MainActivityViewModel.Factory
+            impl: MainActivityViewModel.Factory
     ): AssistedViewModelFactory<MainActivityViewModel>
 
     @Binds
     fun bindAddChildViewModel(
-            factory: AddChildViewModel.Factory
+            impl: AddChildViewModel.Factory
     ): AssistedViewModelFactory<AddChildViewModel>
 
     @Binds
     fun bindHomeViewModel(
-            factory: HomeViewModel.Factory
+            impl: HomeViewModel.Factory
     ): AssistedViewModelFactory<HomeViewModel>
 
     @Binds
     fun bindFindChildrenViewModel(
-            factory: FindChildrenViewModel.Factory
+            impl: FindChildrenViewModel.Factory
     ): AssistedViewModelFactory<FindChildrenViewModel>
 
     @Binds
     fun bindResetPasswordViewModel(
-            factory: ResetPasswordViewModel.Factory
+            impl: ResetPasswordViewModel.Factory
     ): AssistedViewModelFactory<ResetPasswordViewModel>
 
     @Binds
     fun bindSignedInUserProfileViewModel(
-            factory: SignedInUserProfileViewModel.Factory
+            impl: SignedInUserProfileViewModel.Factory
     ): AssistedViewModelFactory<SignedInUserProfileViewModel>
 
     @Binds
     fun bindSignInViewModel(
-            factory: SignInViewModel.Factory
+            impl: SignInViewModel.Factory
     ): AssistedViewModelFactory<SignInViewModel>
 
     @Binds
     fun bindSignUpViewModel(
-            factory: SignUpViewModel.Factory
+            impl: SignUpViewModel.Factory
     ): AssistedViewModelFactory<SignUpViewModel>
 
     @Binds
     fun bindCompleteSignUpViewModel(
-            factory: CompleteSignUpViewModel.Factory
+            impl: CompleteSignUpViewModel.Factory
     ): AssistedViewModelFactory<CompleteSignUpViewModel>
 
     @Binds
     fun bindChildrenSearchResultsViewModel(
-            factory: ChildrenSearchResultsViewModel.Factory
+            impl: ChildrenSearchResultsViewModel.Factory
     ): AssistedViewModelFactory<ChildrenSearchResultsViewModel>
 
     @Binds
     fun bindChildDetailsViewModel(
-            factory: ChildDetailsViewModel.Factory
+            impl: ChildDetailsViewModel.Factory
     ): AssistedViewModelFactory<ChildDetailsViewModel>
 }
