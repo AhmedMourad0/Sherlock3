@@ -38,8 +38,25 @@ data class Password private constructor(val value: String) {
                 chars.distinct().size < MIN_DISTINCT_CHARACTERS ->
                     Exception.FewDistinctCharactersException(chars.distinct().size, MIN_DISTINCT_CHARACTERS)
 
+                chars.areSequential() -> Exception.OnlySequentialCharactersOrDigitsException
+
                 else -> null
             }
+        }
+
+        private fun CharArray.areSequential(): Boolean {
+
+            if (this.size < 3) {
+                return false
+            }
+
+            val gap = this[1].toInt() - this[0].toInt()
+            return this.asSequence()
+                    .map(Char::toInt)
+                    .drop(1)
+                    .fold(true to this[0].toInt()) { (isSequential, prev), current ->
+                        (isSequential && (current - prev == gap)) to current
+                    }.first
         }
     }
 
@@ -51,5 +68,6 @@ data class Password private constructor(val value: String) {
         object NoDigitsException : Exception()
         object NoSymbolsException : Exception()
         data class FewDistinctCharactersException(val count: Int, val min: Int) : Exception()
+        object OnlySequentialCharactersOrDigitsException : Exception()
     }
 }
