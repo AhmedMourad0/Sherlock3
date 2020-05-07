@@ -35,8 +35,9 @@ internal class AppWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
-        for (appWidgetId in appWidgetIds)
-            disposables.put(appWidgetId, updateAppWidget(context, appWidgetManager, appWidgetId))
+        appWidgetIds.forEach {
+            disposables.put(it, updateAppWidget(context, appWidgetManager, it))
+        }
     }
 
     /**

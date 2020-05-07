@@ -62,10 +62,8 @@ enum class Skin(override val value: Int) : ValuedEnum<Int> {
 }
 
 inline fun <V, reified T : ValuedEnum<V>> findEnum(value: V, enumValues: Array<T>): T {
-
-    for (item in enumValues)
-        if (value == item.value)
-            return item
-
-    throw IllegalArgumentException("$value is not a valid error of type ${T::class.java.canonicalName}")
+    return enumValues.firstOrNull {
+        it.value == value
+    }
+            ?: throw IllegalArgumentException("$value is not a valid error of type ${T::class.java.canonicalName}")
 }

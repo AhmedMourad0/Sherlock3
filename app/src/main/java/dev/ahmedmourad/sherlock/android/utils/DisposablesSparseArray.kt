@@ -1,21 +1,21 @@
 package dev.ahmedmourad.sherlock.android.utils
 
 import android.util.SparseArray
+import androidx.core.util.forEach
 
 import io.reactivex.disposables.Disposable
 
 internal class DisposablesSparseArray : SparseArray<Disposable>() {
 
     fun dispose() {
-        for (i in 0 until size())
-            valueAt(i).dispose()
+        this.forEach { _, disposable -> disposable.dispose() }
         clear()
     }
 
     fun dispose(keys: IntArray) {
-        for (key in keys) {
-            dispose(key)
-            remove(key)
+        keys.forEach {
+            dispose(it)
+            remove(it)
         }
     }
 
