@@ -103,6 +103,8 @@ internal fun Password.Exception.localizedMessage(): String {
             appCtx.getString(R.string.password_no_symbols)
         is Password.Exception.FewDistinctCharactersException ->
             appCtx.getString(R.string.password_few_distinct_characters, this.min)
+        Password.Exception.OnlySequentialCharactersOrDigitsException ->
+            appCtx.getString(R.string.password_contains_only_sequential_chars_or_digits)
     }
 }
 
