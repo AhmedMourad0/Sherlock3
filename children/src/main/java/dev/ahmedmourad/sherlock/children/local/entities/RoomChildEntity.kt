@@ -20,7 +20,6 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import timber.log.Timber
 import timber.log.error
 
-//TODO: maybe move weight to a different table
 @Entity(tableName = ChildrenEntry.TABLE_NAME)
 internal data class RoomChildEntity(
 

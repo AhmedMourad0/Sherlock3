@@ -250,7 +250,6 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         }
     }
 
-    //TODO: consider removing all listeners and using observe and onSaveInstanceState instead
     private fun initializeEditTexts() {
         binding?.let { b ->
 

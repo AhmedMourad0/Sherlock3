@@ -11,7 +11,6 @@ import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import kotlinx.serialization.Serializable
 
-//TODO: follow PublishedChild's rules
 //TODO: add user id
 @Serializable
 @NoCopy
