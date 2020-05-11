@@ -2,8 +2,11 @@
 
 ## Project Overview
 
+*This app is my playground where I implement what I consider to be the
+best possible design choices for a modern application.*
+
 Sherlock is a mobile app that aims to help families find their
-lost/kidnapped children (Under development).
+lost/kidnapped children.
 
 ## Key Concepts
 
@@ -31,7 +34,7 @@ lost/kidnapped children (Under development).
 - Home screen widgets.
 - Bundlizer and NoCopy
 
-## TODO:
+## Whiteboard:
 
 - Improve UI, maybe wait for Compose? It's a mess. We also need many
   spinners.
@@ -53,4 +56,4 @@ lost/kidnapped children (Under development).
   you)
 - Go Multiplatform (hopefully Dagger2 will be ported by then, I need
   compile-time dependency graph validation).
-- Redux?
+- Redux? MVI?
