@@ -8,6 +8,7 @@ import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.FirebaseError
 import com.google.firebase.auth.*
 import com.twitter.sdk.android.core.*
 import dagger.Lazy
@@ -32,6 +33,11 @@ import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
+
+private class AuthUserCollisionException(
+        val attemptedCredential: AuthCredential,
+        val origin: FirebaseAuthUserCollisionException
+) : Exception()
 
 @Reusable
 internal class FirebaseAuthenticator @Inject constructor(
@@ -173,7 +179,9 @@ internal class FirebaseAuthenticator @Inject constructor(
                 }
     }
 
-    private fun createSignUpSingle(credentials: UserCredentials): Single<Either<Throwable, IncompleteUser>> {
+    private fun createSignUpSingle(
+            credentials: UserCredentials
+    ): Single<Either<Throwable, IncompleteUser>> {
 
         return Single.create<Either<Throwable, IncompleteUser>> { emitter ->
 
@@ -188,7 +196,18 @@ internal class FirebaseAuthenticator @Inject constructor(
                 }
             }
 
-            val failureListener = { throwable: Throwable ->
+            val failureListener = failureListener@{ throwable: Throwable ->
+
+                if (throwable is FirebaseAuthUserCollisionException &&
+                        throwable.errorCode == FirebaseError.ERROR_EMAIL_ALREADY_IN_USE.toString()) {
+                    emitter.onSuccess(AuthUserCollisionException(
+                            EmailAuthProvider.getCredential(credentials.email.value, credentials.password.value),
+                            throwable
+                    ).left())
+                    return@failureListener
+                    TODO()
+                }
+
                 emitter.onSuccess(when (throwable) {
 
                     is FirebaseAuthWeakPasswordException -> WeakPasswordException(
@@ -239,11 +258,14 @@ internal class FirebaseAuthenticator @Inject constructor(
 
         }.flatMap(this::getGoogleAuthCredentials)
                 .flatMap(this::signInWithCredentials)
+                .flatMap(this::recoverFromUserCollisionIfNecessary)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
 
-    private fun getGoogleAuthCredentials(accountOptional: Option<GoogleSignInAccount>): Single<Either<Throwable, AuthCredential>> {
+    private fun getGoogleAuthCredentials(
+            accountOptional: Option<GoogleSignInAccount>
+    ): Single<Either<Throwable, AuthCredential>> {
         return accountOptional.fold(ifEmpty = {
             getAuthCredentials { it.signInWithGoogle() }
         }, ifSome = { googleSignInAccount ->
@@ -279,11 +301,14 @@ internal class FirebaseAuthenticator @Inject constructor(
 
         }.flatMap(this::getFacebookAuthCredentials)
                 .flatMap(this::signInWithCredentials)
+                .flatMap(this::recoverFromUserCollisionIfNecessary)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
 
-    private fun getFacebookAuthCredentials(accessTokenOptional: Option<AccessToken>): Single<Either<Throwable, AuthCredential>> {
+    private fun getFacebookAuthCredentials(
+            accessTokenOptional: Option<AccessToken>
+    ): Single<Either<Throwable, AuthCredential>> {
         return accessTokenOptional.fold(ifEmpty = {
             getAuthCredentials { it.signInWithFacebook() }
         }, ifSome = { accessToken ->
@@ -318,23 +343,31 @@ internal class FirebaseAuthenticator @Inject constructor(
 
         }.flatMap(this::getTwitterAuthCredentials)
                 .flatMap(this::signInWithCredentials)
+                .flatMap(this::recoverFromUserCollisionIfNecessary)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
 
-    private fun getTwitterAuthCredentials(authTokenOptional: Option<TwitterAuthToken>): Single<Either<Throwable, AuthCredential>> {
+    private fun getTwitterAuthCredentials(
+            authTokenOptional: Option<TwitterAuthToken>
+    ): Single<Either<Throwable, AuthCredential>> {
         return authTokenOptional.fold(ifEmpty = {
             getAuthCredentials { it.signInWithTwitter() }
         }, ifSome = { twitterAuthToken ->
             if (twitterAuthToken.isExpired) {
                 getAuthCredentials { it.signInWithTwitter() }
             } else {
-                Single.just(TwitterAuthProvider.getCredential(twitterAuthToken.token, twitterAuthToken.secret).right())
+                Single.just(TwitterAuthProvider.getCredential(
+                        twitterAuthToken.token,
+                        twitterAuthToken.secret
+                ).right())
             }
         })
     }
 
-    private fun getAuthCredentials(createIntent: (AuthActivityFactory) -> Intent): Single<Either<Throwable, AuthCredential>> {
+    private fun getAuthCredentials(
+            createIntent: (AuthActivityFactory) -> Intent
+    ): Single<Either<Throwable, AuthCredential>> {
         appCtx.startActivity(createIntent(AuthSignInActivity.Companion))
         return AuthenticatorBus.signInCompletion
                 .take(1)
@@ -351,19 +384,28 @@ internal class FirebaseAuthenticator @Inject constructor(
 
                 Single.just(it.left())
 
-            }, ifRight = {
+            }, ifRight = { credential ->
 
                 val successListener = { result: AuthResult ->
 
                     val user = result.user
 
-                    if (user != null)
+                    if (user != null) {
                         emitter.onSuccess(user.toIncompleteUser().right())
-                    else
+                    } else {
                         emitter.onSuccess(NoSignedInUserException().left())
+                    }
                 }
 
-                val failureListener = { throwable: Throwable ->
+                val failureListener = failureListener@{ throwable: Throwable ->
+
+                    if (throwable is FirebaseAuthUserCollisionException &&
+                            throwable.errorCode == FirebaseError.ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL.toString()) {
+                        emitter.onSuccess(AuthUserCollisionException(credential, throwable).left())
+                        return@failureListener
+                        TODO()
+                    }
+
                     emitter.onSuccess(when (throwable) {
 
                         is FirebaseAuthInvalidUserException -> InvalidUserException(
@@ -374,7 +416,6 @@ internal class FirebaseAuthenticator @Inject constructor(
                                 "The credential is malformed or has expired!"
                         )
 
-                        //TODO: can be handled, check docs
                         is FirebaseAuthUserCollisionException -> UserCollisionException(
                                 "There already exists an account with the email address asserted by the credential!"
                         )
@@ -384,10 +425,52 @@ internal class FirebaseAuthenticator @Inject constructor(
                     }.left())
                 }
 
-                auth.get().signInWithCredential(it)
+                auth.get().signInWithCredential(credential)
                         .addOnSuccessListener(successListener)
                         .addOnFailureListener(failureListener)
             })
+
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+    }
+
+    private fun recoverFromUserCollisionIfNecessary(
+            either: Either<Throwable, IncompleteUser>
+    ): Single<Either<Throwable, IncompleteUser>> {
+        return either.fold(ifLeft = { throwable ->
+            if (throwable is AuthUserCollisionException) {
+                signInWithCredentials(throwable.origin.updatedCredential!!.right())
+                        .flatMap {
+                            linkCurrentUserWithCredential(throwable.attemptedCredential)
+                                    .map {
+                                        it.map(FirebaseUser::toIncompleteUser)
+                                    }
+                        }
+            } else {
+                Single.just(throwable.left())
+            }
+        }, ifRight = {
+            Single.just(it.right())
+        })
+    }
+
+    private fun linkCurrentUserWithCredential(
+            credential: AuthCredential
+    ): Single<Either<Throwable, FirebaseUser>> {
+
+        return Single.create<Either<Throwable, FirebaseUser>> { emitter ->
+
+            val successListener = { result: AuthResult ->
+                emitter.onSuccess(result.user!!.right())
+            }
+
+            val failureListener = { e: Exception ->
+                emitter.onSuccess(e.left())
+            }
+
+            //TODO: convert to ? after you make sure it works
+            auth.get().currentUser!!.linkWithCredential(credential)
+                    .addOnSuccessListener(successListener)
+                    .addOnFailureListener(failureListener)
 
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
@@ -537,8 +620,5 @@ private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
             displayName,
             phoneNumber,
             pictureUrl
-    ).getOrHandle {
-        Timber.error(ModelCreationException(it.toString()), it::toString)
-        null
-    }!!
+    )
 }
