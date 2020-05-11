@@ -29,6 +29,7 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.serialization.builtins.nullable
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
@@ -102,7 +103,7 @@ internal class SherlockService : Service() {
                 .setGraph(R.navigation.app_nav_graph)
                 .setDestination(R.id.addChildFragment)
                 .setComponentName(MainActivity::class.java)
-                .setArguments(AddChildFragmentArgs(child.bundle(AppPublishedChild.serializer())).toBundle())
+                .setArguments(AddChildFragmentArgs(child.bundle(AppPublishedChild.serializer().nullable)).toBundle())
                 .createPendingIntent()
 
         val name = child.name

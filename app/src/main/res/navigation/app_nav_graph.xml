@@ -23,8 +23,7 @@
 		tools:layout="@layout/fragment_add_child">
 		<argument
 			android:name="child"
-			app:argType="android.os.Bundle"
-			app:nullable="true" />
+			app:argType="android.os.Bundle" />
 		<action
 			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
 			app:destination="@id/childDetailsFragment" />

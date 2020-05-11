@@ -8,14 +8,17 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import arrow.syntax.function.partially1
+import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFactory
 import dev.ahmedmourad.sherlock.android.databinding.FragmentHomeBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.HomeViewModel
+import kotlinx.serialization.builtins.nullable
 import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
@@ -68,7 +71,7 @@ internal class HomeFragment : Fragment(R.layout.fragment_home) {
         add(AppSection(
                 appCtx.getString(R.string.found_a_child),
                 R.drawable.found_a_child,
-                HomeFragmentDirections.Companion::actionHomeFragmentToAddChildFragment.partially1(null)
+                HomeFragmentDirections.Companion::actionHomeFragmentToAddChildFragment.partially1(null.bundle(AppPublishedChild.serializer().nullable))
         ))
         add(AppSection(
                 appCtx.getString(R.string.search),

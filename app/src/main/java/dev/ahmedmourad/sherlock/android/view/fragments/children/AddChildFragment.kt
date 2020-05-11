@@ -36,6 +36,7 @@ import dev.ahmedmourad.sherlock.domain.constants.*
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
+import kotlinx.serialization.builtins.nullable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -63,7 +64,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         SimpleSavedStateViewModelFactory(
                 this,
                 viewModelFactory,
-                AddChildViewModel.defaultArgs(args.child?.unbundle(AppPublishedChild.serializer()))
+                AddChildViewModel.defaultArgs(args.child.unbundle(AppPublishedChild.serializer().nullable))
         )
     }
 
