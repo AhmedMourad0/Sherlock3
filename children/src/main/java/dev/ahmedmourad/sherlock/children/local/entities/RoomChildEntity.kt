@@ -17,8 +17,6 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
-import timber.log.Timber
-import timber.log.error
 
 @Entity(tableName = ChildrenEntry.TABLE_NAME)
 internal data class RoomChildEntity(
@@ -82,33 +80,21 @@ internal data class RoomChildEntity(
         val weight: Double?
 ) {
 
-    fun toRetrievedChild(): Either<Throwable, Tuple2<RetrievedChild, Weight?>> {
-
-        val name = extractName().getOrHandle {
-            Timber.error(it, it::toString)
-            null
-        }
-
-        val location = extractLocation().getOrHandle {
-            Timber.error(it, it::toString)
-            null
-        }
-
-        val url = pictureUrl?.let(Url.Companion::of)
-                ?.mapLeft { ModelConversionException(it.toString()) }
-                ?.getOrHandle {
-                    Timber.error(it, it::toString)
-                    null
-                }
-
-        val weight = this@RoomChildEntity.weight?.let(Weight.Companion::of)
-                ?.mapLeft { ModelConversionException(it.toString()) }
-                ?.getOrHandle {
-                    Timber.error(it, it::toString)
-                    null
-                }
+    fun toRetrievedChild(): Either<ModelConversionException, Tuple2<RetrievedChild, Weight?>> {
 
         return Either.fx {
+
+            val name = extractName().bind()
+
+            val location = extractLocation().bind()
+
+            val url = pictureUrl?.let(Url.Companion::of)
+                    ?.mapLeft { ModelConversionException(it.toString()) }
+                    ?.bind()
+
+            val weight = this@RoomChildEntity.weight?.let(Weight.Companion::of)
+                    ?.mapLeft { ModelConversionException(it.toString()) }
+                    ?.bind()
 
             val (appearance) = extractApproximateAppearance()
 
@@ -127,45 +113,35 @@ internal data class RoomChildEntity(
         }
     }
 
-    fun simplify(): Tuple2<SimpleRetrievedChild, Weight?>? {
+    fun simplify(): Either<ModelConversionException, Tuple2<SimpleRetrievedChild, Weight?>?> {
+        return Either.fx {
 
-        val name = extractName().getOrHandle {
-            Timber.error(it, it::toString)
-            null
-        }
+            val name = extractName().bind()
 
-        val url = pictureUrl?.let(Url.Companion::of)
-                ?.mapLeft { ModelConversionException(it.toString()) }
-                ?.getOrHandle {
-                    Timber.error(it, it::toString)
-                    null
-                }
+            val url = pictureUrl?.let(Url.Companion::of)
+                    ?.mapLeft { ModelConversionException(it.toString()) }
+                    ?.bind()
 
-        val weight = this@RoomChildEntity.weight?.let(Weight.Companion::of)
-                ?.mapLeft { ModelConversionException(it.toString()) }
-                ?.getOrHandle {
-                    Timber.error(it, it::toString)
-                    null
-                }
+            val weight = this@RoomChildEntity.weight?.let(Weight.Companion::of)
+                    ?.mapLeft { ModelConversionException(it.toString()) }
+                    ?.bind()
 
-        return SimpleRetrievedChild.of(
-                ChildId(id),
-                publicationDate,
-                name,
-                notes,
-                locationName,
-                locationAddress,
-                url
-        ).bimap(
-                leftOperation = { ModelConversionException(it.toString()) },
-                rightOperation = { it toT weight }
-        ).getOrHandle {
-            Timber.error(it, it::toString)
-            null
+            SimpleRetrievedChild.of(
+                    ChildId(id),
+                    publicationDate,
+                    name,
+                    notes,
+                    locationName,
+                    locationAddress,
+                    url
+            ).bimap(
+                    leftOperation = { ModelConversionException(it.toString()) },
+                    rightOperation = { it toT weight }
+            ).bind()
         }
     }
 
-    private fun extractName(): Either<Throwable, Either<Name, FullName>?> {
+    private fun extractName(): Either<ModelConversionException, Either<Name, FullName>?> {
         return Either.fx {
 
             firstName ?: return@fx null
@@ -180,32 +156,28 @@ internal data class RoomChildEntity(
         }
     }
 
-    private fun extractApproximateAppearance(): Either<Throwable, ApproximateAppearance> {
+    private fun extractApproximateAppearance(): Either<ModelConversionException, ApproximateAppearance> {
+        return Either.fx {
 
-        val gender = gender?.let { findEnum(it, Gender.values()) }
-        val skin = skin?.let { findEnum(it, Skin.values()) }
-        val hair = hair?.let { findEnum(it, Hair.values()) }
+            val gender = gender?.let { findEnum(it, Gender.values()) }
+            val skin = skin?.let { findEnum(it, Skin.values()) }
+            val hair = hair?.let { findEnum(it, Hair.values()) }
 
-        val ageRange = extractAgeRange().getOrHandle {
-            Timber.error(it, it::toString)
-            null
+            val ageRange = extractAgeRange().bind()
+
+            val heightRange = extractHeightRange().bind()
+
+            ApproximateAppearance.of(
+                    gender,
+                    skin,
+                    hair,
+                    ageRange,
+                    heightRange
+            ).mapLeft { ModelConversionException(it.toString()) }.bind()
         }
-
-        val heightRange = extractHeightRange().getOrHandle {
-            Timber.error(it, it::toString)
-            null
-        }
-
-        return ApproximateAppearance.of(
-                gender,
-                skin,
-                hair,
-                ageRange,
-                heightRange
-        ).mapLeft { ModelConversionException(it.toString()) }
     }
 
-    private fun extractAgeRange(): Either<Throwable, AgeRange?> {
+    private fun extractAgeRange(): Either<ModelConversionException, AgeRange?> {
         return Either.fx {
 
             minAge ?: return@fx null
@@ -218,7 +190,7 @@ internal data class RoomChildEntity(
         }
     }
 
-    private fun extractHeightRange(): Either<Throwable, HeightRange?> {
+    private fun extractHeightRange(): Either<ModelConversionException, HeightRange?> {
         return Either.fx {
 
             minHeight ?: return@fx null
@@ -231,7 +203,7 @@ internal data class RoomChildEntity(
         }
     }
 
-    private fun extractLocation(): Either<Throwable, Location?> {
+    private fun extractLocation(): Either<ModelConversionException, Location?> {
         return Either.fx {
 
             val id = locationId ?: return@fx null
@@ -249,11 +221,14 @@ internal data class RoomChildEntity(
         }
     }
 
-    private fun extractCoordinates(): Either<Throwable, Coordinates?> {
+    private fun extractCoordinates(): Either<ModelConversionException, Coordinates?> {
+        return Either.fx {
 
-        val latitude = this.locationLatitude ?: return null.right()
-        val longitude = this.locationLongitude ?: return null.right()
+            val latitude = locationLatitude ?: return@fx null
+            val longitude = locationLongitude ?: return@fx null
 
-        return Coordinates.of(latitude, longitude).mapLeft { ModelConversionException(it.toString()) }
+            Coordinates.of(latitude, longitude)
+                    .mapLeft { ModelConversionException(it.toString()) }.bind()
+        }
     }
 }

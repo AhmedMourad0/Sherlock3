@@ -17,16 +17,41 @@ internal interface RemoteRepository {
             childId: ChildId,
             child: PublishedChild,
             pictureUrl: Url?
-    ): Single<Either<Throwable, RetrievedChild>>
+    ): Single<Either<PublishException, RetrievedChild>>
 
     fun find(
             childId: ChildId
-    ): Flowable<Either<Throwable, RetrievedChild?>>
+    ): Flowable<Either<FindException, RetrievedChild?>>
 
     fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>>
+    ): Flowable<Either<FindAllException, Map<RetrievedChild, Weight>>>
 
-    fun clear(): Single<Either<Throwable, Unit>>
+    fun clear(): Single<Either<ClearException, Unit>>
+
+    sealed class PublishException {
+        object NoInternetConnectionException : PublishException()
+        object NoSignedInUserException : PublishException()
+        data class UnknownException(val origin: Throwable) : PublishException()
+    }
+
+    sealed class FindException {
+        object NoInternetConnectionException : FindException()
+        object NoSignedInUserException : FindException()
+        data class InternalException(val origin: Throwable) : FindException()
+        data class UnknownException(val origin: Throwable) : FindException()
+    }
+
+    sealed class FindAllException {
+        object NoInternetConnectionException : FindAllException()
+        object NoSignedInUserException : FindAllException()
+        data class UnknownException(val origin: Throwable) : FindAllException()
+    }
+
+    sealed class ClearException {
+        object NoInternetConnectionException : ClearException()
+        object NoSignedInUserException : ClearException()
+        data class UnknownException(val origin: Throwable) : ClearException()
+    }
 }

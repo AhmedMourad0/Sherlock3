@@ -21,8 +21,6 @@ import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.constants.findEnum
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import dev.ahmedmourad.sherlock.domain.filter.Filter
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
@@ -61,7 +59,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             childId: ChildId,
             child: PublishedChild,
             pictureUrl: Url?
-    ): Single<Either<Throwable, RetrievedChild>> {
+    ): Single<Either<RemoteRepository.PublishException, RetrievedChild>> {
 
         return connectivityManager.get()
                 .isInternetConnected()
@@ -71,27 +69,31 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     if (isInternetConnected)
                         authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
                     else
-                        Single.just(NoInternetConnectionException().left())
+                        Single.just(
+                                RemoteRepository.PublishException.NoInternetConnectionException.left()
+                        )
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            publishChildData(childId, child, pictureUrl)
+                            createPublish(childId, child, pictureUrl)
                         } else {
-                            Single.just(NoSignedInUserException().left())
+                            Single.just(
+                                    RemoteRepository.PublishException.NoSignedInUserException.left()
+                            )
                         }
                     })
                 }
     }
 
-    private fun publishChildData(
+    private fun createPublish(
             childId: ChildId,
             child: PublishedChild,
             pictureUrl: Url?
-    ): Single<Either<Throwable, RetrievedChild>> {
+    ): Single<Either<RemoteRepository.PublishException, RetrievedChild>> {
 
-        return Single.create<Either<Throwable, RetrievedChild>> { emitter ->
+        return Single.create<Either<RemoteRepository.PublishException, RetrievedChild>> { emitter ->
 
             val successListener = { _: Void ->
                 emitter.onSuccess(child.toRetrievedChild(
@@ -102,7 +104,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        RemoteRepository.PublishException.UnknownException(throwable).left()
+                )
             }
 
             db.get().collection(Contract.Database.Children.PATH)
@@ -116,7 +120,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
     override fun find(
             childId: ChildId
-    ): Flowable<Either<Throwable, RetrievedChild?>> {
+    ): Flowable<Either<RemoteRepository.FindException, RetrievedChild?>> {
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
@@ -125,37 +129,45 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     if (isInternetConnected) {
                         authManager.get().observeUserAuthState().map(Boolean::right)
                     } else {
-                        Flowable.just(NoInternetConnectionException().left())
+                        Flowable.just(
+                                RemoteRepository.FindException.NoInternetConnectionException.left()
+                        )
                     }
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            createFindFlowable(childId)
+                            createFind(childId)
                         } else {
-                            Flowable.just(NoSignedInUserException().left())
+                            Flowable.just(
+                                    RemoteRepository.FindException.NoSignedInUserException.left()
+                            )
                         }
                     })
                 }
     }
 
-    private fun createFindFlowable(
+    private fun createFind(
             childId: ChildId
-    ): Flowable<Either<Throwable, RetrievedChild?>> {
+    ): Flowable<Either<RemoteRepository.FindException, RetrievedChild?>> {
 
-        return Flowable.create<Either<Throwable, RetrievedChild?>>({ emitter ->
+        return Flowable.create<Either<RemoteRepository.FindException, RetrievedChild?>>({ emitter ->
 
             val snapshotListener = { snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException? ->
 
                 if (exception != null) {
 
-                    emitter.onNext(exception.left())
+                    emitter.onNext(
+                            RemoteRepository.FindException.UnknownException(exception).left()
+                    )
 
                 } else if (snapshot != null) {
 
                     if (snapshot.exists()) {
-                        emitter.onNext(extractRetrievedChild(snapshot))
+                        emitter.onNext(extractRetrievedChild(snapshot).mapLeft {
+                            RemoteRepository.FindException.InternalException(it)
+                        })
                     } else {
                         emitter.onNext(null.right())
                     }
@@ -174,7 +186,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     override fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>> {
+    ): Flowable<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>> {
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
@@ -183,32 +195,38 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     if (isInternetConnected) {
                         authManager.get().observeUserAuthState().map(Boolean::right)
                     } else {
-                        Flowable.just(NoInternetConnectionException().left())
+                        Flowable.just(
+                                RemoteRepository.FindAllException.NoInternetConnectionException.left()
+                        )
                     }
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            createFindAllFlowable(filter)
+                            createFindAll(filter)
                         } else {
-                            Flowable.just(NoSignedInUserException().left())
+                            Flowable.just(
+                                    RemoteRepository.FindAllException.NoSignedInUserException.left()
+                            )
                         }
                     })
                 }
     }
 
-    private fun createFindAllFlowable(
+    private fun createFindAll(
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, Map<RetrievedChild, Weight>>> {
+    ): Flowable<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>> {
 
-        return Flowable.create<Either<Throwable, Map<RetrievedChild, Weight>>>({ emitter ->
+        return Flowable.create<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>>({ emitter ->
 
             val snapshotListener = { snapshot: QuerySnapshot?, exception: FirebaseFirestoreException? ->
 
                 if (exception != null) {
 
-                    emitter.onNext(exception.left())
+                    emitter.onNext(
+                            RemoteRepository.FindAllException.UnknownException(exception).left()
+                    )
 
                 } else if (snapshot != null) {
 
@@ -233,38 +251,46 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun clear(): Single<Either<Throwable, Unit>> {
+    override fun clear(): Single<Either<RemoteRepository.ClearException, Unit>> {
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
+                    if (isInternetConnected) {
                         authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
-                    else
-                        Single.just(NoInternetConnectionException().left())
+                    } else {
+                        Single.just(
+                                RemoteRepository.ClearException.NoInternetConnectionException.left()
+                        )
+                    }
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = {
-                        if (it)
-                            deleteChildren()
-                        else
-                            Single.just(NoSignedInUserException().left())
+                        if (it) {
+                            createClear()
+                        } else {
+                            Single.just(
+                                    RemoteRepository.ClearException.NoSignedInUserException.left()
+                            )
+                        }
                     })
                 }
     }
 
-    private fun deleteChildren(): Single<Either<Throwable, Unit>> {
+    private fun createClear(): Single<Either<RemoteRepository.ClearException, Unit>> {
 
-        return Single.create<Either<Throwable, Unit>> { emitter ->
+        return Single.create<Either<RemoteRepository.ClearException, Unit>> { emitter ->
 
             val successListener = { _: Void ->
                 emitter.onSuccess(Unit.right())
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        RemoteRepository.ClearException.UnknownException(throwable).left()
+                )
             }
 
             val querySuccessListener: (QuerySnapshot) -> Unit = { snapshot: QuerySnapshot ->
@@ -283,7 +309,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 }
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal fun extractRetrievedChild(snapshot: DocumentSnapshot): Either<Throwable, RetrievedChild> {
+internal fun extractRetrievedChild(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, RetrievedChild> {
 
     val id = snapshot.id
 
@@ -326,7 +354,9 @@ internal fun extractRetrievedChild(snapshot: DocumentSnapshot): Either<Throwable
     }
 }
 
-private fun extractName(snapshot: DocumentSnapshot): Either<Throwable, Either<Name, FullName>?> {
+private fun extractName(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, Either<Name, FullName>?> {
     return Either.fx {
 
         val first = snapshot.getString(Contract.Database.Children.FIRST_NAME) ?: return@fx null
@@ -342,7 +372,9 @@ private fun extractName(snapshot: DocumentSnapshot): Either<Throwable, Either<Na
     }
 }
 
-private fun extractApproximateAppearance(snapshot: DocumentSnapshot): Either<Throwable, ApproximateAppearance> {
+private fun extractApproximateAppearance(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, ApproximateAppearance> {
     return Either.fx {
 
         val gender = snapshot.getLong(Contract.Database.Children.GENDER)?.toInt()
@@ -368,7 +400,9 @@ private fun extractApproximateAppearance(snapshot: DocumentSnapshot): Either<Thr
     }
 }
 
-private fun extractAgeRange(snapshot: DocumentSnapshot): Either<Throwable, AgeRange?> {
+private fun extractAgeRange(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, AgeRange?> {
     return Either.fx {
 
         val min = snapshot.getLong(Contract.Database.Children.MIN_AGE)?.toInt() ?: return@fx null
@@ -383,7 +417,9 @@ private fun extractAgeRange(snapshot: DocumentSnapshot): Either<Throwable, AgeRa
     }
 }
 
-private fun extractHeightRange(snapshot: DocumentSnapshot): Either<Throwable, HeightRange?> {
+private fun extractHeightRange(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, HeightRange?> {
     return Either.fx {
 
         val min = snapshot.getLong(Contract.Database.Children.MIN_HEIGHT)?.toInt() ?: return@fx null
@@ -398,7 +434,9 @@ private fun extractHeightRange(snapshot: DocumentSnapshot): Either<Throwable, He
     }
 }
 
-private fun extractLocation(snapshot: DocumentSnapshot): Either<Throwable, Location?> {
+private fun extractLocation(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, Location?> {
     return Either.fx {
 
         val locationId = snapshot.getString(Contract.Database.Children.LOCATION_ID)
@@ -419,7 +457,9 @@ private fun extractLocation(snapshot: DocumentSnapshot): Either<Throwable, Locat
     }
 }
 
-private fun extractCoordinates(snapshot: DocumentSnapshot): Either<Throwable, Coordinates?> {
+private fun extractCoordinates(
+        snapshot: DocumentSnapshot
+): Either<ModelCreationException, Coordinates?> {
 
     val latitude = snapshot.getDouble(Contract.Database.Children.LOCATION_LATITUDE)
             ?: return null.right()
