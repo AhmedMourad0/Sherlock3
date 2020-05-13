@@ -9,9 +9,28 @@ import io.reactivex.Single
 
 internal interface RemoteRepository {
 
-    fun storeSignUpUser(user: RemoteSignUpUser): Single<Either<Throwable, SignedInUser>>
+    fun storeSignUpUser(user: RemoteSignUpUser): Single<Either<StoreSignUpUserException, SignedInUser>>
 
-    fun findSignedInUser(id: UserId): Flowable<Either<Throwable, SignedInUser?>>
+    fun findSignedInUser(id: UserId): Flowable<Either<FindSignedInUserException, SignedInUser?>>
 
-    fun updateUserLastLoginDate(id: UserId): Single<Either<Throwable, Unit>>
+    fun updateUserLastLoginDate(id: UserId): Single<Either<UpdateUserLastLoginDateException, Unit>>
+
+    sealed class StoreSignUpUserException {
+        object NoInternetConnectionException : StoreSignUpUserException()
+        object NoSignedInUserException : StoreSignUpUserException()
+        data class UnknownException(val origin: Throwable) : StoreSignUpUserException()
+    }
+
+    sealed class FindSignedInUserException {
+        object NoInternetConnectionException : FindSignedInUserException()
+        object NoSignedInUserException : FindSignedInUserException()
+        data class InternalException(val origin: Throwable) : FindSignedInUserException()
+        data class UnknownException(val origin: Throwable) : FindSignedInUserException()
+    }
+
+    sealed class UpdateUserLastLoginDateException {
+        object NoInternetConnectionException : UpdateUserLastLoginDateException()
+        object NoSignedInUserException : UpdateUserLastLoginDateException()
+        data class UnknownException(val origin: Throwable) : UpdateUserLastLoginDateException()
+    }
 }

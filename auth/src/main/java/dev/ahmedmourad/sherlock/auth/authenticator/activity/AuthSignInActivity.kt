@@ -23,7 +23,6 @@ import com.twitter.sdk.android.core.TwitterSession
 import com.twitter.sdk.android.core.identity.TwitterAuthClient
 import dev.ahmedmourad.sherlock.auth.authenticator.AuthActivityFactory
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
-import dev.ahmedmourad.sherlock.domain.exceptions.SignInCancelledException
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import inc.ahmedmourad.sherlock.auth.R
 import splitties.init.appCtx
@@ -91,7 +90,12 @@ internal class AuthSignInActivity : AppCompatActivity() {
                             task.getResult(ApiException::class.java)?.idToken, null
                     ).right())
                 } catch (e: Exception) {
-                    AuthenticatorBus.signInCompletion.accept(e.left())
+                    AuthenticatorBus.signInCompletion.accept(
+                            AuthActivityFactory.Exception.UnknownException(
+                                    e,
+                                    GoogleAuthProvider.PROVIDER_ID
+                            ).left()
+                    )
                 } finally {
                     finish()
                 }
@@ -116,12 +120,19 @@ internal class AuthSignInActivity : AppCompatActivity() {
                 }
 
                 override fun onCancel() {
-                    AuthenticatorBus.signInCompletion.accept(SignInCancelledException().left())
+                    AuthenticatorBus.signInCompletion.accept(
+                            AuthActivityFactory.Exception.NoResponseException.left()
+                    )
                     finish()
                 }
 
                 override fun onError(exception: FacebookException) {
-                    AuthenticatorBus.signInCompletion.accept(exception.left())
+                    AuthenticatorBus.signInCompletion.accept(
+                            AuthActivityFactory.Exception.UnknownException(
+                                    exception,
+                                    FacebookAuthProvider.PROVIDER_ID
+                            ).left()
+                    )
                     finish()
                 }
             })
@@ -151,7 +162,12 @@ internal class AuthSignInActivity : AppCompatActivity() {
                 }
 
                 override fun failure(exception: TwitterException) {
-                    AuthenticatorBus.signInCompletion.accept(exception.left())
+                    AuthenticatorBus.signInCompletion.accept(
+                            AuthActivityFactory.Exception.UnknownException(
+                                    exception,
+                                    TwitterAuthProvider.PROVIDER_ID
+                            ).left()
+                    )
                     finish()
                 }
             })
