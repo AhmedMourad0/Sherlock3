@@ -13,7 +13,26 @@ import io.reactivex.Flowable
 import javax.inject.Inject
 
 interface FindChildrenInteractor :
-        (ChildQuery, Filter<RetrievedChild>) -> Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
+        (ChildQuery, Filter<RetrievedChild>) ->
+        Flowable<Either<FindChildrenInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
+    sealed class Exception {
+        object NoInternetConnectionException : Exception()
+        object NoSignedInUserException : Exception()
+        data class UnknownException(val origin: Throwable) : Exception()
+    }
+}
+
+private fun ChildrenRepository.FindAllException.map() = when (this) {
+
+    ChildrenRepository.FindAllException.NoInternetConnectionException ->
+        FindChildrenInteractor.Exception.NoInternetConnectionException
+
+    ChildrenRepository.FindAllException.NoSignedInUserException ->
+        FindChildrenInteractor.Exception.NoSignedInUserException
+
+    is ChildrenRepository.FindAllException.UnknownException ->
+        FindChildrenInteractor.Exception.UnknownException(this.origin)
+}
 
 @Reusable
 internal class FindChildrenInteractorImpl @Inject constructor(
@@ -22,7 +41,11 @@ internal class FindChildrenInteractorImpl @Inject constructor(
     override fun invoke(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-        return childrenRepository.get().findAll(query, filter)
+    ): Flowable<Either<FindChildrenInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
+        return childrenRepository.get()
+                .findAll(query, filter)
+                .map { either ->
+                    either.mapLeft(ChildrenRepository.FindAllException::map)
+                }
     }
 }

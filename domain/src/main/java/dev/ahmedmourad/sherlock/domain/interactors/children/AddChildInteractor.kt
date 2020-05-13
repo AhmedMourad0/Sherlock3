@@ -9,13 +9,42 @@ import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface AddChildInteractor : (PublishedChild) -> Single<Either<Throwable, RetrievedChild>>
+interface AddChildInteractor :
+        (PublishedChild) -> Single<Either<AddChildInteractor.Exception, RetrievedChild>> {
+    sealed class Exception {
+        object NoInternetConnectionException : Exception()
+        object NoSignedInUserException : Exception()
+        data class InternalException(val origin: Throwable) : Exception()
+        data class UnknownException(val origin: Throwable) : Exception()
+    }
+}
+
+private fun ChildrenRepository.PublishException.map() = when (this) {
+
+    ChildrenRepository.PublishException.NoInternetConnectionException ->
+        AddChildInteractor.Exception.NoInternetConnectionException
+
+    ChildrenRepository.PublishException.NoSignedInUserException ->
+        AddChildInteractor.Exception.NoSignedInUserException
+
+    is ChildrenRepository.PublishException.InternalException ->
+        AddChildInteractor.Exception.InternalException(this.origin)
+
+    is ChildrenRepository.PublishException.UnknownException ->
+        AddChildInteractor.Exception.UnknownException(this.origin)
+}
 
 @Reusable
 internal class AddChildInteractorImpl @Inject constructor(
         private val childrenRepository: Lazy<ChildrenRepository>
 ) : AddChildInteractor {
-    override fun invoke(child: PublishedChild): Single<Either<Throwable, RetrievedChild>> {
-        return childrenRepository.get().publish(child)
+    override fun invoke(
+            child: PublishedChild
+    ): Single<Either<AddChildInteractor.Exception, RetrievedChild>> {
+        return childrenRepository.get()
+                .publish(child)
+                .map { either ->
+                    either.mapLeft(ChildrenRepository.PublishException::map)
+                }
     }
 }
