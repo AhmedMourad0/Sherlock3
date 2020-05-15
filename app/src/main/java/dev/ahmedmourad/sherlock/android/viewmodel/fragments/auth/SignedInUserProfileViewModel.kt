@@ -3,7 +3,6 @@ package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import arrow.core.left
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
@@ -21,7 +20,6 @@ internal class SignedInUserProfileViewModel(
     val signedInUser by lazy {
         interactor.get()
                 .invoke()
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }

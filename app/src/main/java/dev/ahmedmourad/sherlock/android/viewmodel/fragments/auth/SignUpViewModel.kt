@@ -128,25 +128,28 @@ internal class SignUpViewModel(
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onSignUpWithGoogle(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignUpWithGoogle():
+            Single<Either<SignInWithGoogleInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signUpWithGoogleInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignUpWithFacebook(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignUpWithFacebook():
+            Single<Either<SignInWithFacebookInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signUpWithFacebookInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignUpWithTwitter(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignUpWithTwitter():
+            Single<Either<SignInWithTwitterInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signUpWithTwitterInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignUp(): Single<Either<Throwable, SignedInUser>>? {
+    fun onSignUp(): Single<Either<SignUpInteractor.Exception, SignedInUser>>? {
         return toAppSignUpUser()?.toSignUpUser(imageLoader.get())?.let {
             signUpInteractor.get().invoke(it).observeOn(AndroidSchedulers.mainThread())
         }

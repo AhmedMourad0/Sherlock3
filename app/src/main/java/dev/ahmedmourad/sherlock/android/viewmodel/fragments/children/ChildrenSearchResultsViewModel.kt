@@ -3,7 +3,6 @@ package dev.ahmedmourad.sherlock.android.viewmodel.fragments.children
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import arrow.core.left
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
@@ -34,7 +33,6 @@ internal class ChildrenSearchResultsViewModel(
         interactor.get()
                 .invoke(query, filterFactory.get().invoke(query))
                 .retryWhen { refreshSubject.toFlowable(BackpressureStrategy.LATEST) }
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }

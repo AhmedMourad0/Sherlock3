@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
-import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
 import dagger.Lazy
@@ -22,7 +21,10 @@ import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.bus.Bus
-import dev.ahmedmourad.sherlock.domain.constants.*
+import dev.ahmedmourad.sherlock.domain.constants.Gender
+import dev.ahmedmourad.sherlock.domain.constants.Hair
+import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.constants.findEnum
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -193,8 +195,6 @@ internal class AddChildViewModel(
         bus.get()
                 .childPublishingState
                 .retry()
-                .map<Either<Throwable, PublishingState>> { it.right() }
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .toLiveData()

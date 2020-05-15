@@ -65,25 +65,29 @@ internal class SignInViewModel(
         savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
     }
 
-    fun onSignInWithGoogle(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignInWithGoogle():
+            Single<Either<SignInWithGoogleInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signInWithGoogleInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignInWithFacebook(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignInWithFacebook():
+            Single<Either<SignInWithFacebookInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signInWithFacebookInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignInWithTwitter(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
+    fun onSignInWithTwitter():
+            Single<Either<SignInWithTwitterInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
         return signInWithTwitterInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun onSignIn(): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>? {
+    fun onSignIn():
+            Single<Either<SignInInteractor.Exception, Either<IncompleteUser, SignedInUser>>>? {
         return toUserCredentials()?.let {
             signInInteractor.get().invoke(it).observeOn(AndroidSchedulers.mainThread())
         }

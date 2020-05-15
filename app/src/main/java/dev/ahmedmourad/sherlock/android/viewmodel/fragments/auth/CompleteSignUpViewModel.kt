@@ -100,7 +100,7 @@ internal class CompleteSignUpViewModel(
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onCompleteSignUp(): Single<Either<Throwable, SignedInUser>>? {
+    fun onCompleteSignUp(): Single<Either<CompleteSignUpInteractor.Exception, SignedInUser>>? {
         return toCompletedUser()?.let {
             completeSignUpInteractor.get().invoke(
                     it.toCompletedUser(imageLoader.get())
