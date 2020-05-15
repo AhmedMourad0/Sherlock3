@@ -59,7 +59,6 @@
 	<string name="success">Success!</string>
 	<string name="published_child_data_successfully_with_name">Published %1$s\'s data successfully!</string>
 	<string name="published_child_data_successfully">Published child\'s data successfully!</string>
-	<string name="something_went_wrong">Something went wrong!</string>
 	<string name="click_to_retry_with_reason">%1$s\n\nClick to retry!</string>
 	<string name="publishing_failed_with_name">Publishing %1$s\'s data has failed!</string>
 	<string name="publishing_failed">Publishing failed!</string>
@@ -159,5 +158,17 @@
 	<string name="email_used_as_password">You cannot use your email as a password</string>
 	<string name="display_name_used_as_password">You cannot use your display name as a password</string>
 	<string name="phone_number_used_as_password">You cannot use your phone number as a password</string>
+	<string name="something_went_wrong">Something went wrong!</string>
+	<string name="something_went_wrong_with_message">Something went wrong:\n%1$s</string>
+	<string name="authentication_needed">You need to be signed in to perform this action!</string>
+	<string name="internet_connection_needed">You need to be connected to the internet to perform this action!</string>
+	<string name="email_non_existent">The email you entered does not correspond to any existing account!</string>
+	<string name="account_disabled_or_does_not_exist">This account has been disabled or does not exist!</string>
+	<string name="wrong_email_or_password">Incorrect email or password!</string>
+	<string name="account_has_been_disabled">This account has been disabled!</string>
+	<string name="session_has_expired">Your session has expired, please to sign in to continue!</string>
+	<string name="email_already_in_use">This email is already in use by an existing account!</string>
+	<string name="custom_auth_no_response">Authentication was cancelled or has expired!</string>
+	<string name="weak_password">Password is too weak, please enter a stronger one!</string>
 
 </resources>
