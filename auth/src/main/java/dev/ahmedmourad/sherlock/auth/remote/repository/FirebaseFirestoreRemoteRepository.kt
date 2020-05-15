@@ -53,20 +53,30 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     override fun storeSignUpUser(
             user: RemoteSignUpUser
     ): Single<Either<RemoteRepository.StoreSignUpUserException, SignedInUser>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                RemoteRepository.StoreSignUpUserException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        userAuthStateObservable.observeUserAuthState()
-                                .map(Boolean::right)
-                                .singleOrError()
-                    } else {
-                        Single.just(
-                                RemoteRepository.StoreSignUpUserException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            userAuthStateObservable.observeUserAuthState()
+                                    .map(Boolean::right)
+                                    .singleOrError()
+                        } else {
+                            Single.just(
+                                    RemoteRepository.StoreSignUpUserException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
@@ -111,18 +121,28 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     override fun findSignedInUser(
             id: UserId
     ): Flowable<Either<RemoteRepository.FindSignedInUserException, SignedInUser?>> {
+
+        fun ConnectivityManager.ObserveInternetConnectivityException.map() = when (this) {
+            is ConnectivityManager.ObserveInternetConnectivityException.UnknownException ->
+                RemoteRepository.FindSignedInUserException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        userAuthStateObservable.observeUserAuthState().map(Boolean::right)
-                    } else {
-                        Flowable.just(
-                                RemoteRepository.FindSignedInUserException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            userAuthStateObservable.observeUserAuthState().map(Boolean::right)
+                        } else {
+                            Flowable.just(
+                                    RemoteRepository.FindSignedInUserException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
@@ -176,20 +196,30 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     override fun updateUserLastLoginDate(
             id: UserId
     ): Single<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                RemoteRepository.UpdateUserLastLoginDateException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        userAuthStateObservable.observeUserAuthState()
-                                .map(Boolean::right)
-                                .singleOrError()
-                    } else {
-                        Single.just(
-                                RemoteRepository.UpdateUserLastLoginDateException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            userAuthStateObservable.observeUserAuthState()
+                                    .map(Boolean::right)
+                                    .singleOrError()
+                        } else {
+                            Single.just(
+                                    RemoteRepository.UpdateUserLastLoginDateException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())

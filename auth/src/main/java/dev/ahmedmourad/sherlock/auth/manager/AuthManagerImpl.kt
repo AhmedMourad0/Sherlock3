@@ -34,11 +34,16 @@ internal class AuthManagerImpl @Inject constructor(
         @InternalApi private val userAuthStateObservable: Lazy<UserAuthStateObservable>
 ) : AuthManager {
 
-    override fun observeUserAuthState(): Flowable<Boolean> {
+    override fun observeUserAuthState(): Flowable<Either<AuthManager.ObserveUserAuthStateException, Boolean>> {
         return userAuthStateObservable.get()
                 .observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
+                .map<Either<AuthManager.ObserveUserAuthStateException, Boolean>> {
+                    it.right()
+                }.onErrorReturn {
+                    AuthManager.ObserveUserAuthStateException.UnknownException(it).left()
+                }
     }
 
     override fun observeSignedInUser():
@@ -109,6 +114,8 @@ internal class AuthManagerImpl @Inject constructor(
                                     }.toFlowable()
                         })
                     })
+                }.onErrorReturn {
+                    AuthManager.ObserveSignedInUserException.UnknownException(it).left()
                 }
     }
 
@@ -167,6 +174,8 @@ internal class AuthManagerImpl @Inject constructor(
                                             })
                                 }.firstOrError()
                     })
+                }.onErrorReturn {
+                    AuthManager.SignInException.UnknownException(it).left()
                 }
     }
 
@@ -250,6 +259,8 @@ internal class AuthManagerImpl @Inject constructor(
                                     either.mapLeft(RemoteRepository.StoreSignUpUserException::map)
                                 }
                     })
+                }.onErrorReturn {
+                    AuthManager.SignUpException.UnknownException(it).left()
                 }
     }
 
@@ -298,6 +309,8 @@ internal class AuthManagerImpl @Inject constructor(
                                     either.mapLeft(RemoteRepository.StoreSignUpUserException::map)
                                 }
                     })
+                }.onErrorReturn {
+                    AuthManager.CompleteSignUpException.UnknownException(it).left()
                 }
     }
 
@@ -367,6 +380,11 @@ internal class AuthManagerImpl @Inject constructor(
                                             })
                                 }.firstOrError()
                     })
+                }.onErrorReturn {
+                    AuthManager.SignInWithGoogleException.UnknownException(
+                            it,
+                            GoogleAuthProvider.PROVIDER_ID
+                    ).left()
                 }
     }
 
@@ -436,6 +454,11 @@ internal class AuthManagerImpl @Inject constructor(
                                             })
                                 }.firstOrError()
                     })
+                }.onErrorReturn {
+                    AuthManager.SignInWithFacebookException.UnknownException(
+                            it,
+                            FacebookAuthProvider.PROVIDER_ID
+                    ).left()
                 }
     }
 
@@ -505,6 +528,11 @@ internal class AuthManagerImpl @Inject constructor(
                                             })
                                 }.firstOrError()
                     })
+                }.onErrorReturn {
+                    AuthManager.SignInWithTwitterException.UnknownException(
+                            it,
+                            TwitterAuthProvider.PROVIDER_ID
+                    ).left()
                 }
     }
 
@@ -530,6 +558,8 @@ internal class AuthManagerImpl @Inject constructor(
                 .observeOn(Schedulers.io())
                 .map { either ->
                     either.mapLeft(Authenticator.SendPasswordResetEmailException::map)
+                }.onErrorReturn {
+                    AuthManager.SendPasswordResetEmailException.UnknownException(it).left()
                 }
     }
 
@@ -587,6 +617,8 @@ internal class AuthManagerImpl @Inject constructor(
                                     )
                                 }
                     })
+                }.onErrorReturn {
+                    AuthManager.SignOutException.UnknownException(it).left()
                 }
     }
 }

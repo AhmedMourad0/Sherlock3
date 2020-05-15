@@ -87,18 +87,28 @@ internal class FirebaseAuthenticator @Inject constructor(
     override fun signIn(
             credentials: UserCredentials
     ): Single<Either<Authenticator.SignInException, IncompleteUser>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignIn(credentials.email, credentials.password)
-                    } else {
-                        Single.just(
-                                Authenticator.SignInException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignIn(credentials.email, credentials.password)
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
@@ -137,18 +147,29 @@ internal class FirebaseAuthenticator @Inject constructor(
     override fun signUp(
             credentials: UserCredentials
     ): Single<Either<Authenticator.SignUpException, IncompleteUser>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignUpException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignUpSingle(credentials)
-                    } else {
-                        Single.just(
-                                Authenticator.SignUpException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignUpSingle(credentials)
+                        } else {
+                            Single.just(
+                                    Authenticator.SignUpException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
+
                 }
     }
 
@@ -207,23 +228,35 @@ internal class FirebaseAuthenticator @Inject constructor(
                 Authenticator.SignInWithGoogleException.UnknownException(this.origin, this.providerId)
         }
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithGoogleException.UnknownException(
+                        this.origin,
+                        GoogleAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithGoogle()
-                                .flatMap(this::getGoogleAuthCredentials)
-                                .flatMap(this::signInWithCredentials)
-                                .map { userEither ->
-                                    userEither.mapLeft(SignInWithCredentialException::map)
-                                }
-                    } else {
-                        Single.just(
-                                Authenticator.SignInWithGoogleException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithGoogle()
+                                    .flatMap(this::getGoogleAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithGoogleException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
@@ -271,23 +304,35 @@ internal class FirebaseAuthenticator @Inject constructor(
                 Authenticator.SignInWithFacebookException.UnknownException(this.origin, this.providerId)
         }
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithFacebookException.UnknownException(
+                        this.origin,
+                        FacebookAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithFacebookSingle()
-                                .flatMap(this::getFacebookAuthCredentials)
-                                .flatMap(this::signInWithCredentials)
-                                .map { userEither ->
-                                    userEither.mapLeft(SignInWithCredentialException::map)
-                                }
-                    } else {
-                        Single.just(
-                                Authenticator.SignInWithFacebookException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithFacebookSingle()
+                                    .flatMap(this::getFacebookAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithFacebookException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
@@ -336,23 +381,35 @@ internal class FirebaseAuthenticator @Inject constructor(
                 Authenticator.SignInWithTwitterException.UnknownException(this.origin, this.providerId)
         }
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithTwitterException.UnknownException(
+                        this.origin,
+                        TwitterAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithTwitterSingle()
-                                .flatMap(this::getTwitterAuthCredentials)
-                                .flatMap(this::signInWithCredentials)
-                                .map { userEither ->
-                                    userEither.mapLeft(SignInWithCredentialException::map)
-                                }
-                    } else {
-                        Single.just(
-                                Authenticator.SignInWithTwitterException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithTwitterSingle()
+                                    .flatMap(this::getTwitterAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithTwitterException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
@@ -484,18 +541,28 @@ internal class FirebaseAuthenticator @Inject constructor(
     override fun sendPasswordResetEmail(
             email: Email
     ): Single<Either<Authenticator.SendPasswordResetEmailException, Unit>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SendPasswordResetEmailException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSendPasswordResetEmailSingle(email)
-                    } else {
-                        Single.just(
-                                Authenticator.SendPasswordResetEmailException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSendPasswordResetEmailSingle(email)
+                        } else {
+                            Single.just(
+                                    Authenticator.SendPasswordResetEmailException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
@@ -529,19 +596,29 @@ internal class FirebaseAuthenticator @Inject constructor(
     }
 
     override fun signOut(): Single<Either<Authenticator.SignOutException, UserId?>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignOutException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        signOutFromFirebaseAuth()
-                                .andThen(signOutFromGoogle())
-                    } else {
-                        Single.just(
-                                Authenticator.SignOutException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            signOutFromFirebaseAuth()
+                                    .andThen(signOutFromGoogle())
+                        } else {
+                            Single.just(
+                                    Authenticator.SignOutException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { either ->
                     either.fold(ifLeft = {
                         Single.just(it.left())

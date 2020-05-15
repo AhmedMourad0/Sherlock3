@@ -61,17 +61,33 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             pictureUrl: Url?
     ): Single<Either<RemoteRepository.PublishException, RetrievedChild>> {
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                RemoteRepository.PublishException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.PublishException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
-                    else
-                        Single.just(
-                                RemoteRepository.PublishException.NoInternetConnectionException.left()
-                        )
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected)
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }.firstOrError()
+                        else
+                            Single.just(
+                                    RemoteRepository.PublishException.NoInternetConnectionException.left()
+                            )
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
@@ -121,18 +137,35 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     override fun find(
             childId: ChildId
     ): Flowable<Either<RemoteRepository.FindException, RetrievedChild?>> {
+
+        fun ConnectivityManager.ObserveInternetConnectivityException.map() = when (this) {
+            is ConnectivityManager.ObserveInternetConnectivityException.UnknownException ->
+                RemoteRepository.FindException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.FindException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        authManager.get().observeUserAuthState().map(Boolean::right)
-                    } else {
-                        Flowable.just(
-                                RemoteRepository.FindException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }
+                        } else {
+                            Flowable.just(
+                                    RemoteRepository.FindException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
@@ -187,18 +220,35 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
     ): Flowable<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>> {
+
+        fun ConnectivityManager.ObserveInternetConnectivityException.map() = when (this) {
+            is ConnectivityManager.ObserveInternetConnectivityException.UnknownException ->
+                RemoteRepository.FindAllException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.FindAllException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        authManager.get().observeUserAuthState().map(Boolean::right)
-                    } else {
-                        Flowable.just(
-                                RemoteRepository.FindAllException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }
+                        } else {
+                            Flowable.just(
+                                    RemoteRepository.FindAllException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
@@ -252,18 +302,35 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     }
 
     override fun clear(): Single<Either<RemoteRepository.ClearException, Unit>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                RemoteRepository.ClearException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.ClearException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
-                    } else {
-                        Single.just(
-                                RemoteRepository.ClearException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }.firstOrError()
+                        } else {
+                            Single.just(
+                                    RemoteRepository.ClearException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())

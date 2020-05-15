@@ -33,6 +33,11 @@ internal class FirebaseStorageImageRepository @Inject constructor(
             picture: ByteArray?
     ): Single<Either<ImageRepository.StoreUserPictureException, Url?>> {
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                ImageRepository.StoreUserPictureException.UnknownException(this.origin)
+        }
+
         if (picture == null) {
             return Single.just(null.right())
         }
@@ -41,16 +46,20 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        userAuthStateObservable.observeUserAuthState()
-                                .map(Boolean::right)
-                                .firstOrError()
-                    } else {
-                        Single.just(
-                                ImageRepository.StoreUserPictureException.NoInternetConnectionException.left()
-                        )
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            userAuthStateObservable.observeUserAuthState()
+                                    .map(Boolean::right)
+                                    .firstOrError()
+                        } else {
+                            Single.just(
+                                    ImageRepository.StoreUserPictureException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())

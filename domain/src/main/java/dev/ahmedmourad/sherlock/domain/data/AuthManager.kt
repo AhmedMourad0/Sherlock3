@@ -12,7 +12,7 @@ import io.reactivex.Single
 
 interface AuthManager {
 
-    fun observeUserAuthState(): Flowable<Boolean>
+    fun observeUserAuthState(): Flowable<Either<ObserveUserAuthStateException, Boolean>>
 
     fun observeSignedInUser():
             Flowable<Either<ObserveSignedInUserException, Either<IncompleteUser, SignedInUser>?>>
@@ -36,6 +36,10 @@ interface AuthManager {
     fun sendPasswordResetEmail(email: Email): Single<Either<SendPasswordResetEmailException, Unit>>
 
     fun signOut(): Single<Either<SignOutException, Unit>>
+
+    sealed class ObserveUserAuthStateException {
+        data class UnknownException(val origin: Throwable) : ObserveUserAuthStateException()
+    }
 
     sealed class ObserveSignedInUserException {
         object NoInternetConnectionException : ObserveSignedInUserException()

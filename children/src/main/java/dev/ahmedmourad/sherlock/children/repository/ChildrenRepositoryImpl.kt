@@ -84,6 +84,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     either.mapLeft(RemoteRepository.PublishException::map)
                                 }
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.PublishException.UnknownException(it).left()
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
                         bus.get().childPublishingState.accept(PublishingState.Failure(child))
@@ -114,12 +116,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
         }
 
         fun LocalRepository.UpdateIfExistsException.map() = when (this) {
-
             is LocalRepository.UpdateIfExistsException.InternalException ->
                 ChildrenRepository.FindException.InternalException(this.origin)
-
-            is LocalRepository.UpdateIfExistsException.UnknownException ->
-                ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
         return remoteRepository.get()
@@ -143,6 +141,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     .toFlowable()
                         }
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.FindException.UnknownException(it).left()
                 }.doOnSubscribe { bus.get().childFindingState.accept(BackgroundState.ONGOING) }
                 .doOnNext { bus.get().childFindingState.accept(BackgroundState.SUCCESS) }
                 .doOnError { bus.get().childFindingState.accept(BackgroundState.FAILURE) }
@@ -182,6 +182,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                             .right()
                                 }.toFlowable()
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.FindAllException.UnknownException(it).left()
                 }.doOnSubscribe { bus.get().childrenFindingState.accept(BackgroundState.ONGOING) }
                 .doOnNext { bus.get().childrenFindingState.accept(BackgroundState.SUCCESS) }
                 .doOnError { bus.get().childrenFindingState.accept(BackgroundState.FAILURE) }
@@ -190,21 +192,14 @@ internal class ChildrenRepositoryImpl @Inject constructor(
     override fun findLastSearchResults():
             Flowable<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
 
-        fun LocalRepository.FindAllWithWeightException.map() = when (this) {
-
-            is LocalRepository.FindAllWithWeightException.InternalException ->
-                ChildrenRepository.FindLastSearchResultsException.InternalException(this.origin)
-
-            is LocalRepository.FindAllWithWeightException.UnknownException ->
-                ChildrenRepository.FindLastSearchResultsException.UnknownException(this.origin)
-        }
-
         return localRepository.get()
                 .findAllWithWeight()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map { either ->
-                    either.mapLeft(LocalRepository.FindAllWithWeightException::map)
+                .map<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
+                    it.right()
+                }.onErrorReturn {
+                    ChildrenRepository.FindLastSearchResultsException.UnknownException(it).left()
                 }
     }
 
@@ -230,11 +225,6 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     ChildrenRepository.Tester.ClearException.UnknownException(this.origin)
             }
 
-            fun LocalRepository.ClearException.map() = when (this) {
-                is LocalRepository.ClearException.UnknownException ->
-                    ChildrenRepository.Tester.ClearException.UnknownException(this.origin)
-            }
-
             return remoteRepository.get()
                     .clear()
                     .subscribeOn(Schedulers.io())
@@ -243,12 +233,10 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                         either.fold(ifLeft = {
                             Single.just(it.map().left())
                         }, ifRight = {
-                            localRepository.get()
-                                    .clear()
-                                    .map { either ->
-                                        either.mapLeft(LocalRepository.ClearException::map)
-                                    }
+                            localRepository.get().clear().toSingleDefault(Unit.right())
                         })
+                    }.onErrorReturn {
+                        ChildrenRepository.Tester.ClearException.UnknownException(it).left()
                     }
         }
     }

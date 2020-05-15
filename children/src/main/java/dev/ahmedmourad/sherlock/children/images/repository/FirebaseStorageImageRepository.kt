@@ -33,6 +33,16 @@ internal class FirebaseStorageImageRepository @Inject constructor(
             picture: ByteArray?
     ): Single<Either<ImageRepository.StoreChildPictureException, Url?>> {
 
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                ImageRepository.StoreChildPictureException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                ImageRepository.StoreChildPictureException.UnknownException(this.origin)
+        }
+
         if (picture == null) {
             return Single.just(null.right())
         }
@@ -41,13 +51,20 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
-                    else
-                        Single.just(
-                                ImageRepository.StoreChildPictureException.NoInternetConnectionException.left()
-                        )
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }.firstOrError()
+                        } else {
+                            Single.just(
+                                    ImageRepository.StoreChildPictureException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
