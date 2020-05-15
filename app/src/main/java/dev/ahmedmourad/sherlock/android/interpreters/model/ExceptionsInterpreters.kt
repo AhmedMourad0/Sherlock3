@@ -1,4 +1,4 @@
-package dev.ahmedmourad.sherlock.android.model
+package dev.ahmedmourad.sherlock.android.interpreters.model
 
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser

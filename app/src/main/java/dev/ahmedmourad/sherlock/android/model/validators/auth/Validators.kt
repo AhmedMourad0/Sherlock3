@@ -4,10 +4,10 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.interpreters.model.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
-import dev.ahmedmourad.sherlock.android.model.localizedMessage
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
