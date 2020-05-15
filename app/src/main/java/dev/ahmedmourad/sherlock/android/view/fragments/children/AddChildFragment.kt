@@ -33,6 +33,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewMo
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.constants.*
+import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -83,7 +84,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddChildBinding.bind(view)
 
-        setUserInteractionsEnabled(args.child == null)
+        setUserInteractionsEnabled(args.child.unbundle(AppPublishedChild.serializer().nullable) == null)
 
         initializeSkinColorViews()
         initializeHairColorViews()
@@ -94,28 +95,19 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity) { either ->
+        observe(globalViewModel.internetConnectivity) { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
             when (either) {
                 is Either.Left -> {
-                    Timber.error(either.a, either.a::toString)
+                    Timber.error(message = either.a::toString)
                     setInternetDependantViewsEnabled(false)
                 }
                 is Either.Right -> {
-                    handlePublishingStateValue(viewModel.publishingState.value?.orNull())
+                    handlePublishingStateValue(viewModel.publishingState.value)
                 }
             }.exhaust()
         }
 
-        observe(viewModel.publishingState) { either ->
-            when (either) {
-                is Either.Left -> {
-                    Timber.error(either.a, either.a::toString)
-                }
-                is Either.Right -> {
-                    handlePublishingStateValue(either.b)
-                }
-            }.exhaust()
-        }
+        observe(viewModel.publishingState, this::handlePublishingStateValue)
 
         binding?.let { b ->
             arrayOf(b.locationImageView,

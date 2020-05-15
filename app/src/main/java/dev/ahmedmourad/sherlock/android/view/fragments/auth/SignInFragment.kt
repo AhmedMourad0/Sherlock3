@@ -8,17 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
-import arrow.core.identity
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignInBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignInViewModel
-import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
 import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -97,34 +100,113 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
     }
 
     private fun signIn() {
-        signInDisposable = viewModel.onSignIn()?.subscribe(::onSignInSuccess) {
+        signInDisposable = viewModel.onSignIn()?.subscribe({ either ->
+            if (either is Either.Left) {
+                val e = either.a
+                when (e) {
+
+                    SignInInteractor.Exception.AccountDoesNotExistOrHasBeenDisabledException,
+                    SignInInteractor.Exception.WrongPasswordException,
+                    SignInInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                    }
+
+                    is SignInInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is SignInInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
+            }
+        }, {
             Timber.error(it, it::toString)
-        }
+        })
     }
 
     private fun signInWithGoogle() {
-        signInDisposable = viewModel.onSignInWithGoogle().subscribe(::onSignInSuccess) {
+        signInDisposable = viewModel.onSignInWithGoogle().subscribe({ either ->
+            if (either is Either.Left) {
+                val e = either.a
+                when (e) {
+
+                    SignInWithGoogleInteractor.Exception.AccountHasBeenDisabledException,
+                    SignInWithGoogleInteractor.Exception.MalformedOrExpiredCredentialException,
+                    SignInWithGoogleInteractor.Exception.EmailAlreadyInUseException,
+                    SignInWithGoogleInteractor.Exception.NoResponseException,
+                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                    }
+
+                    is SignInWithGoogleInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is SignInWithGoogleInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
+            }
+        }, {
             Timber.error(it, it::toString)
-        }
+        })
     }
 
     private fun signInWithFacebook() {
-        signInDisposable = viewModel.onSignInWithFacebook().subscribe(::onSignInSuccess) {
+        signInDisposable = viewModel.onSignInWithFacebook().subscribe({ either ->
+            if (either is Either.Left) {
+                val e = either.a
+                when (e) {
+
+                    SignInWithFacebookInteractor.Exception.AccountHasBeenDisabledException,
+                    SignInWithFacebookInteractor.Exception.MalformedOrExpiredCredentialException,
+                    SignInWithFacebookInteractor.Exception.EmailAlreadyInUseException,
+                    SignInWithFacebookInteractor.Exception.NoResponseException,
+                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                    }
+
+                    is SignInWithFacebookInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is SignInWithFacebookInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
+            }
+        }, {
             Timber.error(it, it::toString)
-        }
+        })
     }
 
     private fun signInWithTwitter() {
-        signInDisposable = viewModel.onSignInWithTwitter().subscribe(::onSignInSuccess) {
-            Timber.error(it, it::toString)
-        }
-    }
+        signInDisposable = viewModel.onSignInWithTwitter().subscribe({ either ->
+            if (either is Either.Left) {
+                val e = either.a
+                when (e) {
 
-    private fun onSignInSuccess(resultEither: Either<Throwable, Either<IncompleteUser, SignedInUser>>) {
-        resultEither.fold(ifLeft = {
+                    SignInWithTwitterInteractor.Exception.AccountHasBeenDisabledException,
+                    SignInWithTwitterInteractor.Exception.MalformedOrExpiredCredentialException,
+                    SignInWithTwitterInteractor.Exception.EmailAlreadyInUseException,
+                    SignInWithTwitterInteractor.Exception.NoResponseException,
+                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                    }
+
+                    is SignInWithTwitterInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is SignInWithTwitterInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
+            }
+        }, {
             Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
-        }, ifRight = ::identity)
+        })
     }
 
     override fun onDestroyView() {

@@ -28,6 +28,7 @@ import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.constants.findEnum
+import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
@@ -74,11 +75,11 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity) { either ->
+        observe(globalViewModel.internetConnectivity) { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
             when (either) {
                 is Either.Left -> {
                     setInternetDependantViewsEnabled(false)
-                    Timber.error(either.a, either.a::toString)
+                    Timber.error(message = either.a::toString)
                 }
                 is Either.Right -> {
                     setInternetDependantViewsEnabled(either.b)

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import arrow.core.Either
 import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
 import dev.ahmedmourad.bundlizer.bundle
@@ -23,15 +24,17 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
-import dev.ahmedmourad.sherlock.android.utils.*
+import dev.ahmedmourad.sherlock.android.utils.clearBackStack
+import dev.ahmedmourad.sherlock.android.utils.findNavController
+import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
+import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import timber.log.Timber
@@ -90,16 +93,26 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
         observe(globalViewModel.internetConnectivity) { either ->
             either.fold(ifLeft = {
                 showConnectivitySnackBar(Connectivity.CONNECTING)
-                Timber.error(it, it::toString)
+                Timber.error(message = it::toString)
             }, ifRight = {
                 showConnectivitySnackBar(getConnectivity(it))
             })
         }
 
-        observeAll(globalViewModel.userAuthState, globalViewModel.signedInUser) { either ->
+        observe(globalViewModel.userAuthState) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
-                Timber.error(it, it::toString)
+                Timber.error(message = it::toString)
+            }, ifRight = {
+                invalidateOptionsMenu()
+                updateBackdropDestination()
+            })
+        }
+
+        observe(globalViewModel.signedInUser) { either ->
+            either.fold(ifLeft = {
+                invalidateOptionsMenu()
+                Timber.error(message = it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
@@ -262,24 +275,35 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
                 }
 
             }, ifRight = { either ->
-                either.fold(ifLeft = {
-                    if (authNavController.currentDestination?.id != R.id.completeSignUpFragment) {
+
+                if (either != null) {
+                    either.fold(ifLeft = {
+                        if (authNavController.currentDestination?.id != R.id.completeSignUpFragment) {
+                            authNavController.navigate(
+                                    R.id.completeSignUpFragment,
+                                    CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
+                                    clearBackStack(authNavController)
+                            )
+                        }
+                    }, ifRight = {
+                        if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
+                            authNavController.navigate(
+                                    R.id.signedInUserProfileFragment,
+                                    null,
+                                    clearBackStack(authNavController)
+                            )
+                            setInPrimaryContentMode(true)
+                        }
+                    })
+                } else {
+                    if (authNavController.currentDestination?.id !in authNeutralDestinations) {
                         authNavController.navigate(
-                                R.id.completeSignUpFragment,
-                                CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
-                                clearBackStack(authNavController)
-                        )
-                    }
-                }, ifRight = {
-                    if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
-                        authNavController.navigate(
-                                R.id.signedInUserProfileFragment,
+                                R.id.signInFragment,
                                 null,
                                 clearBackStack(authNavController)
                         )
-                        setInPrimaryContentMode(true)
                     }
-                })
+                }
             })
 
         } else {
@@ -324,25 +348,32 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
             userEither!!.fold(ifLeft = {
 
                 when (it) {
-                    is NoInternetConnectionException -> {
+
+                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> {
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // internet error icon
                     }
-                    is NoSignedInUserException -> {
-                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // no user error icon
+
+                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
+                        Timber.error(message = it::toString)
+                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
-                    else -> {
-                        //This should never happen
-                        Timber.error(it, it::toString)
+
+                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
+                        Timber.error(message = it::toString)
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
                 }
 
             }, ifRight = { either ->
-                either.fold(ifLeft = {
-                    ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
-                }, ifRight = {
-                    ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
-                })
+                if (either != null) {
+                    either.fold(ifLeft = {
+                        ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
+                    }, ifRight = {
+                        ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
+                    })
+                } else {
+                    ContextCompat.getDrawable(this, R.drawable.ic_hair) // no user error icon
+                }
             })
 
         } else {
@@ -384,11 +415,9 @@ internal class MainActivity : AppCompatActivity(), BackdropProvider {
 
     private fun signOut() {
         signOutDisposable = viewModel.signOutSingle.subscribe({ resultEither ->
-            resultEither.fold(ifLeft = {
-                Timber.error(it, it::toString)
-            }, ifRight = {
-
-            })
+            if (resultEither is Either.Left) {
+                Timber.error(message = resultEither::toString)
+            }
         }, {
             Timber.error(it, it::toString)
         })

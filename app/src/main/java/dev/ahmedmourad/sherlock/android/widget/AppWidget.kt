@@ -4,9 +4,11 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
+import android.widget.Toast
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.DisposablesSparseArray
 import dev.ahmedmourad.sherlock.android.widget.adapter.ChildrenRemoteViewsServiceIntentFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
@@ -51,7 +53,7 @@ internal class AppWidget : AppWidgetProvider() {
         return interactor()
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ either: Either<Throwable, Map<SimpleRetrievedChild, Weight>> ->
+                .subscribe({ either: Either<FindLastSearchResultsInteractor.Exception, Map<SimpleRetrievedChild, Weight>> ->
 
                     val views = RemoteViews(context.packageName, R.layout.app_widget)
 
@@ -61,7 +63,12 @@ internal class AppWidget : AppWidgetProvider() {
 
                     when (either) {
                         is Either.Left -> {
-                            Timber.error(either.a, either.a::toString)
+                            Timber.error(message = either.a::toString)
+                            Toast.makeText(
+                                    context,
+                                    either.a.localizedMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show()
                         }
                         is Either.Right -> {
                             views.setRemoteAdapter(R.id.widget_list_view,

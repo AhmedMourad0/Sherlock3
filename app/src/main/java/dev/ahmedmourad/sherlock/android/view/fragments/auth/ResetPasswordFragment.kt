@@ -12,11 +12,15 @@ import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentResetPasswordBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
+import dev.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
 import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -80,13 +84,23 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     private fun sendPasswordResetEmail() {
         sendEmailDisposable = viewModel.onCompleteSignUp()?.subscribe(::onSendEmailSuccess) {
             Timber.error(it, it::toString)
+            Toast.makeText(context, somethingWentWrong(it), Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun onSendEmailSuccess(resultEither: Either<Throwable, Unit>) {
-        resultEither.fold(ifLeft = {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+    private fun onSendEmailSuccess(
+            resultEither: Either<SendPasswordResetEmailInteractor.Exception, Unit>
+    ) {
+        resultEither.fold(ifLeft = { e ->
+            when (e) {
+                is SendPasswordResetEmailInteractor.Exception.NonExistentEmailException,
+                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                }
+                is SendPasswordResetEmailInteractor.Exception.UnknownException -> {
+                    Timber.error(e.origin, e::toString)
+                }
+            }.exhaust()
+            Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
         }, ifRight = {
             findNavController().popBackStack()
         })
