@@ -28,6 +28,7 @@ import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
+import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModel
@@ -171,10 +172,21 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         when (value) {
             is PublishingState.Success -> moveToChildDetailsFragment(value.child)
             is PublishingState.Ongoing -> setUserInteractionsEnabled(false)
-            is PublishingState.Failure, null -> {
+            is PublishingState.Failure -> {
+                if (value.error is PublishingState.Exception.NoSignedInUserException) {
+                    (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                } else {
+                    setUserInteractionsEnabled(true)
+                    setInternetDependantViewsEnabled(
+                            globalViewModel.internetConnectivity.value?.orNull() ?: false
+                    )
+                }
+            }
+            null -> {
                 setUserInteractionsEnabled(true)
-                setInternetDependantViewsEnabled(globalViewModel.internetConnectivity.value?.orNull()
-                        ?: false)
+                setInternetDependantViewsEnabled(
+                        globalViewModel.internetConnectivity.value?.orNull() ?: false
+                )
             }
         }
     }

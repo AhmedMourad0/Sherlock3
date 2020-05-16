@@ -16,10 +16,13 @@ import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
+import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
+import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.FindChildrenViewModel
@@ -31,6 +34,7 @@ import dev.ahmedmourad.sherlock.domain.constants.findEnum
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
+import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -225,11 +229,27 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     }
 
     private fun search() {
-        viewModel.toChildQuery()?.let {
-            findNavController().navigate(
-                    FindChildrenFragmentDirections
-                            .actionFindChildrenFragmentToChildrenSearchResultsFragment(it.bundle(ChildQuery.serializer()))
-            )
+        val signedInUserEither = globalViewModel.signedInUser.value
+        if (signedInUserEither != null) {
+            signedInUserEither.fold(ifLeft = {
+                Toast.makeText(appCtx, it.localizedMessage(), Toast.LENGTH_LONG).show()
+            }, ifRight = { user ->
+                if (user == null) {
+                    (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                } else {
+                    viewModel.toChildQuery()?.let {
+                        findNavController().navigate(
+                                FindChildrenFragmentDirections
+                                        .actionFindChildrenFragmentToChildrenSearchResultsFragment(
+                                                it.bundle(ChildQuery.serializer())
+                                        )
+                        )
+                    }
+                }
+            })
+        } else {
+            Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
+            (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
         }
     }
 
