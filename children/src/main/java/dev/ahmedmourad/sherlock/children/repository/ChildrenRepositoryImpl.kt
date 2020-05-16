@@ -67,6 +67,21 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 ChildrenRepository.PublishException.UnknownException(this.origin)
         }
 
+        fun ChildrenRepository.PublishException.toPublishStateException() = when (this) {
+
+            ChildrenRepository.PublishException.NoInternetConnectionException ->
+                PublishingState.Exception.NoInternetConnectionException
+
+            ChildrenRepository.PublishException.NoSignedInUserException ->
+                PublishingState.Exception.NoSignedInUserException
+
+            is ChildrenRepository.PublishException.InternalException ->
+                PublishingState.Exception.InternalException(this.origin)
+
+            is ChildrenRepository.PublishException.UnknownException ->
+                PublishingState.Exception.UnknownException(this.origin)
+        }
+
         val childId = ChildId(UUID.randomUUID().toString())
 
         return imageRepository.get().storeChildPicture(childId, child.picture)
@@ -88,12 +103,21 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     ChildrenRepository.PublishException.UnknownException(it).left()
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
-                        bus.get().childPublishingState.accept(PublishingState.Failure(child))
+                        bus.get().childPublishingState.accept(
+                                PublishingState.Failure(child, it.toPublishStateException())
+                        )
                     }, ifRight = {
                         bus.get().childPublishingState.accept(PublishingState.Success(it))
                     })
                 }.doOnSubscribe { bus.get().childPublishingState.accept(PublishingState.Ongoing(child)) }
-                .doOnError { bus.get().childPublishingState.accept(PublishingState.Failure(child)) }
+                .doOnError {
+                    bus.get().childPublishingState.accept(
+                            PublishingState.Failure(
+                                    child,
+                                    ChildrenRepository.PublishException.UnknownException(it).toPublishStateException()
+                            )
+                    )
+                }
     }
 
     override fun find(
