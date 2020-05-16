@@ -16,16 +16,21 @@ import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentCompleteSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
+import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.CompleteSignUpViewModel
+import dev.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
+import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -156,13 +161,33 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     private fun completeSignUp() {
         completeSignUpDisposable = viewModel.onCompleteSignUp()?.subscribe(::onCompleteSignUpSuccess) {
             Timber.error(it, it::toString)
+            Toast.makeText(appCtx, somethingWentWrong(it), Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun onCompleteSignUpSuccess(resultEither: Either<Throwable, SignedInUser>) {
+    private fun onCompleteSignUpSuccess(
+            resultEither: Either<CompleteSignUpInteractor.Exception, SignedInUser>
+    ) {
         resultEither.fold(ifLeft = {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+            when (it) {
+
+                CompleteSignUpInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                }
+
+                CompleteSignUpInteractor.Exception.NoSignedInUserException -> {
+                    Timber.error(message = it::toString)
+                }
+
+                is CompleteSignUpInteractor.Exception.InternalException -> {
+                    Timber.error(it.origin, it::toString)
+                }
+
+                is CompleteSignUpInteractor.Exception.UnknownException -> {
+                    Timber.error(it.origin, it::toString)
+                }
+
+            }.exhaust()
+            Toast.makeText(context, it.localizedMessage(), Toast.LENGTH_LONG).show()
         }, ifRight = ::identity)
     }
 

@@ -11,7 +11,33 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 interface SignInInteractor :
-        (UserCredentials) -> Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>>
+        (UserCredentials) -> Single<Either<SignInInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
+    sealed class Exception {
+        object AccountDoesNotExistOrHasBeenDisabledException : Exception()
+        object WrongPasswordException : Exception()
+        object NoInternetConnectionException : Exception()
+        data class InternalException(val origin: Throwable) : Exception()
+        data class UnknownException(val origin: Throwable) : Exception()
+    }
+}
+
+private fun AuthManager.SignInException.map() = when (this) {
+
+    AuthManager.SignInException.AccountDoesNotExistOrHasBeenDisabledException ->
+        SignInInteractor.Exception.AccountDoesNotExistOrHasBeenDisabledException
+
+    AuthManager.SignInException.WrongPasswordException ->
+        SignInInteractor.Exception.WrongPasswordException
+
+    AuthManager.SignInException.NoInternetConnectionException ->
+        SignInInteractor.Exception.NoInternetConnectionException
+
+    is AuthManager.SignInException.InternalException ->
+        SignInInteractor.Exception.InternalException(this.origin)
+
+    is AuthManager.SignInException.UnknownException ->
+        SignInInteractor.Exception.UnknownException(this.origin)
+}
 
 @Reusable
 internal class SignInInteractorImpl @Inject constructor(
@@ -19,7 +45,11 @@ internal class SignInInteractorImpl @Inject constructor(
 ) : SignInInteractor {
     override fun invoke(
             credentials: UserCredentials
-    ): Single<Either<Throwable, Either<IncompleteUser, SignedInUser>>> {
-        return authManager.get().signIn(credentials)
+    ): Single<Either<SignInInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
+        return authManager.get()
+                .signIn(credentials)
+                .map { either ->
+                    either.mapLeft(AuthManager.SignInException::map)
+                }
     }
 }

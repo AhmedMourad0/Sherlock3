@@ -16,11 +16,14 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
+import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -62,21 +65,31 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
         binding = FragmentChildDetailsBinding.bind(view)
         (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
 
+        //TODO: show loading, hide when date is received
         //TODO: notify the user when the data is updated or deleted
-        observe(viewModel.result) { resultEither ->
-            when (resultEither) {
-                is Either.Left -> {
-                    Toast.makeText(context, resultEither.a.localizedMessage, Toast.LENGTH_LONG).show()
-                    findNavController().popBackStack()
-                    Timber.error(resultEither.a, resultEither.a::toString)
-                }
-                is Either.Right -> {
-                    populateUi(resultEither.b)
-                }
-                null -> {
-                    //TODO: show loading, hide when date is received
-                }
-            }.exhaust()
+        observe(viewModel.result) { resultEither: Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?> ->
+            resultEither.fold(ifLeft = { e ->
+                    //TODO: show error image with retry option
+                when (e) {
+
+                    FindChildInteractor.Exception.NoInternetConnectionException -> { /* do nothing*/
+                    }
+
+                    FindChildInteractor.Exception.NoSignedInUserException -> {
+                        (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                    }
+
+                    is FindChildInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is FindChildInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
+            }, ifRight = this::populateUi)
         }
     }
 

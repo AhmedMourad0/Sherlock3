@@ -8,7 +8,6 @@ import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.FirebaseError
 import com.google.firebase.auth.*
 import com.twitter.sdk.android.core.*
 import dagger.Lazy
@@ -17,7 +16,7 @@ import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
 import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
-import dev.ahmedmourad.sherlock.domain.exceptions.*
+import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Url
@@ -75,85 +74,65 @@ internal class FirebaseAuthenticator @Inject constructor(
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun getCurrentUser(): Flowable<Either<Throwable, IncompleteUser>> {
-        return connectivityManager.get()
-                .observeInternetConnectivity()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        observeUserAuthState().map(Boolean::right)
-                    } else {
-                        Flowable.just(NoInternetConnectionException().left())
-                    }
-                }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
-                        Flowable.just(it.left())
-                    }, ifRight = { isUserSignedIn ->
-                        if (isUserSignedIn) {
-                            createGetCurrentUserFlowable()
-                        } else {
-                            Flowable.just(NoSignedInUserException().left())
-                        }
-                    })
-                }
+    override fun getCurrentUser(): Flowable<Option<IncompleteUser>> {
+        return createGetCurrentUser()
     }
 
-    private fun createGetCurrentUserFlowable(): Flowable<Either<Throwable, IncompleteUser>> {
-        return Flowable.just<Either<Throwable, IncompleteUser>>(
-                auth.get()
-                        .currentUser
-                        ?.toIncompleteUser()
-                        ?.rightIfNotNull { NoSignedInUserException() }
+    private fun createGetCurrentUser(): Flowable<Option<IncompleteUser>> {
+        return Flowable.just(
+                auth.get().currentUser?.toIncompleteUser().toOption()
         ).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
     override fun signIn(
             credentials: UserCredentials
-    ): Single<Either<Throwable, IncompleteUser>> {
+    ): Single<Either<Authenticator.SignInException, IncompleteUser>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInSingle(credentials.email, credentials.password)
-                    } else {
-                        Single.just(NoInternetConnectionException().left())
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignIn(credentials.email, credentials.password)
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
-    private fun createSignInSingle(
+    private fun createSignIn(
             email: Email,
             password: Password
-    ): Single<Either<Throwable, IncompleteUser>> {
+    ): Single<Either<Authenticator.SignInException, IncompleteUser>> {
 
-        return Single.create<Either<Throwable, IncompleteUser>> { emitter ->
+        return Single.create<Either<Authenticator.SignInException, IncompleteUser>> { emitter ->
 
             val successListener = { result: AuthResult ->
-
-                val user = result.user
-
-                if (user != null) {
-                    emitter.onSuccess(user.toIncompleteUser().right())
-                } else {
-                    emitter.onSuccess(NoSignedInUserException().left())
-                }
+                emitter.onSuccess(result.user!!.toIncompleteUser().right())
             }
 
             val failureListener = { throwable: Throwable ->
                 emitter.onSuccess(when (throwable) {
 
-                    is FirebaseAuthInvalidUserException -> InvalidUserException(
-                            "The user account corresponding to the email does not exist or has been disabled!"
-                    )
+                    is FirebaseAuthInvalidUserException ->
+                        Authenticator.SignInException.AccountDoesNotExistOrHasBeenDisabledException
 
-                    is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsException(
-                            "Wrong password!"
-                    )
+                    is FirebaseAuthInvalidCredentialsException ->
+                        Authenticator.SignInException.WrongPasswordException
 
-                    else -> throwable
+                    else -> Authenticator.SignInException.UnknownException(throwable)
 
                 }.left())
             }
@@ -165,64 +144,59 @@ internal class FirebaseAuthenticator @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun signUp(credentials: UserCredentials): Single<Either<Throwable, IncompleteUser>> {
+    override fun signUp(
+            credentials: UserCredentials
+    ): Single<Either<Authenticator.SignUpException, IncompleteUser>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignUpException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignUpSingle(credentials)
-                    } else {
-                        Single.just(NoInternetConnectionException().left())
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignUpSingle(credentials)
+                        } else {
+                            Single.just(
+                                    Authenticator.SignUpException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
+
                 }
     }
 
     private fun createSignUpSingle(
             credentials: UserCredentials
-    ): Single<Either<Throwable, IncompleteUser>> {
+    ): Single<Either<Authenticator.SignUpException, IncompleteUser>> {
 
-        return Single.create<Either<Throwable, IncompleteUser>> { emitter ->
+        return Single.create<Either<Authenticator.SignUpException, IncompleteUser>> { emitter ->
 
             val successListener = { result: AuthResult ->
-
-                val createdUser = result.user
-
-                if (createdUser != null) {
-                    emitter.onSuccess(createdUser.toIncompleteUser().right())
-                } else { // Wait, that's illegal
-                    emitter.onSuccess(NoSignedInUserException().left())
-                }
+                emitter.onSuccess(result.user!!.toIncompleteUser().right())
             }
 
             val failureListener = failureListener@{ throwable: Throwable ->
 
-                if (throwable is FirebaseAuthUserCollisionException &&
-                        throwable.errorCode == FirebaseError.ERROR_EMAIL_ALREADY_IN_USE.toString()) {
-                    emitter.onSuccess(AuthUserCollisionException(
-                            EmailAuthProvider.getCredential(credentials.email.value, credentials.password.value),
-                            throwable
-                    ).left())
-                    return@failureListener
-                    TODO()
-                }
-
                 emitter.onSuccess(when (throwable) {
 
-                    is FirebaseAuthWeakPasswordException -> WeakPasswordException(
-                            "The password is not strong enough!"
-                    )
+                    is FirebaseAuthWeakPasswordException ->
+                        Authenticator.SignUpException.WeakPasswordException
 
-                    is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsException(
-                            "The email address is malformed!"
-                    )
+                    is FirebaseAuthInvalidCredentialsException ->
+                        Authenticator.SignUpException.MalformedEmailException
 
-                    is FirebaseAuthUserCollisionException -> UserCollisionException(
-                            "There already exists an account with the given email address!"
-                    )
+                    is FirebaseAuthUserCollisionException ->
+                        Authenticator.SignUpException.EmailAlreadyInUseException(credentials.email)
 
-                    else -> throwable
+                    else -> Authenticator.SignUpException.UnknownException(throwable)
 
                 }.left())
             }
@@ -234,64 +208,135 @@ internal class FirebaseAuthenticator @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun signInWithGoogle(): Single<Either<Throwable, IncompleteUser>> {
+    override fun signInWithGoogle(): Single<Either<Authenticator.SignInWithGoogleException, IncompleteUser>> {
+
+        fun SignInWithCredentialException.map() = when (this) {
+
+            SignInWithCredentialException.NoResponseException ->
+                Authenticator.SignInWithGoogleException.NoResponseException
+
+            SignInWithCredentialException.AccountHasBeenDisabledException ->
+                Authenticator.SignInWithGoogleException.AccountHasBeenDisabledException
+
+            SignInWithCredentialException.MalformedOrExpiredCredentialException ->
+                Authenticator.SignInWithGoogleException.MalformedOrExpiredCredentialException
+
+            SignInWithCredentialException.EmailAlreadyInUseException ->
+                Authenticator.SignInWithGoogleException.EmailAlreadyInUseException
+
+            is SignInWithCredentialException.UnknownException ->
+                Authenticator.SignInWithGoogleException.UnknownException(this.origin, this.providerId)
+        }
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithGoogleException.UnknownException(
+                        this.origin,
+                        GoogleAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithGoogleSingle()
-                    } else {
-                        Single.just(NoInternetConnectionException().left())
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithGoogle()
+                                    .flatMap(this::getGoogleAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithGoogleException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
-    private fun createSignInWithGoogleSingle(): Single<Either<Throwable, IncompleteUser>> {
-
+    private fun createSignInWithGoogle(): Single<Option<GoogleSignInAccount>> {
         return Single.create<Option<GoogleSignInAccount>> { emitter ->
 
             emitter.setCancellable { AuthenticatorBus.signInCancellation.accept(Unit) }
 
             emitter.onSuccess(GoogleSignIn.getLastSignedInAccount(appCtx).toOption())
 
-        }.flatMap(this::getGoogleAuthCredentials)
-                .flatMap(this::signInWithCredentials)
-                .flatMap(this::recoverFromUserCollisionIfNecessary)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
     private fun getGoogleAuthCredentials(
             accountOptional: Option<GoogleSignInAccount>
-    ): Single<Either<Throwable, AuthCredential>> {
+    ): Single<Either<AuthActivityFactory.Exception, AuthCredential>> {
         return accountOptional.fold(ifEmpty = {
-            getAuthCredentials { it.signInWithGoogle() }
+            getAuthCredentials(AuthActivityFactory::signInWithGoogle)
         }, ifSome = { googleSignInAccount ->
             if (googleSignInAccount.isExpired) {
-                getAuthCredentials { it.signInWithGoogle() }
+                getAuthCredentials(AuthActivityFactory::signInWithGoogle)
             } else {
                 Single.just(GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null).right())
             }
         })
     }
 
-    override fun signInWithFacebook(): Single<Either<Throwable, IncompleteUser>> {
+    override fun signInWithFacebook(): Single<Either<Authenticator.SignInWithFacebookException, IncompleteUser>> {
+
+        fun SignInWithCredentialException.map() = when (this) {
+
+            SignInWithCredentialException.NoResponseException ->
+                Authenticator.SignInWithFacebookException.NoResponseException
+
+            SignInWithCredentialException.AccountHasBeenDisabledException ->
+                Authenticator.SignInWithFacebookException.AccountHasBeenDisabledException
+
+            SignInWithCredentialException.MalformedOrExpiredCredentialException ->
+                Authenticator.SignInWithFacebookException.MalformedOrExpiredCredentialException
+
+            SignInWithCredentialException.EmailAlreadyInUseException ->
+                Authenticator.SignInWithFacebookException.EmailAlreadyInUseException
+
+            is SignInWithCredentialException.UnknownException ->
+                Authenticator.SignInWithFacebookException.UnknownException(this.origin, this.providerId)
+        }
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithFacebookException.UnknownException(
+                        this.origin,
+                        FacebookAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithFacebookSingle()
-                    } else {
-                        Single.just(NoInternetConnectionException().left())
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithFacebookSingle()
+                                    .flatMap(this::getFacebookAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithFacebookException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
-    private fun createSignInWithFacebookSingle(): Single<Either<Throwable, IncompleteUser>> {
+    private fun createSignInWithFacebookSingle(): Single<Option<AccessToken>> {
 
         return Single.create<Option<AccessToken>> { emitter ->
 
@@ -299,63 +344,93 @@ internal class FirebaseAuthenticator @Inject constructor(
 
             emitter.onSuccess(AccessToken.getCurrentAccessToken().toOption())
 
-        }.flatMap(this::getFacebookAuthCredentials)
-                .flatMap(this::signInWithCredentials)
-                .flatMap(this::recoverFromUserCollisionIfNecessary)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
     private fun getFacebookAuthCredentials(
             accessTokenOptional: Option<AccessToken>
-    ): Single<Either<Throwable, AuthCredential>> {
+    ): Single<Either<AuthActivityFactory.Exception, AuthCredential>> {
         return accessTokenOptional.fold(ifEmpty = {
-            getAuthCredentials { it.signInWithFacebook() }
+            getAuthCredentials(AuthActivityFactory::signInWithFacebook)
         }, ifSome = { accessToken ->
             if (accessToken.isExpired) {
-                getAuthCredentials { it.signInWithFacebook() }
+                getAuthCredentials(AuthActivityFactory::signInWithFacebook)
             } else {
                 Single.just(FacebookAuthProvider.getCredential(accessToken.token).right())
             }
         })
     }
 
-    override fun signInWithTwitter(): Single<Either<Throwable, IncompleteUser>> {
+    override fun signInWithTwitter(): Single<Either<Authenticator.SignInWithTwitterException, IncompleteUser>> {
+
+        fun SignInWithCredentialException.map() = when (this) {
+
+            SignInWithCredentialException.NoResponseException ->
+                Authenticator.SignInWithTwitterException.NoResponseException
+
+            SignInWithCredentialException.AccountHasBeenDisabledException ->
+                Authenticator.SignInWithTwitterException.AccountHasBeenDisabledException
+
+            SignInWithCredentialException.MalformedOrExpiredCredentialException ->
+                Authenticator.SignInWithTwitterException.MalformedOrExpiredCredentialException
+
+            SignInWithCredentialException.EmailAlreadyInUseException ->
+                Authenticator.SignInWithTwitterException.EmailAlreadyInUseException
+
+            is SignInWithCredentialException.UnknownException ->
+                Authenticator.SignInWithTwitterException.UnknownException(this.origin, this.providerId)
+        }
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignInWithTwitterException.UnknownException(
+                        this.origin,
+                        TwitterAuthProvider.PROVIDER_ID
+                )
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected) {
-                        createSignInWithTwitterSingle()
-                    } else {
-                        Single.just(NoInternetConnectionException().left())
-                    }
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSignInWithTwitterSingle()
+                                    .flatMap(this::getTwitterAuthCredentials)
+                                    .flatMap(this::signInWithCredentials)
+                                    .map { userEither ->
+                                        userEither.mapLeft(SignInWithCredentialException::map)
+                                    }
+                        } else {
+                            Single.just(
+                                    Authenticator.SignInWithTwitterException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
-    private fun createSignInWithTwitterSingle(): Single<Either<Throwable, IncompleteUser>> {
+    private fun createSignInWithTwitterSingle(): Single<Option<TwitterAuthToken>> {
         return Single.create<Option<TwitterAuthToken>> { emitter ->
 
             emitter.setCancellable { AuthenticatorBus.signInCancellation.accept(Unit) }
 
             emitter.onSuccess(TwitterCore.getInstance().sessionManager.activeSession?.authToken.toOption())
 
-        }.flatMap(this::getTwitterAuthCredentials)
-                .flatMap(this::signInWithCredentials)
-                .flatMap(this::recoverFromUserCollisionIfNecessary)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
     private fun getTwitterAuthCredentials(
             authTokenOptional: Option<TwitterAuthToken>
-    ): Single<Either<Throwable, AuthCredential>> {
+    ): Single<Either<AuthActivityFactory.Exception, AuthCredential>> {
         return authTokenOptional.fold(ifEmpty = {
-            getAuthCredentials { it.signInWithTwitter() }
+            getAuthCredentials(AuthActivityFactory::signInWithTwitter)
         }, ifSome = { twitterAuthToken ->
             if (twitterAuthToken.isExpired) {
-                getAuthCredentials { it.signInWithTwitter() }
+                getAuthCredentials(AuthActivityFactory::signInWithTwitter)
             } else {
                 Single.just(TwitterAuthProvider.getCredential(
                         twitterAuthToken.token,
@@ -367,60 +442,48 @@ internal class FirebaseAuthenticator @Inject constructor(
 
     private fun getAuthCredentials(
             createIntent: (AuthActivityFactory) -> Intent
-    ): Single<Either<Throwable, AuthCredential>> {
+    ): Single<Either<AuthActivityFactory.Exception, AuthCredential>> {
         appCtx.startActivity(createIntent(AuthSignInActivity.Companion))
         return AuthenticatorBus.signInCompletion
                 .take(1)
-                .single(NoSignedInUserException().left())
+                .single(AuthActivityFactory.Exception.NoResponseException.left())
     }
 
     private fun signInWithCredentials(
-            credentialEither: Either<Throwable, AuthCredential>
-    ): Single<Either<Throwable, IncompleteUser>> {
+            credentialEither: Either<AuthActivityFactory.Exception, AuthCredential>
+    ): Single<Either<SignInWithCredentialException, IncompleteUser>> {
 
-        return Single.create<Either<Throwable, IncompleteUser>> { emitter ->
+        return Single.create<Either<SignInWithCredentialException, IncompleteUser>> { emitter ->
 
-            credentialEither.fold(ifLeft = {
+            credentialEither.fold(ifLeft = { e ->
 
-                Single.just(it.left())
+                Single.just(when (e) {
+                    AuthActivityFactory.Exception.NoResponseException ->
+                        SignInWithCredentialException.NoResponseException
+                    is AuthActivityFactory.Exception.UnknownException ->
+                        SignInWithCredentialException.UnknownException(e.origin, e.providerId)
+                }.left())
 
             }, ifRight = { credential ->
 
                 val successListener = { result: AuthResult ->
-
-                    val user = result.user
-
-                    if (user != null) {
-                        emitter.onSuccess(user.toIncompleteUser().right())
-                    } else {
-                        emitter.onSuccess(NoSignedInUserException().left())
-                    }
+                    emitter.onSuccess(result.user!!.toIncompleteUser().right())
                 }
 
                 val failureListener = failureListener@{ throwable: Throwable ->
 
-                    if (throwable is FirebaseAuthUserCollisionException &&
-                            throwable.errorCode == FirebaseError.ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL.toString()) {
-                        emitter.onSuccess(AuthUserCollisionException(credential, throwable).left())
-                        return@failureListener
-                        TODO()
-                    }
-
                     emitter.onSuccess(when (throwable) {
 
-                        is FirebaseAuthInvalidUserException -> InvalidUserException(
-                                "The user account you are trying to sign in to has been disabled!"
-                        )
+                        is FirebaseAuthInvalidUserException ->
+                            SignInWithCredentialException.AccountHasBeenDisabledException
 
-                        is FirebaseAuthInvalidCredentialsException -> InvalidCredentialsException(
-                                "The credential is malformed or has expired!"
-                        )
+                        is FirebaseAuthInvalidCredentialsException ->
+                            SignInWithCredentialException.MalformedOrExpiredCredentialException
 
-                        is FirebaseAuthUserCollisionException -> UserCollisionException(
-                                "There already exists an account with the email address asserted by the credential!"
-                        )
+                        is FirebaseAuthUserCollisionException ->
+                            SignInWithCredentialException.EmailAlreadyInUseException
 
-                        else -> throwable
+                        else -> SignInWithCredentialException.UnknownException(throwable, credential.signInMethod)
 
                     }.left())
                 }
@@ -475,22 +538,39 @@ internal class FirebaseAuthenticator @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun sendPasswordResetEmail(email: Email): Single<Either<Throwable, Unit>> {
+    override fun sendPasswordResetEmail(
+            email: Email
+    ): Single<Either<Authenticator.SendPasswordResetEmailException, Unit>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SendPasswordResetEmailException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        createSendPasswordResetEmailSingle(email)
-                    else
-                        Single.just(NoInternetConnectionException().left())
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            createSendPasswordResetEmailSingle(email)
+                        } else {
+                            Single.just(
+                                    Authenticator.SendPasswordResetEmailException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }
     }
 
-    private fun createSendPasswordResetEmailSingle(email: Email): Single<Either<Throwable, Unit>> {
+    private fun createSendPasswordResetEmailSingle(
+            email: Email
+    ): Single<Either<Authenticator.SendPasswordResetEmailException, Unit>> {
 
-        return Single.create<Either<Throwable, Unit>> { emitter ->
+        return Single.create<Either<Authenticator.SendPasswordResetEmailException, Unit>> { emitter ->
 
             val successListener = { _: Void ->
                 emitter.onSuccess(Unit.right())
@@ -499,11 +579,11 @@ internal class FirebaseAuthenticator @Inject constructor(
             val failureListener = { throwable: Throwable ->
                 emitter.onSuccess(when (throwable) {
 
-                    is FirebaseAuthInvalidUserException -> InvalidUserException(
-                            "There is no user corresponding to the given email address!"
-                    )
+                    is FirebaseAuthInvalidUserException ->
+                        Authenticator.SendPasswordResetEmailException.NonExistentEmailException(email)
 
-                    else -> throwable
+                    else ->
+                        Authenticator.SendPasswordResetEmailException.UnknownException(throwable)
 
                 }.left())
             }
@@ -515,17 +595,30 @@ internal class FirebaseAuthenticator @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun signOut(): Single<Either<Throwable, UserId?>> {
+    override fun signOut(): Single<Either<Authenticator.SignOutException, UserId?>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                Authenticator.SignOutException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        signOutFromFirebaseAuth()
-                                .andThen(signOutFromGoogle())
-                    else
-                        Single.just(NoInternetConnectionException().left())
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            signOutFromFirebaseAuth()
+                                    .andThen(signOutFromGoogle())
+                        } else {
+                            Single.just(
+                                    Authenticator.SignOutException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { either ->
                     either.fold(ifLeft = {
                         Single.just(it.left())
@@ -541,16 +634,16 @@ internal class FirebaseAuthenticator @Inject constructor(
         return Completable.fromAction(auth.get()::signOut)
     }
 
-    private fun signOutFromGoogle(): Single<Either<Throwable, Unit>> {
+    private fun signOutFromGoogle(): Single<Either<Authenticator.SignOutException, Unit>> {
 
-        return Single.create<Either<Throwable, Unit>> { emitter ->
+        return Single.create<Either<Authenticator.SignOutException, Unit>> { emitter ->
 
             val successListener = { _: Void? ->
                 emitter.onSuccess(Unit.right())
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(Authenticator.SignOutException.UnknownException(throwable).left())
             }
 
             GoogleSignIn.getClient(
@@ -574,12 +667,26 @@ internal class FirebaseAuthenticator @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }
+
+    sealed class SignInWithCredentialException {
+        object AccountHasBeenDisabledException : SignInWithCredentialException()
+        object MalformedOrExpiredCredentialException : SignInWithCredentialException()
+        object EmailAlreadyInUseException : SignInWithCredentialException()
+        object NoResponseException : SignInWithCredentialException()
+        data class UnknownException(val origin: Throwable, val providerId: String) : SignInWithCredentialException()
+    }
 }
 
 interface AuthActivityFactory {
+
     fun signInWithGoogle(): Intent
     fun signInWithFacebook(): Intent
     fun signInWithTwitter(): Intent
+
+    sealed class Exception {
+        object NoResponseException : Exception()
+        data class UnknownException(val origin: Throwable, val providerId: String) : Exception()
+    }
 }
 
 private fun FirebaseUser.toIncompleteUser(): IncompleteUser {

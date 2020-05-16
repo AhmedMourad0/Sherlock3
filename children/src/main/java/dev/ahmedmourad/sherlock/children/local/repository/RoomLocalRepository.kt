@@ -16,6 +16,8 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
+import timber.log.error
 import javax.inject.Inject
 
 @Reusable
@@ -25,16 +27,20 @@ internal class RoomLocalRepository @Inject constructor(
 
     override fun updateIfExists(
             child: RetrievedChild
-    ): Maybe<Either<Throwable, Tuple2<RetrievedChild, Weight?>>> {
+    ): Maybe<Either<LocalRepository.UpdateIfExistsException, Tuple2<RetrievedChild, Weight?>>> {
         return db.get()
                 .resultsDao()
                 .updateIfExists(child.toRoomChildEntity(null))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map(RoomChildEntity::toRetrievedChild)
+                .map { roomChild ->
+                    roomChild.toRetrievedChild().mapLeft {
+                        LocalRepository.UpdateIfExistsException.InternalException(it)
+                    }
+                }
     }
 
-    override fun findAllWithWeight(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+    override fun findAllWithWeight(): Flowable<Map<SimpleRetrievedChild, Weight>> {
         return db.get()
                 .resultsDao()
                 .findAllWithWeight()
@@ -42,16 +48,21 @@ internal class RoomLocalRepository @Inject constructor(
                 .observeOn(Schedulers.io())
                 .distinctUntilChanged()
                 .map { list ->
-                    list.mapNotNull(RoomChildEntity::simplify)
-                            .mapNotNull { tuple ->
-                                tuple.b?.let { tuple.a toT it }
-                            }.toMap().right()
+                    list.map(RoomChildEntity::simplify)
+                            .mapNotNull { either ->
+                                either.map { tuple ->
+                                    tuple?.b?.let { tuple.a toT it }
+                                }.getOrHandle {
+                                    Timber.error(it, it::toString)
+                                    null
+                                }
+                            }.toMap()
                 }
     }
 
     override fun replaceAll(
             results: Map<RetrievedChild, Weight>
-    ): Single<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+    ): Single<Map<SimpleRetrievedChild, Weight>> {
         return db.get()
                 .resultsDao()
                 .replaceAll(results.map { (it.key toT it.value).toRoomChildEntity() })
@@ -61,7 +72,7 @@ internal class RoomLocalRepository @Inject constructor(
                 .map { newValues ->
                     newValues.mapKeys { (child, _) ->
                         child.simplify()
-                    }.right()
+                    }
                 }
     }
 

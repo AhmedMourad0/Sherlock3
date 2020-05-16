@@ -4,19 +4,24 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import arrow.core.identity
+import arrow.core.Either
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
+import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
@@ -34,6 +39,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     @Inject
     internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignedInUserProfileViewModel>>
 
+    private val globalViewModel: GlobalViewModel by activityViewModels()
     private val viewModel: SignedInUserProfileViewModel by viewModels {
         SimpleSavedStateViewModelFactory(
                 this,
@@ -52,12 +58,27 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignedInUserProfileBinding.bind(view)
-        observe(viewModel.signedInUser) { resultEither ->
-            resultEither.fold(ifLeft = {
-                Timber.error(it, it::toString)
-                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+        observe(globalViewModel.signedInUser) { resultEither ->
+            resultEither.fold(ifLeft = { e ->
+                when (e) {
+
+                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                    }
+
+                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
+                        Timber.error(e.origin, e::toString)
+                    }
+
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
             }, ifRight = { userEither ->
-                userEither.fold(ifLeft = ::identity, ifRight = this::populateUi)
+                if (userEither is Either.Right) {
+                    populateUi(userEither.b)
+                }
             })
         }
     }

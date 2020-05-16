@@ -14,8 +14,6 @@ import dev.ahmedmourad.sherlock.auth.images.contract.Contract
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
@@ -30,7 +28,15 @@ internal class FirebaseStorageImageRepository @Inject constructor(
         @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
-    override fun storeUserPicture(id: UserId, picture: ByteArray?): Single<Either<Throwable, Url?>> {
+    override fun storeUserPicture(
+            id: UserId,
+            picture: ByteArray?
+    ): Single<Either<ImageRepository.StoreUserPictureException, Url?>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                ImageRepository.StoreUserPictureException.UnknownException(this.origin)
+        }
 
         if (picture == null) {
             return Single.just(null.right())
@@ -40,21 +46,30 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        userAuthStateObservable.observeUserAuthState()
-                                .map(Boolean::right)
-                                .firstOrError()
-                    else
-                        Single.just(NoInternetConnectionException().left())
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            userAuthStateObservable.observeUserAuthState()
+                                    .map(Boolean::right)
+                                    .firstOrError()
+                        } else {
+                            Single.just(
+                                    ImageRepository.StoreUserPictureException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            storePicture(Contract.Users.PATH, id, picture)
+                            createStoreUserPicture(Contract.Users.PATH, id, picture)
                         } else {
-                            Single.just(NoSignedInUserException().left())
+                            Single.just(
+                                    ImageRepository.StoreUserPictureException.NoSignedInUserException.left()
+                            )
                         }
                     })
                 }.flatMap { referenceEither ->
@@ -66,19 +81,25 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 }
     }
 
-    private fun storePicture(path: String, id: UserId, picture: ByteArray): Single<Either<Throwable, StorageReference>> {
+    private fun createStoreUserPicture(
+            path: String,
+            id: UserId,
+            picture: ByteArray
+    ): Single<Either<ImageRepository.StoreUserPictureException, StorageReference>> {
 
         val filePath = storage.get().getReference(path)
                 .child("${id.value}.${Contract.FILE_FORMAT}")
 
-        return Single.create<Either<Throwable, StorageReference>> { emitter ->
+        return Single.create<Either<ImageRepository.StoreUserPictureException, StorageReference>> { emitter ->
 
             val successListener = { _: UploadTask.TaskSnapshot ->
                 emitter.onSuccess(filePath.right())
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        ImageRepository.StoreUserPictureException.UnknownException(throwable).left()
+                )
             }
 
             filePath.putBytes(picture)
@@ -88,16 +109,26 @@ internal class FirebaseStorageImageRepository @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    private fun fetchPictureUrl(filePath: StorageReference): Single<Either<Throwable, Url>> {
+    private fun fetchPictureUrl(
+            filePath: StorageReference
+    ): Single<Either<ImageRepository.StoreUserPictureException, Url>> {
 
-        return Single.create<Either<Throwable, Url>> { emitter ->
+        return Single.create<Either<ImageRepository.StoreUserPictureException, Url>> { emitter ->
 
             val successListener = { uri: Uri ->
-                emitter.onSuccess(Url.of(uri.toString()).mapLeft { ModelCreationException(it.toString()) })
+                emitter.onSuccess(
+                        Url.of(uri.toString()).mapLeft {
+                            ImageRepository.StoreUserPictureException.InternalException(
+                                    ModelCreationException(it.toString())
+                            )
+                        }
+                )
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        ImageRepository.StoreUserPictureException.UnknownException(throwable).left()
+                )
             }
 
             filePath.downloadUrl

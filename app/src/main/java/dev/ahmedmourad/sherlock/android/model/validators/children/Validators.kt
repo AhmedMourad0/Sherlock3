@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
+import dev.ahmedmourad.sherlock.android.interpreters.model.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
-import dev.ahmedmourad.sherlock.android.model.localizedMessage
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin

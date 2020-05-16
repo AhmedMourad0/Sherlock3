@@ -3,9 +3,6 @@ package dev.ahmedmourad.sherlock.android.viewmodel.shared
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
@@ -28,8 +25,6 @@ internal class GlobalViewModel(
         observeInternetConnectivityInteractor.get()
                 .invoke()
                 .retry()
-                .map<Either<Throwable, Boolean>> { it.right() }
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }
@@ -37,8 +32,6 @@ internal class GlobalViewModel(
     val userAuthState by lazy {
         observeUserAuthStateInteractor.get()
                 .invoke()
-                .map<Either<Throwable, Boolean>> { it.right() }
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }
@@ -46,7 +39,6 @@ internal class GlobalViewModel(
     val signedInUser by lazy {
         observeSignedInUserInteractor.get()
                 .invoke()
-                .onErrorReturn { it.left() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }

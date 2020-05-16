@@ -18,14 +18,18 @@ import dev.ahmedmourad.sherlock.android.adapters.DynamicRecyclerAdapter
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildrenSearchResultsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.view.BackdropProvider
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
+import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -70,10 +74,22 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
 
         //TODO: either give the option to update or not, or onPublish new values to the bottom
         //TODO: paginate
+        //TODO: show loading, hide when date is received
         observe(viewModel.searchResults) { resultsEither ->
-            resultsEither.fold(ifLeft = {
-                Timber.error(it, it::toString)
-                Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+            resultsEither.fold(ifLeft = { e ->
+                //TODO: show error image with retry option when appropriate
+                @Suppress("IMPLICIT_CAST_TO_ANY")
+                when (e) {
+                    FindChildrenInteractor.Exception.NoInternetConnectionException -> { /* do nothing*/
+                    }
+                    FindChildrenInteractor.Exception.NoSignedInUserException -> {
+                        (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                    }
+                    is FindChildrenInteractor.Exception.UnknownException -> {
+                        Timber.error(message = e::toString)
+                    }
+                }.exhaust()
+                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
             }, ifRight = adapter::update)
         }
     }

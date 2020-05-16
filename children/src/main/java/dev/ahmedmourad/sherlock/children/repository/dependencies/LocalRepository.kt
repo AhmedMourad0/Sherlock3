@@ -14,13 +14,17 @@ internal interface LocalRepository {
 
     fun updateIfExists(
             child: RetrievedChild
-    ): Maybe<Either<Throwable, Tuple2<RetrievedChild, Weight?>>>
+    ): Maybe<Either<UpdateIfExistsException, Tuple2<RetrievedChild, Weight?>>>
 
-    fun findAllWithWeight(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
+    fun findAllWithWeight(): Flowable<Map<SimpleRetrievedChild, Weight>>
 
     fun replaceAll(
             results: Map<RetrievedChild, Weight>
-    ): Single<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
+    ): Single<Map<SimpleRetrievedChild, Weight>>
 
     fun clear(): Completable
+
+    sealed class UpdateIfExistsException {
+        data class InternalException(val origin: Throwable) : UpdateIfExistsException()
+    }
 }

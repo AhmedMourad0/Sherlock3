@@ -10,13 +10,32 @@ import io.reactivex.Flowable
 import javax.inject.Inject
 
 interface FindLastSearchResultsInteractor :
-        () -> Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>>
+        () -> Flowable<Either<FindLastSearchResultsInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
+    sealed class Exception {
+        data class InternalException(val origin: Throwable) : Exception()
+        data class UnknownException(val origin: Throwable) : Exception()
+    }
+}
+
+private fun ChildrenRepository.FindLastSearchResultsException.map() = when (this) {
+
+    is ChildrenRepository.FindLastSearchResultsException.InternalException ->
+        FindLastSearchResultsInteractor.Exception.InternalException(this.origin)
+
+    is ChildrenRepository.FindLastSearchResultsException.UnknownException ->
+        FindLastSearchResultsInteractor.Exception.UnknownException(this.origin)
+}
 
 @Reusable
 internal class FindLastSearchResultsInteractorImpl @Inject constructor(
         private val childrenRepository: Lazy<ChildrenRepository>
 ) : FindLastSearchResultsInteractor {
-    override fun invoke(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
-        return childrenRepository.get().findLastSearchResults()
+    override fun invoke():
+            Flowable<Either<FindLastSearchResultsInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
+        return childrenRepository.get()
+                .findLastSearchResults()
+                .map { either ->
+                    either.mapLeft(ChildrenRepository.FindLastSearchResultsException::map)
+                }
     }
 }

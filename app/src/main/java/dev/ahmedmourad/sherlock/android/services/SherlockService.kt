@@ -17,6 +17,7 @@ import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
 import dev.ahmedmourad.sherlock.android.utils.backgroundContextChannelId
@@ -86,14 +87,15 @@ internal class SherlockService : Service() {
                     stopSelf()
                 }.subscribe({ childEither ->
                     childEither.fold(ifLeft = {
-                        Timber.error(it, it::toString)
-                        showPublishingFailedNotification(it, appChild, true)
+                        showPublishingFailedNotification(it, appChild)
                     }, ifRight = { child ->
                         this.showPublishedSuccessfullyNotification(child.simplify())
                     })
                 }, {
-                    Timber.error(it, it::toString)
-                    showPublishingFailedNotification(it, appChild, true)
+                    showPublishingFailedNotification(
+                            AddChildInteractor.Exception.UnknownException(it),
+                            appChild
+                    )
                 })
     }
 
@@ -143,8 +145,10 @@ internal class SherlockService : Service() {
             getString(R.string.published_child_data_successfully_with_name, "${it.first.value} ${it.last.value}".trim())
         }) ?: getString(R.string.published_child_data_successfully)
 
-        val notification = NotificationCompat.Builder(applicationContext, backgroundContextChannelId(applicationContext))
-                .setContentTitle(getString(R.string.success))
+        val notification = NotificationCompat.Builder(
+                applicationContext,
+                backgroundContextChannelId(applicationContext)
+        ).setContentTitle(getString(R.string.success))
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_sherlock)
                 .setContentIntent(pendingIntent)
@@ -158,7 +162,12 @@ internal class SherlockService : Service() {
                 .notify(NOTIFICATION_ID_PUBLISHED_SUCCESSFULLY, notification)
     }
 
-    private fun showPublishingFailedNotification(throwable: Throwable, child: AppPublishedChild, isRecoverable: Boolean) {
+    private fun showPublishingFailedNotification(
+            e: AddChildInteractor.Exception,
+            child: AppPublishedChild
+    ) {
+
+        Timber.error(message = e::toString)
 
         val name = child.name
         val contentTitle = name?.fold(ifLeft = {
@@ -167,8 +176,10 @@ internal class SherlockService : Service() {
             getString(R.string.publishing_failed_with_name, "${it.first.value} ${it.last.value}".trim())
         }) ?: getString(R.string.publishing_failed)
 
-        val notificationBuilder = NotificationCompat.Builder(applicationContext, backgroundContextChannelId(applicationContext))
-                .setContentTitle(contentTitle)
+        val notificationBuilder = NotificationCompat.Builder(
+                applicationContext,
+                backgroundContextChannelId(applicationContext)
+        ).setContentTitle(contentTitle)
                 .setSmallIcon(R.drawable.ic_sherlock)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .setTicker(getString(R.string.publishing_failed))
@@ -176,34 +187,39 @@ internal class SherlockService : Service() {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
 
-        if (isRecoverable) {
-
-            val pendingIntent = createIntent(child).let {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    PendingIntent.getForegroundService(
-                            applicationContext,
-                            REQUEST_CODE_PUBLISHING_FAILED,
-                            it,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                } else {
-                    PendingIntent.getService(
-                            applicationContext,
-                            REQUEST_CODE_PUBLISHING_FAILED,
-                            it,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                }
+        val pendingIntent = createIntent(child).let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                PendingIntent.getForegroundService(
+                        applicationContext,
+                        REQUEST_CODE_PUBLISHING_FAILED,
+                        it,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            } else {
+                PendingIntent.getService(
+                        applicationContext,
+                        REQUEST_CODE_PUBLISHING_FAILED,
+                        it,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                )
             }
-
-            notificationBuilder.setContentText(getString(R.string.click_to_retry_with_reason, throwable.localizedMessage))
-                    .setContentIntent(pendingIntent)
-        } else {
-            notificationBuilder.setContentText(throwable.localizedMessage)
         }
 
-        checkNotNull(ContextCompat.getSystemService(applicationContext, NotificationManager::class.java))
-                .notify(NOTIFICATION_ID_PUBLISHING_FAILED, notificationBuilder.build())
+        notificationBuilder.setContentText(getString(
+                R.string.click_to_retry_with_reason,
+                e.localizedMessage()
+        )).setContentIntent(pendingIntent)
+
+        checkNotNull(ContextCompat.getSystemService(
+                applicationContext,
+                NotificationManager::class.java
+        )).notify(NOTIFICATION_ID_PUBLISHING_FAILED, notificationBuilder.build())
+
+        Toast.makeText(
+                applicationContext,
+                e.localizedMessage(),
+                Toast.LENGTH_LONG
+        ).show()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

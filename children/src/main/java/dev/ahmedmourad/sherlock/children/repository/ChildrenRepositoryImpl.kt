@@ -36,7 +36,51 @@ internal class ChildrenRepositoryImpl @Inject constructor(
 
     private val tester by lazy { SherlockTester(remoteRepository, localRepository) }
 
-    override fun publish(child: PublishedChild): Single<Either<Throwable, RetrievedChild>> {
+    override fun publish(
+            child: PublishedChild
+    ): Single<Either<ChildrenRepository.PublishException, RetrievedChild>> {
+
+        fun ImageRepository.StoreChildPictureException.map() = when (this) {
+
+            ImageRepository.StoreChildPictureException.NoInternetConnectionException ->
+                ChildrenRepository.PublishException.NoInternetConnectionException
+
+            ImageRepository.StoreChildPictureException.NoSignedInUserException ->
+                ChildrenRepository.PublishException.NoSignedInUserException
+
+            is ImageRepository.StoreChildPictureException.InternalException ->
+                ChildrenRepository.PublishException.InternalException(this.origin)
+
+            is ImageRepository.StoreChildPictureException.UnknownException ->
+                ChildrenRepository.PublishException.UnknownException(this.origin)
+        }
+
+        fun RemoteRepository.PublishException.map() = when (this) {
+
+            RemoteRepository.PublishException.NoInternetConnectionException ->
+                ChildrenRepository.PublishException.NoInternetConnectionException
+
+            RemoteRepository.PublishException.NoSignedInUserException ->
+                ChildrenRepository.PublishException.NoSignedInUserException
+
+            is RemoteRepository.PublishException.UnknownException ->
+                ChildrenRepository.PublishException.UnknownException(this.origin)
+        }
+
+        fun ChildrenRepository.PublishException.toPublishStateException() = when (this) {
+
+            ChildrenRepository.PublishException.NoInternetConnectionException ->
+                PublishingState.Exception.NoInternetConnectionException
+
+            ChildrenRepository.PublishException.NoSignedInUserException ->
+                PublishingState.Exception.NoSignedInUserException
+
+            is ChildrenRepository.PublishException.InternalException ->
+                PublishingState.Exception.InternalException(this.origin)
+
+            is ChildrenRepository.PublishException.UnknownException ->
+                PublishingState.Exception.UnknownException(this.origin)
+        }
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -45,30 +89,68 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 .observeOn(Schedulers.io())
                 .flatMap { urlEither ->
                     urlEither.fold(ifLeft = {
-                        Single.just(it.left())
+                        Single.just(it.map().left())
                     }, ifRight = {
-                        remoteRepository.get().publish(childId, child, it)
+                        remoteRepository.get()
+                                .publish(childId, child, it)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(Schedulers.io())
+                                .map { either ->
+                                    either.mapLeft(RemoteRepository.PublishException::map)
+                                }
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.PublishException.UnknownException(it).left()
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
-                        bus.get().childPublishingState.accept(PublishingState.Failure(child))
+                        bus.get().childPublishingState.accept(
+                                PublishingState.Failure(child, it.toPublishStateException())
+                        )
                     }, ifRight = {
                         bus.get().childPublishingState.accept(PublishingState.Success(it))
                     })
                 }.doOnSubscribe { bus.get().childPublishingState.accept(PublishingState.Ongoing(child)) }
-                .doOnError { bus.get().childPublishingState.accept(PublishingState.Failure(child)) }
+                .doOnError {
+                    bus.get().childPublishingState.accept(
+                            PublishingState.Failure(
+                                    child,
+                                    ChildrenRepository.PublishException.UnknownException(it).toPublishStateException()
+                            )
+                    )
+                }
     }
 
     override fun find(
             childId: ChildId
-    ): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
+    ): Flowable<Either<ChildrenRepository.FindException, Tuple2<RetrievedChild, Weight?>?>> {
+
+        fun RemoteRepository.FindException.map() = when (this) {
+
+            RemoteRepository.FindException.NoInternetConnectionException ->
+                ChildrenRepository.FindException.NoInternetConnectionException
+
+            RemoteRepository.FindException.NoSignedInUserException ->
+                ChildrenRepository.FindException.NoSignedInUserException
+
+            is RemoteRepository.FindException.InternalException ->
+                ChildrenRepository.FindException.InternalException(this.origin)
+
+            is RemoteRepository.FindException.UnknownException ->
+                ChildrenRepository.FindException.UnknownException(this.origin)
+        }
+
+        fun LocalRepository.UpdateIfExistsException.map() = when (this) {
+            is LocalRepository.UpdateIfExistsException.InternalException ->
+                ChildrenRepository.FindException.InternalException(this.origin)
+        }
+
         return remoteRepository.get()
                 .find(childId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { childEither ->
                     childEither.fold(ifLeft = {
-                        Flowable.just(it.left())
+                        Flowable.just(it.map().left())
                     }, ifRight = { child ->
                         if (child == null) {
                             Flowable.just(null.right())
@@ -77,10 +159,14 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     .updateIfExists(child)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
-                                    .toSingle((child toT null).right<Tuple2<RetrievedChild, Weight?>>())
+                                    .map { either ->
+                                        either.mapLeft(LocalRepository.UpdateIfExistsException::map)
+                                    }.toSingle((child toT null).right<Tuple2<RetrievedChild, Weight?>>())
                                     .toFlowable()
                         }
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.FindException.UnknownException(it).left()
                 }.doOnSubscribe { bus.get().childFindingState.accept(BackgroundState.ONGOING) }
                 .doOnNext { bus.get().childFindingState.accept(BackgroundState.SUCCESS) }
                 .doOnError { bus.get().childFindingState.accept(BackgroundState.FAILURE) }
@@ -89,14 +175,27 @@ internal class ChildrenRepositoryImpl @Inject constructor(
     override fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+    ): Flowable<Either<ChildrenRepository.FindAllException, Map<SimpleRetrievedChild, Weight>>> {
+
+        fun RemoteRepository.FindAllException.map() = when (this) {
+
+            RemoteRepository.FindAllException.NoInternetConnectionException ->
+                ChildrenRepository.FindAllException.NoInternetConnectionException
+
+            RemoteRepository.FindAllException.NoSignedInUserException ->
+                ChildrenRepository.FindAllException.NoSignedInUserException
+
+            is RemoteRepository.FindAllException.UnknownException ->
+                ChildrenRepository.FindAllException.UnknownException(this.origin)
+        }
+
         return remoteRepository.get()
                 .findAll(query, filter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { resultsEither ->
                     resultsEither.fold(ifLeft = {
-                        Flowable.just(it.left())
+                        Flowable.just(it.map().left())
                     }, ifRight = { results ->
                         localRepository.get()
                                 .replaceAll(results)
@@ -107,16 +206,25 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                             .right()
                                 }.toFlowable()
                     })
+                }.onErrorReturn {
+                    ChildrenRepository.FindAllException.UnknownException(it).left()
                 }.doOnSubscribe { bus.get().childrenFindingState.accept(BackgroundState.ONGOING) }
                 .doOnNext { bus.get().childrenFindingState.accept(BackgroundState.SUCCESS) }
                 .doOnError { bus.get().childrenFindingState.accept(BackgroundState.FAILURE) }
     }
 
-    override fun findLastSearchResults(): Flowable<Either<Throwable, Map<SimpleRetrievedChild, Weight>>> {
+    override fun findLastSearchResults():
+            Flowable<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
+
         return localRepository.get()
                 .findAllWithWeight()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
+                .map<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
+                    it.right()
+                }.onErrorReturn {
+                    ChildrenRepository.FindLastSearchResultsException.UnknownException(it).left()
+                }
     }
 
     override fun test(): ChildrenRepository.Tester {
@@ -127,19 +235,32 @@ internal class ChildrenRepositoryImpl @Inject constructor(
             private val remoteRepository: Lazy<RemoteRepository>,
             private val localRepository: Lazy<LocalRepository>
     ) : ChildrenRepository.Tester {
-        override fun clear(): Single<Either<Throwable, Unit>> {
+        override fun clear(): Single<Either<ChildrenRepository.Tester.ClearException, Unit>> {
+
+            fun RemoteRepository.ClearException.map() = when (this) {
+
+                RemoteRepository.ClearException.NoInternetConnectionException ->
+                    ChildrenRepository.Tester.ClearException.NoInternetConnectionException
+
+                RemoteRepository.ClearException.NoSignedInUserException ->
+                    ChildrenRepository.Tester.ClearException.NoSignedInUserException
+
+                is RemoteRepository.ClearException.UnknownException ->
+                    ChildrenRepository.Tester.ClearException.UnknownException(this.origin)
+            }
+
             return remoteRepository.get()
                     .clear()
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
                     .flatMap { either ->
                         either.fold(ifLeft = {
-                            Single.just(it.left())
+                            Single.just(it.map().left())
                         }, ifRight = {
-                            localRepository.get()
-                                    .clear()
-                                    .andThen(Single.just(Unit.right()))
+                            localRepository.get().clear().toSingleDefault(Unit.right())
                         })
+                    }.onErrorReturn {
+                        ChildrenRepository.Tester.ClearException.UnknownException(it).left()
                     }
         }
     }

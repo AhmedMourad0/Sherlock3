@@ -14,8 +14,6 @@ import dev.ahmedmourad.sherlock.children.images.contract.Contract
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoInternetConnectionException
-import dev.ahmedmourad.sherlock.domain.exceptions.NoSignedInUserException
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
@@ -30,7 +28,20 @@ internal class FirebaseStorageImageRepository @Inject constructor(
         @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
-    override fun storeChildPicture(id: ChildId, picture: ByteArray?): Single<Either<Throwable, Url?>> {
+    override fun storeChildPicture(
+            id: ChildId,
+            picture: ByteArray?
+    ): Single<Either<ImageRepository.StoreChildPictureException, Url?>> {
+
+        fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
+            is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                ImageRepository.StoreChildPictureException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                ImageRepository.StoreChildPictureException.UnknownException(this.origin)
+        }
 
         if (picture == null) {
             return Single.just(null.right())
@@ -40,11 +51,20 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnected ->
-                    if (isInternetConnected)
-                        authManager.get().observeUserAuthState().map(Boolean::right).firstOrError()
-                    else
-                        Single.just(NoInternetConnectionException().left())
+                .flatMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authManager.get().observeUserAuthState().map { either ->
+                                either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
+                            }.firstOrError()
+                        } else {
+                            Single.just(
+                                    ImageRepository.StoreChildPictureException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
                 }.flatMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Single.just(it.left())
@@ -52,7 +72,9 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                         if (isUserSignedIn) {
                             storePicture(Contract.Children.PATH, id, picture)
                         } else {
-                            Single.just(NoSignedInUserException().left())
+                            Single.just(
+                                    ImageRepository.StoreChildPictureException.NoSignedInUserException.left()
+                            )
                         }
                     })
                 }.flatMap { filePath ->
@@ -64,19 +86,25 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                 }
     }
 
-    private fun storePicture(path: String, id: ChildId, picture: ByteArray): Single<Either<Throwable, StorageReference>> {
+    private fun storePicture(
+            path: String,
+            id: ChildId,
+            picture: ByteArray
+    ): Single<Either<ImageRepository.StoreChildPictureException, StorageReference>> {
 
         val filePath = storage.get().getReference(path)
                 .child("${id.value}.${Contract.FILE_FORMAT}")
 
-        return Single.create<Either<Throwable, StorageReference>> { emitter ->
+        return Single.create<Either<ImageRepository.StoreChildPictureException, StorageReference>> { emitter ->
 
             val successListener = { _: UploadTask.TaskSnapshot ->
                 emitter.onSuccess(filePath.right())
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        ImageRepository.StoreChildPictureException.UnknownException(throwable).left()
+                )
             }
 
             filePath.putBytes(picture)
@@ -86,16 +114,24 @@ internal class FirebaseStorageImageRepository @Inject constructor(
         }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    private fun fetchPictureUrl(filePath: StorageReference): Single<Either<Throwable, Url>> {
+    private fun fetchPictureUrl(
+            filePath: StorageReference
+    ): Single<Either<ImageRepository.StoreChildPictureException, Url>> {
 
-        return Single.create<Either<Throwable, Url>> { emitter ->
+        return Single.create<Either<ImageRepository.StoreChildPictureException, Url>> { emitter ->
 
             val successListener = { uri: Uri ->
-                emitter.onSuccess(Url.of(uri.toString()).mapLeft { ModelCreationException(it.toString()) })
+                emitter.onSuccess(Url.of(uri.toString()).mapLeft {
+                    ImageRepository.StoreChildPictureException.InternalException(
+                            ModelCreationException(it.toString())
+                    )
+                })
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(throwable.left())
+                emitter.onSuccess(
+                        ImageRepository.StoreChildPictureException.UnknownException(throwable).left()
+                )
             }
 
             filePath.downloadUrl

@@ -12,13 +12,41 @@ import io.reactivex.Flowable
 import javax.inject.Inject
 
 interface FindChildInteractor :
-        (ChildId) -> Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>>
+        (ChildId) -> Flowable<Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?>> {
+    sealed class Exception {
+        object NoInternetConnectionException : Exception()
+        object NoSignedInUserException : Exception()
+        data class InternalException(val origin: Throwable) : Exception()
+        data class UnknownException(val origin: Throwable) : Exception()
+    }
+}
+
+private fun ChildrenRepository.FindException.map() = when (this) {
+
+    ChildrenRepository.FindException.NoInternetConnectionException ->
+        FindChildInteractor.Exception.NoInternetConnectionException
+
+    ChildrenRepository.FindException.NoSignedInUserException ->
+        FindChildInteractor.Exception.NoSignedInUserException
+
+    is ChildrenRepository.FindException.InternalException ->
+        FindChildInteractor.Exception.InternalException(this.origin)
+
+    is ChildrenRepository.FindException.UnknownException ->
+        FindChildInteractor.Exception.UnknownException(this.origin)
+}
 
 @Reusable
 internal class FindChildInteractorImpl @Inject constructor(
         private val childrenRepository: Lazy<ChildrenRepository>
 ) : FindChildInteractor {
-    override fun invoke(childId: ChildId): Flowable<Either<Throwable, Tuple2<RetrievedChild, Weight?>?>> {
-        return childrenRepository.get().find(childId)
+    override fun invoke(
+            childId: ChildId
+    ): Flowable<Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?>> {
+        return childrenRepository.get()
+                .find(childId)
+                .map { either ->
+                    either.mapLeft(ChildrenRepository.FindException::map)
+                }
     }
 }
