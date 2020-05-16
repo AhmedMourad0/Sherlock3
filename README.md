@@ -32,7 +32,8 @@ lost/kidnapped children.
 - Backdrop.
 - Timber.
 - Home screen widgets.
-- Bundlizer and NoCopy
+- ADT driven error handling.
+- Bundlizer and NoCopy.
 
 ## Whiteboard:
 
@@ -41,8 +42,6 @@ lost/kidnapped children.
 - Testing.
 - Firebase Crashlytics.
 - Package per feature?
-- Replace Throwable for interactors failures with ADTs for better error
-  handling and documentation.
 - Anonymous authentication as a firestore fallback strategy when the
   user is signed but not with Firebase.
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
