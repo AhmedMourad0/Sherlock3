@@ -43,7 +43,7 @@ lost/kidnapped children.
 - Firebase Crashlytics.
 - Package per feature?
 - Anonymous authentication as a firestore fallback strategy when the
-  user is signed but not with Firebase.
+  user is signed in but not with Firebase.
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
   data modules.
 - Replace RxJava with Kotlin Coroutines and Flow.
