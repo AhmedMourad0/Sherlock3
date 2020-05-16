@@ -19,7 +19,7 @@ import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
-import dev.ahmedmourad.sherlock.android.view.BackdropProvider
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
@@ -76,7 +76,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                     }
 
                     FindChildInteractor.Exception.NoSignedInUserException -> {
-                        (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                        (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                     }
 
                     is FindChildInteractor.Exception.InternalException -> {

@@ -28,7 +28,7 @@ import dev.ahmedmourad.sherlock.android.utils.clearBackStack
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
 import dev.ahmedmourad.sherlock.android.utils.observe
-import dev.ahmedmourad.sherlock.android.view.BackdropProvider
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.view.fragments.auth.CompleteSignUpFragmentArgs
 import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
@@ -42,7 +42,7 @@ import timber.log.error
 import javax.inject.Inject
 import javax.inject.Provider
 
-internal class MainActivity : AppCompatActivity(), BackdropProvider {
+internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
     @Inject
     lateinit var viewModelFactory: Provider<AssistedViewModelFactory<MainActivityViewModel>>

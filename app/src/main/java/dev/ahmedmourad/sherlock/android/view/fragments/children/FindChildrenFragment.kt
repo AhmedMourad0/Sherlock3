@@ -22,7 +22,7 @@ import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
 import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
-import dev.ahmedmourad.sherlock.android.view.BackdropProvider
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.FindChildrenViewModel
@@ -235,7 +235,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 Toast.makeText(appCtx, it.localizedMessage(), Toast.LENGTH_LONG).show()
             }, ifRight = { user ->
                 if (user == null) {
-                    (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                 } else {
                     viewModel.toChildQuery()?.let {
                         findNavController().navigate(
@@ -249,7 +249,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             })
         } else {
             Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
-            (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+            (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
         }
     }
 

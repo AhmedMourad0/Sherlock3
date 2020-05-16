@@ -1,5 +1,5 @@
 package dev.ahmedmourad.sherlock.android.view
 
-internal interface BackdropProvider {
+internal interface BackdropActivity {
     fun setInPrimaryContentMode(newValue: Boolean)
 }

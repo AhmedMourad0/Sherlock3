@@ -20,7 +20,7 @@ import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.observe
-import dev.ahmedmourad.sherlock.android.view.BackdropProvider
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSearchResultsViewModel
@@ -83,7 +83,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
                     FindChildrenInteractor.Exception.NoInternetConnectionException -> { /* do nothing*/
                     }
                     FindChildrenInteractor.Exception.NoSignedInUserException -> {
-                        (requireActivity() as BackdropProvider).setInPrimaryContentMode(false)
+                        (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                     }
                     is FindChildrenInteractor.Exception.UnknownException -> {
                         Timber.error(message = e::toString)
