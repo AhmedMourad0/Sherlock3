@@ -78,7 +78,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Single<Either<RemoteRepository.StoreSignUpUserException, SignedInUser>>>(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
@@ -144,7 +144,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindSignedInUserException, SignedInUser?>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
@@ -221,7 +221,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Single<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>>>(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {

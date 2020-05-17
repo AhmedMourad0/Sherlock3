@@ -89,7 +89,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                             )
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Single<Either<RemoteRepository.PublishException, RetrievedChild>>>(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
@@ -167,7 +167,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindException, RetrievedChild?>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
@@ -250,7 +250,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
@@ -332,7 +332,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Single<Either<RemoteRepository.ClearException, Unit>>>(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = {
                         if (it) {

@@ -61,7 +61,7 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                         }
                     })
                 }.flatMap { isUserSignedInEither ->
-                    isUserSignedInEither.fold(ifLeft = {
+                    isUserSignedInEither.fold<Single<Either<ImageRepository.StoreUserPictureException, StorageReference>>>(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
