@@ -42,6 +42,7 @@ lost/kidnapped children.
 - Testing.
 - Firebase Crashlytics.
 - Package per feature?
+- Use AndroidX's App Startup
 - Anonymous authentication as a firestore fallback strategy when the
   user is signed in but not with Firebase.
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
