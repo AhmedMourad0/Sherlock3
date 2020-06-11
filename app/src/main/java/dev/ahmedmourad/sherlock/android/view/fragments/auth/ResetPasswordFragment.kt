@@ -63,8 +63,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
     //This's temporary and is here for debugging purposes
     private fun addErrorObservers() {
-        observe(viewModel.emailError
-        ) { msg ->
+        observe(viewModel.emailError) { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                 viewModel.onEmailErrorDismissed()
@@ -94,7 +93,8 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         resultEither.fold(ifLeft = { e ->
             when (e) {
                 is SendPasswordResetEmailInteractor.Exception.NonExistentEmailException,
-                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
+                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> {
+                    /* do nothing */
                 }
                 is SendPasswordResetEmailInteractor.Exception.UnknownException -> {
                     Timber.error(e.origin, e::toString)

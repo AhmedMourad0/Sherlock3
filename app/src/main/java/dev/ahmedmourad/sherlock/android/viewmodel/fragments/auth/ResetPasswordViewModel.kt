@@ -64,7 +64,7 @@ internal class ResetPasswordViewModel(
         private const val KEY_EMAIL =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
         private const val KEY_ERROR_EMAIL =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_EMAIL"
 
         fun defaultArgs(email: String?): Bundle? {
             return email?.let { e ->
