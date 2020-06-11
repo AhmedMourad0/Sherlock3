@@ -6,6 +6,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         jcenter()
     }
     dependencies {
@@ -15,7 +16,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.4.2.0"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
-        classpath "dev.ahmedmourad.nocopy:nocopy-gradle-plugin:0.1.0"
+        classpath "dev.ahmedmourad.nocopy:nocopy-gradle-plugin:0.2.0-SNAPSHOT"
     }
 }
 
