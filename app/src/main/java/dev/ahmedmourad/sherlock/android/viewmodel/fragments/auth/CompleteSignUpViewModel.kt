@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
+import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
 import dagger.Lazy
@@ -24,6 +25,8 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFacto
 import dev.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
+import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,8 +49,8 @@ internal class CompleteSignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
     val phoneNumber: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER, null) }
-    val picturePath: LiveData<ImagePicker.PicturePath?>
-            by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE_PATH, null) }
+    val picture: LiveData<ImagePicker.PicturePath?>
+            by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE, null) }
 
     val emailError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_EMAIL, null) }
@@ -55,8 +58,8 @@ internal class CompleteSignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_DISPLAY_NAME, null) }
     val phoneNumberError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PHONE_NUMBER, null) }
-    val picturePathError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE_PATH, null) }
+    val pictureError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE, null) }
     val userError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
 
@@ -77,7 +80,7 @@ internal class CompleteSignUpViewModel(
     }
 
     fun onPicturePathChange(newValue: ImagePicker.PicturePath?) {
-        savedStateHandle.set(KEY_PICTURE_PATH, newValue)
+        savedStateHandle.set(KEY_PICTURE, newValue)
     }
 
     fun onEmailErrorDismissed() {
@@ -93,7 +96,7 @@ internal class CompleteSignUpViewModel(
     }
 
     fun onPicturePathErrorDismissed() {
-        savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
+        savedStateHandle.set(KEY_ERROR_PICTURE, null)
     }
 
     fun onUserErrorDismissed() {
@@ -111,33 +114,37 @@ internal class CompleteSignUpViewModel(
     private fun toCompletedUser(): AppCompletedUser? {
         return Either.fx<Unit, AppCompletedUser> {
 
-            val (email) = validateEmail(email.value).mapLeft {
+            val email = !validateEmail(email.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_EMAIL, it)
             }
 
-            val (displayName) = validateDisplayName(displayName.value).mapLeft {
+            val displayName = !validateDisplayName(displayName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, it)
             }
 
-            val (phoneNumber) = validatePhoneNumber(
+            val phoneNumber = !validatePhoneNumber(
                     phoneNumberCountryCode.value,
                     phoneNumber.value
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
             }
 
-            val (picturePath) = picturePath.value?.let { pp ->
-                validatePicturePath(pp.value).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
-                }
-            } ?: null.right()
+            val picture = picture.value?.let { pic ->
+                Url.of(pic.value).fold(ifLeft = {
+                    validatePicturePath(pic.value).bimap(leftOperation = {
+                        savedStateHandle.set(KEY_ERROR_PICTURE, it)
+                    }, rightOperation = PicturePath::right)
+                }, ifRight = {
+                    it.left().right()
+                })
+            }?.bind()
 
             validateAppCompletedUser(
                     id,
                     email,
                     displayName,
                     phoneNumber,
-                    picturePath
+                    picture
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_USER, it)
             }.bind()
@@ -172,8 +179,8 @@ internal class CompleteSignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER_COUNTRY_CODE"
         private const val KEY_PHONE_NUMBER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER"
-        private const val KEY_PICTURE_PATH =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PICTURE_PATH"
+        private const val KEY_PICTURE =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PICTURE"
 
         private const val KEY_ERROR_EMAIL =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_EMAIL"
@@ -181,8 +188,8 @@ internal class CompleteSignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_DISPLAY_NAME"
         private const val KEY_ERROR_PHONE_NUMBER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PHONE_NUMBER"
-        private const val KEY_ERROR_PICTURE_PATH =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PICTURE_PATH"
+        private const val KEY_ERROR_PICTURE =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PICTURE"
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
 
@@ -194,7 +201,7 @@ internal class CompleteSignUpViewModel(
                 putString(KEY_PHONE_NUMBER_COUNTRY_CODE, incompleteUser.phoneNumber?.countryCode)
                 putString(KEY_PHONE_NUMBER, incompleteUser.phoneNumber?.number)
                 putParcelable(
-                        KEY_PICTURE_PATH,
+                        KEY_PICTURE,
                         incompleteUser.pictureUrl?.let(ImagePicker.PicturePath.Companion::from)
                 )
             }

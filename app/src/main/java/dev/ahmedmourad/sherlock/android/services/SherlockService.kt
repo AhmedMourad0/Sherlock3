@@ -78,9 +78,7 @@ internal class SherlockService : Service() {
         addChildDisposable = addChildInteractor.get().invoke(child)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess {
-                    Toast.makeText(applicationContext, getString(R.string.published_successfully), Toast.LENGTH_LONG).show()
-                }.doOnError {
+                .doOnError {
                     Toast.makeText(applicationContext, it.localizedMessage, Toast.LENGTH_LONG).show()
                 }.doFinally {
                     stopForeground(true)
@@ -89,7 +87,7 @@ internal class SherlockService : Service() {
                     childEither.fold(ifLeft = {
                         showPublishingFailedNotification(it, appChild)
                     }, ifRight = { child ->
-                        this.showPublishedSuccessfullyNotification(child.simplify())
+                        showPublishedSuccessfullyNotification(child.simplify())
                     })
                 }, {
                     showPublishingFailedNotification(
@@ -158,8 +156,17 @@ internal class SherlockService : Service() {
                 .setColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
                 .build()
 
-        checkNotNull(ContextCompat.getSystemService(applicationContext, NotificationManager::class.java))
-                .notify(NOTIFICATION_ID_PUBLISHED_SUCCESSFULLY, notification)
+        checkNotNull(ContextCompat.getSystemService(
+                applicationContext,
+                NotificationManager::class.java
+        )).notify(NOTIFICATION_ID_PUBLISHED_SUCCESSFULLY, notification)
+
+
+        Toast.makeText(
+                applicationContext,
+                getString(R.string.published_successfully),
+                Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun showPublishingFailedNotification(

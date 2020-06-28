@@ -295,9 +295,12 @@ internal class AuthManagerImpl @Inject constructor(
                 AuthManager.CompleteSignUpException.UnknownException(this.origin)
         }
 
-        return imageRepository.get()
-                .storeUserPicture(completedUser.id, completedUser.picture)
-                .subscribeOn(Schedulers.io())
+        return (completedUser.picture ?: null.left()).fold(ifLeft = {
+            Single.just(it.right())
+        }, ifRight = {
+            imageRepository.get()
+                    .storeUserPicture(completedUser.id, it)
+        }).subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap { urlEither ->
                     urlEither.fold(ifLeft = {

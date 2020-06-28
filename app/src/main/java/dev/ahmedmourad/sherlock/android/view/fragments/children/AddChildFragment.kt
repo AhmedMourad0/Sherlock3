@@ -173,10 +173,10 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             is PublishingState.Success -> moveToChildDetailsFragment(value.child)
             is PublishingState.Ongoing -> setUserInteractionsEnabled(false)
             is PublishingState.Failure -> {
+                setUserInteractionsEnabled(true)
                 if (value.error is PublishingState.Exception.NoSignedInUserException) {
                     (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                 } else {
-                    setUserInteractionsEnabled(true)
                     setInternetDependantViewsEnabled(
                             globalViewModel.internetConnectivity.value?.orNull() ?: false
                     )

@@ -11,6 +11,7 @@ import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
+import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import splitties.init.appCtx
 
@@ -72,7 +73,7 @@ internal fun validateAppCompletedUser(
         email: Email,
         displayName: DisplayName,
         phoneNumber: PhoneNumber,
-        picturePath: PicturePath?
+        picturePath: Either<Url, PicturePath>?
 ): Either<String, AppCompletedUser> {
     return AppCompletedUser.of(
             id,

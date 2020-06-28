@@ -87,7 +87,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         observeAll(viewModel.emailError,
                 viewModel.displayNameError,
                 viewModel.phoneNumberError,
-                viewModel.picturePathError,
+                viewModel.pictureError,
                 viewModel.userError
         ) { msg ->
             msg?.let {
@@ -134,9 +134,9 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                 viewModel.onPhoneNumberChange(text.toString())
             }
 
-            if (viewModel.picturePath.value != null) {
+            if (viewModel.picture.value != null) {
                 imageLoader.get().load(
-                        viewModel.picturePath.value?.value,
+                        viewModel.picture.value?.value,
                         b.pictureImageView,
                         R.drawable.placeholder,
                         R.drawable.placeholder
@@ -146,7 +146,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) { picturePath ->
+        observe(viewModel.picture) { picturePath ->
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
