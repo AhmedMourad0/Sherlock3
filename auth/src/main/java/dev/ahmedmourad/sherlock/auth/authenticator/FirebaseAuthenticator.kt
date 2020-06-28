@@ -63,6 +63,8 @@ internal class FirebaseAuthenticator @Inject constructor(
     private fun createObserveUserAuthState(): Flowable<Boolean> {
         return Flowable.create<Boolean>({ emitter ->
 
+            emitter.onNext(auth.get().currentUser != null)
+
             val authStateListener = { firebaseAuth: FirebaseAuth ->
                 emitter.onNext(firebaseAuth.currentUser != null)
             }
@@ -694,6 +696,7 @@ private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
     val id = UserId(this.uid)
 
     val email = this.email
+            ?.takeUnless { it.isBlank() }
             ?.let(Email.Companion::of)
             ?.getOrHandle {
                 Timber.error(ModelCreationException(it.toString()), it::toString)
@@ -701,6 +704,7 @@ private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
             }
 
     val displayName = this.displayName
+            ?.takeUnless { it.isBlank() }
             ?.let(DisplayName.Companion::of)
             ?.getOrHandle {
                 Timber.error(ModelCreationException(it.toString()), it::toString)
@@ -708,6 +712,7 @@ private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
             }
 
     val phoneNumber = this.phoneNumber
+            ?.takeUnless { it.isBlank() }
             ?.let { PhoneNumber.of(it) }
             ?.getOrHandle {
                 Timber.error(ModelCreationException(it.toString()), it::toString)
@@ -715,6 +720,7 @@ private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
             }
 
     val pictureUrl = this.photoUrl?.toString()
+            ?.takeUnless { it.isBlank() }
             ?.let(Url.Companion::of)
             ?.getOrHandle {
                 Timber.error(ModelCreationException(it.toString()), it::toString)

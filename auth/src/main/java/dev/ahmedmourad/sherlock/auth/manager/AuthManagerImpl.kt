@@ -80,7 +80,7 @@ internal class AuthManagerImpl @Inject constructor(
                 .getCurrentUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { incompleteUserOption ->
+                .switchMap { incompleteUserOption ->
                     incompleteUserOption.fold(ifEmpty = {
                         Flowable.just(null.right())
                     }, ifSome = { incompleteUser ->
@@ -96,7 +96,7 @@ internal class AuthManagerImpl @Inject constructor(
                                     )
                                 }
                     })
-                }.flatMap { either ->
+                }.switchMap { either ->
                     either.fold(ifLeft = {
                         Flowable.just(it?.left() ?: null.right())
                     }, ifRight = { userEither ->
@@ -592,7 +592,7 @@ internal class AuthManagerImpl @Inject constructor(
                 .getCurrentUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .singleOrError()
+                .firstOrError()
                 .flatMap { userOption ->
                     userOption.fold(ifEmpty = {
                         Single.just(Unit.right())

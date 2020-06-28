@@ -52,7 +52,7 @@ dependencies {
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    implementation "com.github.pwittchen:reactivenetwork-rx2:3.0.3"
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.8'
 
     implementation "com.louiscad.splitties:splitties-appctx:$splittiesVersion"
 

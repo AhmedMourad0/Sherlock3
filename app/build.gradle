@@ -65,7 +65,9 @@ android {
     configurations{
         all*.exclude group: 'com.google.guava', module: 'listenablefuture'
     }
-    viewBinding.enabled = true
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 scabbard {
@@ -86,16 +88,16 @@ dependencies {
     implementation "androidx.media:media:1.1.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
-    implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
     implementation "androidx.exifinterface:exifinterface:1.2.0"
     implementation "com.android.support:multidex:1.0.3"
-    implementation "androidx.core:core-ktx:1.2.0"
+    implementation 'androidx.core:core-ktx:1.3.0'
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation "androidx.fragment:fragment:1.2.4"
+    implementation 'androidx.fragment:fragment:1.2.5'
 
-    implementation "com.google.android.material:material:1.2.0-alpha06"
+    implementation 'com.google.android.material:material:1.3.0-alpha01'
 
     implementation "com.google.android.gms:play-services-places:17.0.0"
 
@@ -104,12 +106,12 @@ dependencies {
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    implementation "com.github.bumptech.glide:glide:4.9.0"
-    kapt "com.github.bumptech.glide:compiler:4.9.0"
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
     implementation "com.github.Jay-Goo:RangeSeekBar:v2.0.4"
 
-    implementation "de.hdodenhof:circleimageview:3.0.1"
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     implementation "com.github.esafirm.android-image-picker:imagepicker:2.0.0"
 
@@ -122,9 +124,9 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-android:2.0"
 
     testImplementation "junit:junit:4.13"
-    testImplementation "org.mockito:mockito-core:2.26.0"
-    testImplementation "org.mockito:mockito-inline:2.26.0"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.mockito:mockito-inline:3.3.3'
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
     testImplementation "org.spekframework.spek2:spek-runner-junit5:$spek_version"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -134,8 +136,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:3.2.0"
-    androidTestImplementation "org.mockito:mockito-android:2.26.0"
-    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    androidTestImplementation 'org.mockito:mockito-android:3.3.3'
+    androidTestImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     implementation project(":domain")

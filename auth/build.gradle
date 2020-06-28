@@ -64,13 +64,13 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:1.1.0"
 
-    implementation "com.google.firebase:firebase-core:17.4.0"
+    implementation 'com.google.firebase:firebase-core:17.4.3'
     api "com.google.firebase:firebase-storage:19.1.1"
     api "com.google.firebase:firebase-firestore-ktx:21.4.3"
     api "com.google.firebase:firebase-auth:19.3.1"
     implementation "com.google.android.gms:play-services-auth:18.0.0"
 
-    implementation "com.facebook.android:facebook-login:5.0.0"
+    implementation 'com.facebook.android:facebook-login:7.1.0'
     implementation "androidx.browser:browser:1.2.0"
 
     implementation("com.twitter.sdk.android:twitter-core:3.3.0@aar") { transitive = true }
@@ -83,17 +83,17 @@ dependencies {
     implementation "com.jakewharton.timber:timber-android:$timberVersion"
 
     testImplementation "junit:junit:4.13"
-    testImplementation "org.mockito:mockito-core:2.26.0"
-    testImplementation "org.mockito:mockito-inline:2.26.0"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.mockito:mockito-inline:3.3.3'
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
     testImplementation "org.spekframework.spek2:spek-runner-junit5:$spek_version"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "androidx.test:core:1.2.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
-    androidTestImplementation "org.mockito:mockito-android:2.26.0"
-    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    androidTestImplementation 'org.mockito:mockito-android:3.3.3'
+    androidTestImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
 
     implementation project(":domain")
 }

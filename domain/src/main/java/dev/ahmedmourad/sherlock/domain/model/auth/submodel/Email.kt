@@ -22,8 +22,8 @@ data class Email private constructor(val value: String) {
         fun validate(value: String): Exception? {
             return when {
                 value.isBlank() -> Exception.BlankEmailException
-                value.trim().contains(" ") -> Exception.EmailContainsWhiteSpacesException
-                EMAIL_REGEX.matches(value) -> Exception.MalformedEmailException
+                value.trim().contains(" ") -> Exception.EmailContainsWhiteSpacesException(value)
+                !EMAIL_REGEX.matches(value) -> Exception.MalformedEmailException(value)
                 else -> null
             }
         }
@@ -31,7 +31,7 @@ data class Email private constructor(val value: String) {
 
     sealed class Exception {
         object BlankEmailException : Exception()
-        object EmailContainsWhiteSpacesException : Exception()
-        object MalformedEmailException : Exception()
+        data class EmailContainsWhiteSpacesException(val value: String) : Exception()
+        data class MalformedEmailException(val value: String) : Exception()
     }
 }

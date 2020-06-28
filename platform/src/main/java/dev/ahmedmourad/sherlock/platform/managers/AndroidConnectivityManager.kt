@@ -33,7 +33,7 @@ internal class AndroidConnectivityManager @Inject constructor() : ConnectivityMa
         return ReactiveNetwork.observeNetworkConnectivity(appCtx)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMapSingle { ReactiveNetwork.checkInternetConnectivity() }
+                .switchMapSingle { ReactiveNetwork.checkInternetConnectivity() }
                 .toFlowable(BackpressureStrategy.LATEST)
                 .map<Either<ConnectivityManager.ObserveInternetConnectivityException, Boolean>> {
                     it.right()

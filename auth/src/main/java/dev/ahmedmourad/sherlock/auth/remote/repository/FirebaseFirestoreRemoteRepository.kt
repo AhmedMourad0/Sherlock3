@@ -70,7 +70,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         if (isInternetConnected) {
                             userAuthStateObservable.observeUserAuthState()
                                     .map(Boolean::right)
-                                    .singleOrError()
+                                    .firstOrError()
                         } else {
                             Single.just(
                                     RemoteRepository.StoreSignUpUserException.NoInternetConnectionException.left()
@@ -131,7 +131,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnectedEither ->
+                .switchMap { isInternetConnectedEither ->
                     isInternetConnectedEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
@@ -143,7 +143,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                             )
                         }
                     })
-                }.flatMap { isUserSignedInEither ->
+                }.switchMap { isUserSignedInEither ->
                     isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindSignedInUserException, SignedInUser?>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
@@ -213,7 +213,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         if (isInternetConnected) {
                             userAuthStateObservable.observeUserAuthState()
                                     .map(Boolean::right)
-                                    .singleOrError()
+                                    .firstOrError()
                         } else {
                             Single.just(
                                     RemoteRepository.UpdateUserLastLoginDateException.NoInternetConnectionException.left()
@@ -247,9 +247,13 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             }
 
             val failureListener = { throwable: Throwable ->
-                emitter.onSuccess(
-                        RemoteRepository.UpdateUserLastLoginDateException.UnknownException(throwable).left()
-                )
+                if (throwable is FirebaseFirestoreException && throwable.code == FirebaseFirestoreException.Code.NOT_FOUND) {
+                    emitter.onSuccess(Unit.right())
+                } else {
+                    emitter.onSuccess(
+                            RemoteRepository.UpdateUserLastLoginDateException.UnknownException(throwable).left()
+                    )
+                }
             }
 
             db.get().collection(Contract.Database.Users.PATH)
@@ -274,27 +278,28 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
 
     return Either.fx {
 
-        val (email) = snapshot.getString(Contract.Database.Users.EMAIL)
+        val email = snapshot.getString(Contract.Database.Users.EMAIL)
                 ?.let(Email.Companion::of)
-                ?.mapLeft { ModelCreationException(it.toString()) } ?: return@fx null
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind() ?: return@fx null
 
-        val (displayName) = snapshot.getString(Contract.Database.Users.DISPLAY_NAME)
+        val displayName = snapshot.getString(Contract.Database.Users.DISPLAY_NAME)
                 ?.let(DisplayName.Companion::of)
-                ?.mapLeft { ModelCreationException(it.toString()) } ?: return@fx null
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind() ?: return@fx null
 
-        val (username) = snapshot.getString(Contract.Database.Users.USER_NAME)
+        val username = snapshot.getString(Contract.Database.Users.USER_NAME)
                 ?.let(Username.Companion::of)
-                ?.mapLeft { ModelCreationException(it.toString()) } ?: return@fx null
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind() ?: return@fx null
 
         val countryCode = snapshot.getString(Contract.Database.Users.COUNTRY_CODE) ?: return@fx null
 
         val number = snapshot.getString(Contract.Database.Users.PHONE_NUMBER) ?: return@fx null
 
-        val (phoneNumber) = PhoneNumber.of(countryCode, number).mapLeft { ModelCreationException(it.toString()) }
+        val phoneNumber = !PhoneNumber.of(countryCode, number)
+                .mapLeft { ModelCreationException(it.toString()) }
 
-        val (pictureUrl) = snapshot.getString(Contract.Database.Users.PICTURE_URL)
+        val pictureUrl = snapshot.getString(Contract.Database.Users.PICTURE_URL)
                 ?.let(Url.Companion::of)
-                ?.mapLeft { ModelCreationException(it.toString()) } ?: null.right()
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind()
 
         SignedInUser.of(
                 id,

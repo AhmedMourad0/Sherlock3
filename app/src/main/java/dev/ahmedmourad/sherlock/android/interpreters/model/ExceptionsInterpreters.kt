@@ -80,9 +80,9 @@ internal fun Email.Exception.localizedMessage(): String {
     return when (this) {
         Email.Exception.BlankEmailException ->
             appCtx.getString(R.string.email_empty_or_blank)
-        Email.Exception.EmailContainsWhiteSpacesException ->
+        is Email.Exception.EmailContainsWhiteSpacesException ->
             appCtx.getString(R.string.email_contains_whitespaces)
-        Email.Exception.MalformedEmailException ->
+        is Email.Exception.MalformedEmailException ->
             appCtx.getString(R.string.malformed_email)
     }
 }

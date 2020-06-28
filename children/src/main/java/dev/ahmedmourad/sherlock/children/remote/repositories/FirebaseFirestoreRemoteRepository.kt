@@ -152,7 +152,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnectedEither ->
+                .switchMap { isInternetConnectedEither ->
                     isInternetConnectedEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
@@ -166,7 +166,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                             )
                         }
                     })
-                }.flatMap { isUserSignedInEither ->
+                }.switchMap { isUserSignedInEither ->
                     isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindException, RetrievedChild?>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
@@ -235,7 +235,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { isInternetConnectedEither ->
+                .switchMap { isInternetConnectedEither ->
                     isInternetConnectedEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
@@ -249,7 +249,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                             )
                         }
                     })
-                }.flatMap { isUserSignedInEither ->
+                }.switchMap { isUserSignedInEither ->
                     isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindAllException, Map<RetrievedChild, Weight>>>>(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->

@@ -148,7 +148,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 .find(childId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { childEither ->
+                .switchMap { childEither ->
                     childEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { child ->
@@ -193,7 +193,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 .findAll(query, filter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { resultsEither ->
+                .switchMap { resultsEither ->
                     resultsEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { results ->

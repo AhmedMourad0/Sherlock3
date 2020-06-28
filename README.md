@@ -37,6 +37,14 @@ lost/kidnapped children.
 
 ## Whiteboard:
 
+- unsafeOf
+- LiveQuery (allowing users to register their search parameters for live
+  updates and sending them notifications when a child with high
+- Firebase Cloud Functions.
+  likelihood for a match is found).
+- Use Monads to abstract over data types (RxJava, Coroutines,...) in
+  data modules.
+- Replace RxJava with Kotlin Coroutines and Flow.
 - Improve UI, maybe wait for Compose? It's a mess. We also need many
   spinners.
 - Testing.
@@ -45,13 +53,6 @@ lost/kidnapped children.
 - Use AndroidX's App Startup
 - Anonymous authentication as a firestore fallback strategy when the
   user is signed in but not with Firebase.
-- Use Monads to abstract over data types (RxJava, Coroutines,...) in
-  data modules.
-- Replace RxJava with Kotlin Coroutines and Flow.
-- Firebase Cloud Functions.
-- LiveQuery (allowing users to register their search parameters for live
-  updates and sending them notifications when a child with high
-  likelihood for a match is found).
 - Timeline (shows a live feed of newly missing or found children near
   you)
 - Go Multiplatform (hopefully Dagger2 will be ported by then, I need

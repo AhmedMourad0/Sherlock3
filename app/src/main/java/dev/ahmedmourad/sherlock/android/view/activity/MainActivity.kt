@@ -415,6 +415,8 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
     private fun signOut() {
         signOutDisposable = viewModel.signOutSingle.subscribe({ resultEither ->
+
+            Timber.error(message = resultEither::toString)
             if (resultEither is Either.Left) {
                 Timber.error(message = resultEither::toString)
             }
