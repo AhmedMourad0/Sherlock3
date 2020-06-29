@@ -62,8 +62,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
             resultEither.fold(ifLeft = { e ->
                 when (e) {
 
-                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is ObserveSignedInUserInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)

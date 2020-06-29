@@ -93,9 +93,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         resultEither.fold(ifLeft = { e ->
             when (e) {
                 is SendPasswordResetEmailInteractor.Exception.NonExistentEmailException,
-                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> {
-                    /* do nothing */
-                }
+                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> Unit
                 is SendPasswordResetEmailInteractor.Exception.UnknownException -> {
                     Timber.error(e.origin, e::toString)
                 }

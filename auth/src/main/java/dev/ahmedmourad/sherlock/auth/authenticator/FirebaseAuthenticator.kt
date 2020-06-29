@@ -574,7 +574,7 @@ internal class FirebaseAuthenticator @Inject constructor(
 
         return Single.create<Either<Authenticator.SendPasswordResetEmailException, Unit>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(Unit.right())
             }
 

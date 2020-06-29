@@ -16,7 +16,7 @@ data class PhoneNumber private constructor(val number: String, val countryCode: 
 
         fun of(number: String, countryCode: String = ""): Either<Exception, PhoneNumber> {
             return validate(number, countryCode)?.left()
-                    ?: PhoneNumberUtil.getInstance().parse(number, countryCode).let {
+                    ?: PhoneNumberUtil.getInstance().parse(number, null).let {
                         PhoneNumber(it.nationalNumber.toString(), it.countryCode.toString()).right()
                     }
         }
@@ -24,33 +24,38 @@ data class PhoneNumber private constructor(val number: String, val countryCode: 
         fun validate(number: String, countryCode: String = ""): Exception? {
             return when {
 
-                number.isBlank() -> Exception.BlankPhoneNumberException
+                number.isBlank() ->
+                    Exception.BlankPhoneNumberException
 
-                number.trim().contains(" ") -> Exception.PhoneNumberContainsWhiteSpacesException
+                number.trim().contains(" ") ->
+                    Exception.PhoneNumberContainsWhiteSpacesException(number, countryCode)
 
-                countryCode.trim().contains(" ") -> Exception.CountryCodeContainsWhiteSpacesException
+                countryCode.trim().contains(" ") ->
+                    Exception.CountryCodeContainsWhiteSpacesException(number, countryCode)
 
-                else -> validatePhoneNumber(number, countryCode)
+                else ->
+                    validatePhoneNumber(number, countryCode)
             }
         }
 
         private fun validatePhoneNumber(number: String, countryCode: String): Exception? {
             return try {
-                val phoneUtil = PhoneNumberUtil.getInstance()
-                val numberProto = phoneUtil.parse(number, countryCode)
-                if (numberProto.hasCountryCode() && phoneUtil.isValidNumber(numberProto)) {
-                    null
-                } else {
-                    Exception.InvalidPhoneNumberException
-                }
+                PhoneNumberUtil.getInstance().parse(number, null)
+                null
             } catch (e: NumberParseException) {
                 when (e.errorType) {
-                    NumberParseException.ErrorType.INVALID_COUNTRY_CODE -> Exception.InvalidCountryCodeException
-                    NumberParseException.ErrorType.NOT_A_NUMBER -> Exception.InvalidPhoneNumberException
-                    NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD -> Exception.PhoneNumberTooShortAfterIddException
-                    NumberParseException.ErrorType.TOO_SHORT_NSN -> Exception.PhoneNumberTooShortException
-                    NumberParseException.ErrorType.TOO_LONG -> Exception.PhoneNumberTooLongException
-                    null -> Exception.InvalidPhoneNumberException
+                    NumberParseException.ErrorType.INVALID_COUNTRY_CODE ->
+                        Exception.InvalidCountryCodeException(number, countryCode)
+                    NumberParseException.ErrorType.NOT_A_NUMBER ->
+                        Exception.InvalidPhoneNumberException(number, countryCode)
+                    NumberParseException.ErrorType.TOO_SHORT_AFTER_IDD ->
+                        Exception.PhoneNumberTooShortAfterIddException(number, countryCode)
+                    NumberParseException.ErrorType.TOO_SHORT_NSN ->
+                        Exception.PhoneNumberTooShortException(number, countryCode)
+                    NumberParseException.ErrorType.TOO_LONG ->
+                        Exception.PhoneNumberTooLongException(number, countryCode)
+                    null ->
+                        Exception.InvalidPhoneNumberException(number, countryCode)
                 }
             }
         }
@@ -58,12 +63,12 @@ data class PhoneNumber private constructor(val number: String, val countryCode: 
 
     sealed class Exception {
         object BlankPhoneNumberException : Exception()
-        object PhoneNumberContainsWhiteSpacesException : Exception()
-        object CountryCodeContainsWhiteSpacesException : Exception()
-        object PhoneNumberTooShortAfterIddException : Exception()
-        object PhoneNumberTooShortException : Exception()
-        object PhoneNumberTooLongException : Exception()
-        object InvalidCountryCodeException : Exception()
-        object InvalidPhoneNumberException : Exception()
+        data class PhoneNumberContainsWhiteSpacesException(val number: String, val countryCode: String) : Exception()
+        data class CountryCodeContainsWhiteSpacesException(val number: String, val countryCode: String) : Exception()
+        data class PhoneNumberTooShortAfterIddException(val number: String, val countryCode: String) : Exception()
+        data class PhoneNumberTooShortException(val number: String, val countryCode: String) : Exception()
+        data class PhoneNumberTooLongException(val number: String, val countryCode: String) : Exception()
+        data class InvalidCountryCodeException(val number: String, val countryCode: String) : Exception()
+        data class InvalidPhoneNumberException(val number: String, val countryCode: String) : Exception()
     }
 }

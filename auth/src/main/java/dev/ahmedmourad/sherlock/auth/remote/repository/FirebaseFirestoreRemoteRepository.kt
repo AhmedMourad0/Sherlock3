@@ -99,7 +99,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         return Single.create<Either<RemoteRepository.StoreSignUpUserException, SignedInUser>> { emitter ->
 
             val registrationDate = System.currentTimeMillis()
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(user.toSignedInUser(registrationDate).right())
             }
 
@@ -242,7 +242,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
         return Single.create<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(Unit.right())
             }
 
@@ -272,9 +272,9 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
     val id = UserId(snapshot.id)
 
     val registrationDate = snapshot.getTimestamp(Contract.Database.Users.REGISTRATION_DATE)
-            ?.seconds
-            ?.let { it * 1000L }
-            ?: return ModelCreationException("publicationDate is null for id=\"$id\"").left()
+            ?.toDate()
+            ?.time
+            ?: return ModelCreationException("registrationDate is null for id=$id").left()
 
     return Either.fx {
 

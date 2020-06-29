@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
-import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
@@ -158,11 +157,11 @@ internal class SignUpViewModel(
     private fun toAppSignUpUser(): AppSignUpUser? {
         return Either.fx<Unit, AppSignUpUser> {
 
-            val (email) = validateEmail(email.value).mapLeft {
+            val email = !validateEmail(email.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_EMAIL, it)
             }
 
-            val (password) = validatePassword(password.value).mapLeft {
+            val password = !validatePassword(password.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PASSWORD, it)
             }
 
@@ -170,26 +169,26 @@ internal class SignUpViewModel(
                 savedStateHandle.set(KEY_ERROR_PASSWORD_CONFIRMATION, it)
             }.bind()
 
-            val (credentials) = validateUserCredentials(email, password).mapLeft {
+            val credentials = !validateUserCredentials(email, password).mapLeft {
                 savedStateHandle.set(KEY_ERROR_CREDENTIALS, it)
             }
 
-            val (displayName) = validateDisplayName(displayName.value).mapLeft {
+            val displayName = !validateDisplayName(displayName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, it)
             }
 
-            val (phoneNumber) = validatePhoneNumber(
+            val phoneNumber = !validatePhoneNumber(
                     phoneNumberCountryCode.value,
                     phoneNumber.value
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
             }
 
-            val (picturePath) = picturePath.value?.let { pp ->
+            val picturePath = picturePath.value?.let { pp ->
                 validatePicturePath(pp.value).mapLeft {
                     savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
                 }
-            } ?: null.right()
+            }?.bind()
 
             validateAppSignUpUser(
                     credentials,

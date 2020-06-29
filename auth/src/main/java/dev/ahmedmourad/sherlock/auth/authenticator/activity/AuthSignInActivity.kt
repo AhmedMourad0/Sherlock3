@@ -66,6 +66,12 @@ internal class AuthSignInActivity : AppCompatActivity() {
         signInStrategy.handleResult(requestCode, resultCode, data)
     }
 
+    override fun onStop() {
+        super.onStop()
+        signInStrategy.dispose()
+        finish()
+    }
+
     private inner class GoogleSignInStrategy : SignInStrategy {
 
         override fun initiate() {
@@ -109,7 +115,6 @@ internal class AuthSignInActivity : AppCompatActivity() {
         private val callbackManager = CallbackManager.Factory.create()
 
         override fun initiate() {
-
             loginManager.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
 
                 override fun onSuccess(loginResult: LoginResult) {
@@ -136,12 +141,15 @@ internal class AuthSignInActivity : AppCompatActivity() {
                     finish()
                 }
             })
-
             loginManager.logInWithReadPermissions(this@AuthSignInActivity, listOf("email", "public_profile"))
         }
 
         override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
             callbackManager.onActivityResult(requestCode, resultCode, data)
+        }
+
+        override fun dispose() {
+            loginManager.unregisterCallback(callbackManager)
         }
     }
 
@@ -176,6 +184,10 @@ internal class AuthSignInActivity : AppCompatActivity() {
         override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
             authClient.onActivityResult(requestCode, resultCode, data)
         }
+
+        override fun dispose() {
+            authClient.cancelAuthorize()
+        }
     }
 
     companion object : AuthActivityFactory {
@@ -207,4 +219,5 @@ internal class AuthSignInActivity : AppCompatActivity() {
 interface SignInStrategy {
     fun initiate()
     fun handleResult(requestCode: Int, resultCode: Int, data: Intent?)
+    fun dispose() = Unit
 }

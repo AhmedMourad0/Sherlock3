@@ -171,8 +171,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         resultEither.fold(ifLeft = {
             when (it) {
 
-                CompleteSignUpInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                }
+                CompleteSignUpInteractor.Exception.NoInternetConnectionException -> Unit
 
                 CompleteSignUpInteractor.Exception.NoSignedInUserException -> {
                     Timber.error(message = it::toString)

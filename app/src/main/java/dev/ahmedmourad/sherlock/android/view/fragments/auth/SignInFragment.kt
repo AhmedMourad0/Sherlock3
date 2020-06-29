@@ -107,8 +107,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
 
                     SignInInteractor.Exception.AccountDoesNotExistOrHasBeenDisabledException,
                     SignInInteractor.Exception.WrongPasswordException,
-                    SignInInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -135,8 +134,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
                     SignInWithGoogleInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithGoogleInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithGoogleInteractor.Exception.NoResponseException,
-                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithGoogleInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -163,8 +161,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
                     SignInWithFacebookInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithFacebookInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithFacebookInteractor.Exception.NoResponseException,
-                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithFacebookInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -191,8 +188,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
                     SignInWithTwitterInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithTwitterInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithTwitterInteractor.Exception.NoResponseException,
-                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithTwitterInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)

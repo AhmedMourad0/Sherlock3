@@ -97,7 +97,7 @@ internal class FirebaseStorageImageRepository @Inject constructor(
 
         return Single.create<Either<ImageRepository.StoreChildPictureException, StorageReference>> { emitter ->
 
-            val successListener = { _: UploadTask.TaskSnapshot ->
+            val successListener = { _: UploadTask.TaskSnapshot? ->
                 emitter.onSuccess(filePath.right())
             }
 
@@ -120,7 +120,7 @@ internal class FirebaseStorageImageRepository @Inject constructor(
 
         return Single.create<Either<ImageRepository.StoreChildPictureException, Url>> { emitter ->
 
-            val successListener = { uri: Uri ->
+            val successListener = { uri: Uri? ->
                 emitter.onSuccess(Url.of(uri.toString()).mapLeft {
                     ImageRepository.StoreChildPictureException.InternalException(
                             ModelCreationException(it.toString())

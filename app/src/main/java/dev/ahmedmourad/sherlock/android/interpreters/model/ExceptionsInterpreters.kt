@@ -127,19 +127,19 @@ internal fun PhoneNumber.Exception.localizedMessage(): String {
     return when (this) {
         PhoneNumber.Exception.BlankPhoneNumberException ->
             appCtx.getString(R.string.invalid_phone_number)
-        PhoneNumber.Exception.PhoneNumberContainsWhiteSpacesException ->
+        is PhoneNumber.Exception.PhoneNumberContainsWhiteSpacesException ->
             appCtx.getString(R.string.phone_number_contains_whitespaces)
-        PhoneNumber.Exception.CountryCodeContainsWhiteSpacesException ->
+        is PhoneNumber.Exception.CountryCodeContainsWhiteSpacesException ->
             appCtx.getString(R.string.country_code_contains_whitespaces)
-        PhoneNumber.Exception.PhoneNumberTooShortAfterIddException ->
+        is PhoneNumber.Exception.PhoneNumberTooShortAfterIddException ->
             appCtx.getString(R.string.international_phone_number_too_short)
-        PhoneNumber.Exception.PhoneNumberTooShortException ->
+        is PhoneNumber.Exception.PhoneNumberTooShortException ->
             appCtx.getString(R.string.phone_number_too_short)
-        PhoneNumber.Exception.PhoneNumberTooLongException ->
+        is PhoneNumber.Exception.PhoneNumberTooLongException ->
             appCtx.getString(R.string.phone_number_too_long)
-        PhoneNumber.Exception.InvalidCountryCodeException ->
+        is PhoneNumber.Exception.InvalidCountryCodeException ->
             appCtx.getString(R.string.invalid_country_code)
-        PhoneNumber.Exception.InvalidPhoneNumberException ->
+        is PhoneNumber.Exception.InvalidPhoneNumberException ->
             appCtx.getString(R.string.invalid_phone_number)
     }
 }

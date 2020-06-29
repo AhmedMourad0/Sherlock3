@@ -111,7 +111,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
         return Single.create<Either<RemoteRepository.PublishException, RetrievedChild>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(child.toRetrievedChild(
                         childId,
                         System.currentTimeMillis(),
@@ -350,7 +350,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
         return Single.create<Either<RemoteRepository.ClearException, Unit>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(Unit.right())
             }
 
@@ -385,7 +385,7 @@ internal fun extractRetrievedChild(
     val publicationDate = snapshot.getTimestamp(Contract.Database.Children.PUBLICATION_DATE)
             ?.seconds
             ?.let { it * 1000L }
-            ?: return ModelCreationException("publicationDate is null for id=\"$id\"").left()
+            ?: return ModelCreationException("publicationDate is null for id=$id").left()
 
     val pictureUrl = snapshot.getString(Contract.Database.Children.PICTURE_URL)
             ?.let(Url.Companion::of)

@@ -172,8 +172,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                     SignUpInteractor.Exception.WeakPasswordException,
                     SignUpInteractor.Exception.MalformedEmailException,
                     is SignUpInteractor.Exception.EmailAlreadyInUseException,
-                    SignUpInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignUpInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignUpInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -200,8 +199,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                     SignInWithGoogleInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithGoogleInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithGoogleInteractor.Exception.NoResponseException,
-                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithGoogleInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -228,8 +226,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                     SignInWithFacebookInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithFacebookInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithFacebookInteractor.Exception.NoResponseException,
-                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithFacebookInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
@@ -256,8 +253,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                     SignInWithTwitterInteractor.Exception.MalformedOrExpiredCredentialException,
                     SignInWithTwitterInteractor.Exception.EmailAlreadyInUseException,
                     SignInWithTwitterInteractor.Exception.NoResponseException,
-                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> { /* do nothing */
-                    }
+                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> Unit
 
                     is SignInWithTwitterInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)

@@ -136,39 +136,39 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
     fun toChildQuery(): ChildQuery? {
         return Either.fx<Unit, ChildQuery> {
 
-            val (firstName) = validateName(firstName.value).mapLeft {
+            val firstName = !validateName(firstName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
             }
 
-            val (lastName) = validateName(lastName.value).mapLeft {
+            val lastName = !validateName(lastName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_LAST_NAME, it)
             }
 
-            val (fullName) = validateFullName(firstName, lastName).mapLeft {
+            val fullName = !validateFullName(firstName, lastName).mapLeft {
                 savedStateHandle.set(KEY_ERROR_NAME, it)
             }
 
-            val (age) = validateAge(age.value).mapLeft {
+            val age = !validateAge(age.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_AGE, it)
             }
 
-            val (height) = validateHeight(height.value).mapLeft {
+            val height = !validateHeight(height.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_HEIGHT, it)
             }
 
-            val (gender) = validateGender(gender.value).mapLeft {
+            val gender = !validateGender(gender.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_GENDER, it)
             }
 
-            val (skin) = validateSkin(skin.value).mapLeft {
+            val skin = !validateSkin(skin.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_SKIN, it)
             }
 
-            val (hair) = validateHair(hair.value).mapLeft {
+            val hair = !validateHair(hair.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_HAIR, it)
             }
 
-            val (appearance) = validateExactAppearance(
+            val appearance = !validateExactAppearance(
                     age,
                     height,
                     gender,
@@ -197,7 +197,7 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
                 }
             }
 
-            val (location) = validateLocation(tempLocation).mapLeft {
+            val location = !validateLocation(tempLocation).mapLeft {
                 savedStateHandle.set(KEY_ERROR_LOCATION, it)
             }
 

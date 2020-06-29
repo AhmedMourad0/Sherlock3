@@ -96,11 +96,11 @@ internal class SignInViewModel(
     private fun toUserCredentials(): UserCredentials? {
         return Either.fx<Unit, UserCredentials> {
 
-            val (email) = validateEmail(email.value).mapLeft {
+            val email = !validateEmail(email.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_EMAIL, it)
             }
 
-            val (password) = validatePassword(password.value).mapLeft {
+            val password = !validatePassword(password.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PASSWORD, it)
             }
 

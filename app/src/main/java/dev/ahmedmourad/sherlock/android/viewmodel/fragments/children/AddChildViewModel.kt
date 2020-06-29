@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
-import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
@@ -209,43 +208,43 @@ internal class AddChildViewModel(
     private fun toPublishedChild(): AppPublishedChild? {
         return Either.fx<Unit, AppPublishedChild> {
 
-            val (firstName) = validateName(firstName.value).mapLeft {
+            val firstName = !validateName(firstName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
             }
 
-            val (lastName) = validateNameNullable(lastName.value).mapLeft {
+            val lastName = !validateNameNullable(lastName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_LAST_NAME, it)
             }
 
-            val (name) = validateNameEitherNullable(firstName, lastName).mapLeft {
+            val name = !validateNameEitherNullable(firstName, lastName).mapLeft {
                 savedStateHandle.set(KEY_ERROR_NAME, it)
             }
 
-            val (minAge) = validateAgeNullable(minAge.value).mapLeft {
+            val minAge = !validateAgeNullable(minAge.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_MIN_AGE, it)
             }
 
-            val (maxAge) = validateAgeNullable(maxAge.value).mapLeft {
+            val maxAge = !validateAgeNullable(maxAge.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_MAX_AGE, it)
             }
 
-            val (ageRange) = validateAgeRange(minAge, maxAge).mapLeft {
+            val ageRange = !validateAgeRange(minAge, maxAge).mapLeft {
                 savedStateHandle.set(KEY_ERROR_AGE, it)
             }
 
-            val (minHeight) = validateHeightNullable(minHeight.value).mapLeft {
+            val minHeight = !validateHeightNullable(minHeight.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_MIN_HEIGHT, it)
             }
 
-            val (maxHeight) = validateHeightNullable(maxHeight.value).mapLeft {
+            val maxHeight = !validateHeightNullable(maxHeight.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_MAX_HEIGHT, it)
             }
 
-            val (heightRange) = validateHeightRange(minHeight, maxHeight).mapLeft {
+            val heightRange = !validateHeightRange(minHeight, maxHeight).mapLeft {
                 savedStateHandle.set(KEY_ERROR_HEIGHT, it)
             }
 
-            val (appearance) = validateApproximateAppearance(
+            val appearance = !validateApproximateAppearance(
                     ageRange,
                     heightRange,
                     gender.value?.let { findEnum(it, Gender.values()) },
@@ -274,11 +273,11 @@ internal class AddChildViewModel(
                 }
             }
 
-            val (picturePath) = picturePath.value?.let { picturePath ->
+            val picturePath = picturePath.value?.let { picturePath ->
                 validatePicturePath(picturePath.value).mapLeft {
                     savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
                 }
-            } ?: null.right()
+            }?.bind()
 
             validateAppPublishedChild(
                     name,

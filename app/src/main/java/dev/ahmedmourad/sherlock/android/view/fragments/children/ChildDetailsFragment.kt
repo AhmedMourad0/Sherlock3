@@ -72,8 +72,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                     //TODO: show error image with retry option
                 when (e) {
 
-                    FindChildInteractor.Exception.NoInternetConnectionException -> { /* do nothing*/
-                    }
+                    FindChildInteractor.Exception.NoInternetConnectionException -> Unit
 
                     FindChildInteractor.Exception.NoSignedInUserException -> {
                         (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
