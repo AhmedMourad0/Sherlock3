@@ -45,8 +45,6 @@ internal class CompleteSignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
     val displayName: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_DISPLAY_NAME, null) }
-    val phoneNumberCountryCode: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
     val phoneNumber: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER, null) }
     val picture: LiveData<ImagePicker.PicturePath?>
@@ -69,10 +67,6 @@ internal class CompleteSignUpViewModel(
 
     fun onDisplayNameChange(newValue: String?) {
         savedStateHandle.set(KEY_DISPLAY_NAME, newValue)
-    }
-
-    fun onPhoneNumberCountryCodeChange(newValue: String?) {
-        savedStateHandle.set(KEY_PHONE_NUMBER_COUNTRY_CODE, newValue)
     }
 
     fun onPhoneNumberChange(newValue: String?) {
@@ -122,10 +116,7 @@ internal class CompleteSignUpViewModel(
                 savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, it)
             }
 
-            val phoneNumber = !validatePhoneNumber(
-                    phoneNumberCountryCode.value,
-                    phoneNumber.value
-            ).mapLeft {
+            val phoneNumber = !validatePhoneNumber(phoneNumber.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
             }
 
@@ -175,8 +166,6 @@ internal class CompleteSignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
         private const val KEY_DISPLAY_NAME =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.DISPLAY_NAME"
-        private const val KEY_PHONE_NUMBER_COUNTRY_CODE =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER_COUNTRY_CODE"
         private const val KEY_PHONE_NUMBER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER"
         private const val KEY_PICTURE =
@@ -198,8 +187,7 @@ internal class CompleteSignUpViewModel(
                 putBundle(KEY_ID, incompleteUser.id.bundle(UserId.serializer()))
                 putString(KEY_EMAIL, incompleteUser.email?.value)
                 putString(KEY_DISPLAY_NAME, incompleteUser.displayName?.value)
-                putString(KEY_PHONE_NUMBER_COUNTRY_CODE, incompleteUser.phoneNumber?.countryCode)
-                putString(KEY_PHONE_NUMBER, incompleteUser.phoneNumber?.number)
+                putString(KEY_PHONE_NUMBER, incompleteUser.phoneNumber?.fullNumber())
                 putParcelable(
                         KEY_PICTURE,
                         incompleteUser.pictureUrl?.let(ImagePicker.PicturePath.Companion::from)

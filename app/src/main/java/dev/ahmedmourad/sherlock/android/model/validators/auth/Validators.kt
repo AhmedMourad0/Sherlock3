@@ -55,17 +55,13 @@ internal fun validateDisplayName(value: String?): Either<String, DisplayName> {
     return DisplayName.of(value).mapLeft(DisplayName.Exception::localizedMessage)
 }
 
-internal fun validatePhoneNumber(countryCode: String?, number: String?): Either<String, PhoneNumber> {
+internal fun validatePhoneNumber(fullNumber: String?): Either<String, PhoneNumber> {
 
-    if (number == null) {
+    if (fullNumber == null) {
         return appCtx.getString(R.string.phone_number_empty_or_blank).left()
     }
 
-    if (countryCode == null) {
-        return appCtx.getString(R.string.invalid_country_code).left()
-    }
-
-    return PhoneNumber.of(number, countryCode).mapLeft(PhoneNumber.Exception::localizedMessage)
+    return PhoneNumber.of(fullNumber).mapLeft(PhoneNumber.Exception::localizedMessage)
 }
 
 internal fun validateAppCompletedUser(

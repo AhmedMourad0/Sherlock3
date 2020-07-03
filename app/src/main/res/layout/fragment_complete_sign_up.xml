@@ -3,6 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:clipToPadding="false"
 	android:paddingTop="36dp"
 	tools:context="dev.ahmedmourad.sherlock.android.view.activity.MainActivity">
@@ -55,26 +56,45 @@
 		
 		</com.google.android.material.textfield.TextInputLayout>
 		
-		<com.google.android.material.textfield.TextInputLayout
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="36dp"
-			android:layout_marginEnd="36dp"
-			android:layout_marginBottom="28dp">
+			android:orientation="horizontal"
+			android:gravity="center_vertical">
 			
-			<com.google.android.material.textfield.TextInputEditText
-				android:id="@+id/phone_number_edit_Text"
+			<com.hbb20.CountryCodePicker
+				android:id="@+id/country_code_picker"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				app:ccp_countryAutoDetectionPref="SIM_NETWORK_LOCALE"
+				app:ccp_autoFormatNumber="false"
+				app:ccp_hintExampleNumber="true"
+				app:ccp_hintExampleNumberType="PERSONAL_NUMBER"
+				app:ccp_autoDetectCountry="true"
+				app:ccp_autoDetectLanguage="true" />
+			
+			<com.google.android.material.textfield.TextInputLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:autofillHints="phoneNumber"
-				android:fontFamily="sans-serif-light"
-				android:hint="@string/phone_number"
-				android:imeOptions="actionDone"
-				android:inputType="phone"
-				android:maxLines="1"
-				tools:targetApi="o" />
+				android:layout_marginStart="36dp"
+				android:layout_marginEnd="36dp"
+				android:layout_marginBottom="28dp">
+				
+				<com.google.android.material.textfield.TextInputEditText
+					android:id="@+id/phone_number_edit_Text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:autofillHints="phoneNumber"
+					android:fontFamily="sans-serif-light"
+					android:hint="@string/phone_number"
+					android:imeOptions="actionDone"
+					android:inputType="phone"
+					android:maxLines="1"
+					tools:targetApi="o" />
+			
+			</com.google.android.material.textfield.TextInputLayout>
 		
-		</com.google.android.material.textfield.TextInputLayout>
+		</LinearLayout>
 		
 		<LinearLayout
 			android:layout_width="match_parent"

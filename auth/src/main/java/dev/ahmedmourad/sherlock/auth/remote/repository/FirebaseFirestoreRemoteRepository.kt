@@ -271,12 +271,11 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
 
     val id = UserId(snapshot.id)
 
-    val registrationDate = snapshot.getTimestamp(Contract.Database.Users.REGISTRATION_DATE)
-            ?.toDate()
-            ?.time
-            ?: return ModelCreationException("registrationDate is null for id=$id").left()
-
     return Either.fx {
+
+        val registrationDate = snapshot.getTimestamp(Contract.Database.Users.REGISTRATION_DATE)
+                ?.toDate()
+                ?.time ?: return@fx null
 
         val email = snapshot.getString(Contract.Database.Users.EMAIL)
                 ?.let(Email.Companion::of)
@@ -294,7 +293,7 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
 
         val number = snapshot.getString(Contract.Database.Users.PHONE_NUMBER) ?: return@fx null
 
-        val phoneNumber = !PhoneNumber.of(countryCode, number)
+        val phoneNumber = !PhoneNumber.of(number, countryCode)
                 .mapLeft { ModelCreationException(it.toString()) }
 
         val pictureUrl = snapshot.getString(Contract.Database.Users.PICTURE_URL)

@@ -83,7 +83,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             when (either) {
                 is Either.Left -> {
                     setInternetDependantViewsEnabled(false)
-                    Timber.error(message = either.a::toString)
+                    Timber.error(RuntimeException(either.a.toString()), either.a::toString)
                 }
                 is Either.Right -> {
                     setInternetDependantViewsEnabled(either.b)

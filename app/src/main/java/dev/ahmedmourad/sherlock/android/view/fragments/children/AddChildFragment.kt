@@ -99,7 +99,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         observe(globalViewModel.internetConnectivity) { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
             when (either) {
                 is Either.Left -> {
-                    Timber.error(message = either.a::toString)
+                    Timber.error(RuntimeException(either.a.toString()), either.a::toString)
                     setInternetDependantViewsEnabled(false)
                 }
                 is Either.Right -> {

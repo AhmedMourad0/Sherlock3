@@ -85,7 +85,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
                         (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                     }
                     is FindChildrenInteractor.Exception.UnknownException -> {
-                        Timber.error(message = e::toString)
+                        Timber.error(RuntimeException(e.toString()), e::toString)
                     }
                 }.exhaust()
                 Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()

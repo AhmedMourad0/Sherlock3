@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import arrow.core.identity
+import com.hbb20.CountryCodePicker
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
@@ -65,7 +66,6 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         injector.inject(this)
     }
 
-    //TODO: sign out button
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCompleteSignUpBinding.bind(view)
@@ -104,21 +104,25 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     private fun initializeEditTexts() {
         binding?.let { b ->
 
+            fun CountryCodePicker.unsafeFullNumberWithPlus(): String {
+                return "+${this.selectedCountryCode}${b.phoneNumberEditText.text}"
+            }
+
+            b.countryCodePicker.registerCarrierNumberEditText(b.phoneNumberEditText)
+
+            b.countryCodePicker.setOnCountryChangeListener {
+                viewModel.onPhoneNumberChange(b.countryCodePicker.unsafeFullNumberWithPlus())
+            }
+
+            if (viewModel.phoneNumber.value?.isBlank() == false) {
+                b.countryCodePicker.fullNumber = viewModel.phoneNumber.value
+            }
+
             b.displayNameEditText.setText(viewModel.displayName.value)
             b.emailEditText.setText(viewModel.email.value)
 
-            val phoneNumber = viewModel.phoneNumber.value
-            val countryCode = viewModel.phoneNumberCountryCode.value
-            if (phoneNumber != null && countryCode != null) {
-                b.phoneNumberEditText.setText(
-                        getString(
-                                R.string.phone_number_with_country_code,
-                                countryCode,
-                                phoneNumber
-                        )
-                )
-            } else {
-                b.phoneNumberEditText.text = null
+            b.phoneNumberEditText.doOnTextChanged { _, _, _, _ ->
+                viewModel.onPhoneNumberChange(b.countryCodePicker.unsafeFullNumberWithPlus())
             }
 
             b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
@@ -127,11 +131,6 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
             b.emailEditText.doOnTextChanged { text, _, _, _ ->
                 viewModel.onEmailChange(text.toString())
-            }
-
-            b.phoneNumberEditText.doOnTextChanged { text, _, _, _ ->
-                viewModel.onPhoneNumberCountryCodeChange("")
-                viewModel.onPhoneNumberChange(text.toString())
             }
 
             if (viewModel.picture.value != null) {
@@ -174,7 +173,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                 CompleteSignUpInteractor.Exception.NoInternetConnectionException -> Unit
 
                 CompleteSignUpInteractor.Exception.NoSignedInUserException -> {
-                    Timber.error(message = it::toString)
+                    Timber.error(RuntimeException(it.toString()), it::toString)
                 }
 
                 is CompleteSignUpInteractor.Exception.InternalException -> {

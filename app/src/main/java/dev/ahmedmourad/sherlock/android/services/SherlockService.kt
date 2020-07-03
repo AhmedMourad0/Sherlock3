@@ -174,7 +174,7 @@ internal class SherlockService : Service() {
             child: AppPublishedChild
     ) {
 
-        Timber.error(message = e::toString)
+        Timber.error(RuntimeException(e.toString()), e::toString)
 
         val name = child.name
         val contentTitle = name?.fold(ifLeft = {

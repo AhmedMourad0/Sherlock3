@@ -85,39 +85,40 @@ internal class AuthManagerImpl @Inject constructor(
                         Flowable.just(null.right())
                     }, ifSome = { incompleteUser ->
                         remoteRepository.get()
-                                .findSignedInUser(incompleteUser.id)
-                                .map { userEither ->
-                                    userEither.bimap(
-                                            leftOperation =
-                                            RemoteRepository.FindSignedInUserException::map,
-                                            rightOperation = { user ->
-                                                user?.right() ?: incompleteUser.left()
-                                            }
-                                    )
-                                }
+                                .updateUserLastLoginDate(incompleteUser.id)
+                                .flatMap { either ->
+                                    either.fold(ifLeft = { e ->
+                                        Single.just(e.map()?.left() ?: null.right())
+                                    }, ifRight = {
+                                        Single.just(incompleteUser.right())
+                                    })
+                                }.toFlowable()
                     })
-                }.switchMap { either ->
-                    either.fold(ifLeft = {
-                        Flowable.just(it?.left() ?: null.right())
-                    }, ifRight = { userEither ->
-                        userEither?.fold(ifLeft = { incompleteUser ->
-                            Flowable.just(incompleteUser.left().right())
-                        }, ifRight = { signedInUser ->
+                }.switchMap { incompleteUserEither ->
+                    incompleteUserEither.fold(ifLeft = {
+                        Flowable.just(it.left())
+                    }, ifRight = { incompleteUser ->
+                        if (incompleteUser == null) {
+                            Flowable.just(null.right())
+                        } else {
                             remoteRepository.get()
-                                    .updateUserLastLoginDate(signedInUser.id)
-                                    .flatMap { either ->
-                                        either.fold(ifLeft = { e ->
-                                            Single.just(e.map()?.left() ?: null.right())
-                                        }, ifRight = {
-                                            Single.just(signedInUser.right().right())
+                                    .findSignedInUser(incompleteUser.id)
+                                    .switchMap { userEither ->
+                                        userEither.fold(ifLeft = { e ->
+                                            Flowable.just(e.map()?.left() ?: null.right())
+                                        }, ifRight = { user ->
+                                            Flowable.just(user?.right()?.right()
+                                                    ?: incompleteUser.left().right()
+                                            )
                                         })
-                                    }.toFlowable()
-                        })
+                                    }
+                        }
                     })
                 }.onErrorReturn {
                     AuthManager.ObserveSignedInUserException.UnknownException(it).left()
                 }
     }
+
 
     override fun signIn(
             credentials: UserCredentials

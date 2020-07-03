@@ -112,18 +112,18 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
             b.passwordEditText.setText(viewModel.password.value)
             b.confirmPasswordEditText.setText(viewModel.passwordConfirmation.value)
 
-            val phoneNumber = viewModel.phoneNumber.value
-            val countryCode = viewModel.phoneNumberCountryCode.value
-            if (phoneNumber != null && countryCode != null) {
-                b.phoneNumberEditText.setText(
-                        getString(
-                                R.string.phone_number_with_country_code,
-                                countryCode,
-                                phoneNumber
-                        )
-                )
-            } else {
-                b.phoneNumberEditText.text = null
+            b.countryCodePicker.registerCarrierNumberEditText(b.phoneNumberEditText)
+
+            b.countryCodePicker.setOnCountryChangeListener {
+                viewModel.onPhoneNumberChange(b.countryCodePicker.fullNumberWithPlus)
+            }
+
+            if (viewModel.phoneNumber.value?.isBlank() == false) {
+                b.countryCodePicker.fullNumber = viewModel.phoneNumber.value
+            }
+
+            b.phoneNumberEditText.doOnTextChanged { _, _, _, _ ->
+                viewModel.onPhoneNumberChange(b.countryCodePicker.fullNumberWithPlus)
             }
 
             b.displayNameEditText.doOnTextChanged { text, _, _, _ ->
@@ -140,11 +140,6 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
             b.confirmPasswordEditText.doOnTextChanged { text, _, _, _ ->
                 viewModel.onPasswordConfirmationChange(text.toString())
-            }
-
-            b.phoneNumberEditText.doOnTextChanged { text, _, _, _ ->
-                viewModel.onPhoneNumberCountryCodeChange("")
-                viewModel.onPhoneNumberChange(text.toString())
             }
         }
     }

@@ -43,8 +43,6 @@ internal class SignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_EMAIL, null) }
     val displayName: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_DISPLAY_NAME, null) }
-    val phoneNumberCountryCode: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER_COUNTRY_CODE, null) }
     val phoneNumber: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_PHONE_NUMBER, null) }
     val picturePath: LiveData<ImagePicker.PicturePath?>
@@ -81,10 +79,6 @@ internal class SignUpViewModel(
 
     fun onDisplayNameChange(newValue: String?) {
         savedStateHandle.set(KEY_DISPLAY_NAME, newValue)
-    }
-
-    fun onPhoneNumberCountryCodeChange(newValue: String?) {
-        savedStateHandle.set(KEY_PHONE_NUMBER_COUNTRY_CODE, newValue)
     }
 
     fun onPhoneNumberChange(newValue: String?) {
@@ -178,7 +172,6 @@ internal class SignUpViewModel(
             }
 
             val phoneNumber = !validatePhoneNumber(
-                    phoneNumberCountryCode.value,
                     phoneNumber.value
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
@@ -233,8 +226,6 @@ internal class SignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.EMAIL"
         private const val KEY_DISPLAY_NAME =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.DISPLAY_NAME"
-        private const val KEY_PHONE_NUMBER_COUNTRY_CODE =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER_COUNTRY_CODE"
         private const val KEY_PHONE_NUMBER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.PHONE_NUMBER"
         private const val KEY_PICTURE_PATH =

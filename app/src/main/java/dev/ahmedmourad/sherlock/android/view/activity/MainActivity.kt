@@ -93,7 +93,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         observe(globalViewModel.internetConnectivity) { either ->
             either.fold(ifLeft = {
                 showConnectivitySnackBar(Connectivity.CONNECTING)
-                Timber.error(message = it::toString)
+                Timber.error(RuntimeException(it.toString()), it::toString)
             }, ifRight = {
                 showConnectivitySnackBar(getConnectivity(it))
             })
@@ -102,7 +102,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         observe(globalViewModel.userAuthState) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
-                Timber.error(message = it::toString)
+                Timber.error(RuntimeException(it.toString()), it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
@@ -112,7 +112,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         observe(globalViewModel.signedInUser) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
-                Timber.error(message = it::toString)
+                Timber.error(RuntimeException(it.toString()), it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
@@ -350,16 +350,16 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 when (it) {
 
                     ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> {
-                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // internet error icon
+                        ContextCompat.getDrawable(this, R.drawable.ic_height) // internet error icon
                     }
 
                     is ObserveSignedInUserInteractor.Exception.InternalException -> {
-                        Timber.error(message = it::toString)
+                        Timber.error(RuntimeException(it.toString()), it::toString)
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
 
                     is ObserveSignedInUserInteractor.Exception.UnknownException -> {
-                        Timber.error(message = it::toString)
+                        Timber.error(RuntimeException(it.toString()), it::toString)
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
                 }
@@ -369,10 +369,10 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                     either.fold(ifLeft = {
                         ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
                     }, ifRight = {
-                        ContextCompat.getDrawable(this, R.drawable.ic_gender) // profile pic
+                        ContextCompat.getDrawable(this, R.drawable.ic_sherlock) // profile pic
                     })
                 } else {
-                    ContextCompat.getDrawable(this, R.drawable.ic_hair) // no user error icon
+                    ContextCompat.getDrawable(this, R.drawable.ic_gender) // no user error icon
                 }
             })
 
@@ -415,10 +415,8 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
     private fun signOut() {
         signOutDisposable = viewModel.signOutSingle.subscribe({ resultEither ->
-
-            Timber.error(message = resultEither::toString)
             if (resultEither is Either.Left) {
-                Timber.error(message = resultEither::toString)
+                Timber.error(RuntimeException(resultEither.toString()), resultEither::toString)
             }
         }, {
             Timber.error(it, it::toString)
