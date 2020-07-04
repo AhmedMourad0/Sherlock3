@@ -82,17 +82,11 @@ internal class FirebaseAuthenticator @Inject constructor(
                 .observeOn(Schedulers.io())
                 .switchMap { isUserSignedIn ->
                     if (isUserSignedIn) {
-                        createGetCurrentUser()
+                        Flowable.just(auth.get().currentUser?.toIncompleteUser().toOption())
                     } else {
                         Flowable.just(none())
                     }
                 }
-    }
-
-    private fun createGetCurrentUser(): Flowable<Option<IncompleteUser>> {
-        return Flowable.just(
-                auth.get().currentUser?.toIncompleteUser().toOption()
-        ).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
     override fun signIn(

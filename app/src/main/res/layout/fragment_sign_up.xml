@@ -240,7 +240,7 @@
 				android:layout_marginStart="16dp"
 				android:contentDescription="@string/sign_up_with_twitter"
 				android:padding="4dp"
-				android:src="@mipmap/facebook_circular" />
+				android:src="@mipmap/twitter_circular" />
 		
 		</LinearLayout>
 	
