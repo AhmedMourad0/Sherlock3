@@ -225,7 +225,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         Single.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            createUpdateUserLastLoginDate(id, db)
+                            createUpdateUserLastLoginDate(id)
                         } else {
                             Single.just(
                                     RemoteRepository.UpdateUserLastLoginDateException.NoSignedInUserException.left()
@@ -236,8 +236,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     }
 
     private fun createUpdateUserLastLoginDate(
-            id: UserId,
-            db: Lazy<FirebaseFirestore>
+            id: UserId
     ): Single<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>> {
 
         return Single.create<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>> { emitter ->

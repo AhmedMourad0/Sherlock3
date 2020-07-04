@@ -23,8 +23,8 @@ internal interface AuthBindingsModule {
 
     @Binds
     fun bindObserveSignedInUserInteractor(
-            impl: ObserveSignedInUserInteractorImpl
-    ): ObserveSignedInUserInteractor
+            impl: ObserveCurrentUserInteractorImpl
+    ): ObserveCurrentUserInteractor
 
     @Binds
     fun bindSendPasswordResetEmailInteractor(

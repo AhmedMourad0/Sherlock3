@@ -17,7 +17,7 @@ internal interface Authenticator : UserAuthStateObservable {
 
     override fun observeUserAuthState(): Flowable<Boolean>
 
-    fun getCurrentUser(): Flowable<Option<IncompleteUser>>
+    fun observeCurrentUser(): Flowable<Option<IncompleteUser>>
 
     fun signIn(credentials: UserCredentials): Single<Either<SignInException, IncompleteUser>>
 

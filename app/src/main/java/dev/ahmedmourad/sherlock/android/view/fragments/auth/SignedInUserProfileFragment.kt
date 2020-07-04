@@ -18,7 +18,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFacto
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -62,13 +62,13 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
             resultEither.fold(ifLeft = { e ->
                 when (e) {
 
-                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> Unit
+                    ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> Unit
 
-                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
+                    is ObserveCurrentUserInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
                     }
 
-                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
+                    is ObserveCurrentUserInteractor.Exception.UnknownException -> {
                         Timber.error(e.origin, e::toString)
                     }
 

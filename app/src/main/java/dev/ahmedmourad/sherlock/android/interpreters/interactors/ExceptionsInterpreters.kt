@@ -23,13 +23,13 @@ internal fun CompleteSignUpInteractor.Exception.localizedMessage(): String {
     }
 }
 
-internal fun ObserveSignedInUserInteractor.Exception.localizedMessage(): String {
+internal fun ObserveCurrentUserInteractor.Exception.localizedMessage(): String {
     return when (this) {
-        ObserveSignedInUserInteractor.Exception.NoInternetConnectionException ->
+        ObserveCurrentUserInteractor.Exception.NoInternetConnectionException ->
             appCtx.getString(R.string.internet_connection_needed)
-        is ObserveSignedInUserInteractor.Exception.InternalException ->
+        is ObserveCurrentUserInteractor.Exception.InternalException ->
             somethingWentWrong(this.origin)
-        is ObserveSignedInUserInteractor.Exception.UnknownException ->
+        is ObserveCurrentUserInteractor.Exception.UnknownException ->
             somethingWentWrong(this.origin)
     }
 }

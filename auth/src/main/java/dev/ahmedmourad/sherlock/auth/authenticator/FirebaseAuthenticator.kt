@@ -63,21 +63,30 @@ internal class FirebaseAuthenticator @Inject constructor(
     private fun createObserveUserAuthState(): Flowable<Boolean> {
         return Flowable.create<Boolean>({ emitter ->
 
-            emitter.onNext(auth.get().currentUser != null)
-
             val authStateListener = { firebaseAuth: FirebaseAuth ->
                 emitter.onNext(firebaseAuth.currentUser != null)
             }
 
-            auth.get().addAuthStateListener(authStateListener)
-
             emitter.setCancellable { auth.get().removeAuthStateListener(authStateListener) }
+
+            emitter.onNext(auth.get().currentUser != null)
+
+            auth.get().addAuthStateListener(authStateListener)
 
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun getCurrentUser(): Flowable<Option<IncompleteUser>> {
-        return createGetCurrentUser()
+    override fun observeCurrentUser(): Flowable<Option<IncompleteUser>> {
+        return observeUserAuthState()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .switchMap { isUserSignedIn ->
+                    if (isUserSignedIn) {
+                        createGetCurrentUser()
+                    } else {
+                        Flowable.just(none())
+                    }
+                }
     }
 
     private fun createGetCurrentUser(): Flowable<Option<IncompleteUser>> {

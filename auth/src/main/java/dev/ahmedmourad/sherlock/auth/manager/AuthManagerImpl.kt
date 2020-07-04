@@ -47,37 +47,37 @@ internal class AuthManagerImpl @Inject constructor(
     }
 
     override fun observeSignedInUser():
-            Flowable<Either<AuthManager.ObserveSignedInUserException, Either<IncompleteUser, SignedInUser>?>> {
+            Flowable<Either<AuthManager.ObserveCurrentUserException, Either<IncompleteUser, SignedInUser>?>> {
 
         fun RemoteRepository.FindSignedInUserException.map() = when (this) {
 
             RemoteRepository.FindSignedInUserException.NoInternetConnectionException ->
-                AuthManager.ObserveSignedInUserException.NoInternetConnectionException
+                AuthManager.ObserveCurrentUserException.NoInternetConnectionException
 
             RemoteRepository.FindSignedInUserException.NoSignedInUserException ->
                 null
 
             is RemoteRepository.FindSignedInUserException.InternalException ->
-                AuthManager.ObserveSignedInUserException.InternalException(this.origin)
+                AuthManager.ObserveCurrentUserException.InternalException(this.origin)
 
             is RemoteRepository.FindSignedInUserException.UnknownException ->
-                AuthManager.ObserveSignedInUserException.UnknownException(this.origin)
+                AuthManager.ObserveCurrentUserException.UnknownException(this.origin)
         }
 
         fun RemoteRepository.UpdateUserLastLoginDateException.map() = when (this) {
 
             RemoteRepository.UpdateUserLastLoginDateException.NoInternetConnectionException ->
-                AuthManager.ObserveSignedInUserException.NoInternetConnectionException
+                AuthManager.ObserveCurrentUserException.NoInternetConnectionException
 
             RemoteRepository.UpdateUserLastLoginDateException.NoSignedInUserException ->
                 null
 
             is RemoteRepository.UpdateUserLastLoginDateException.UnknownException ->
-                AuthManager.ObserveSignedInUserException.UnknownException(this.origin)
+                AuthManager.ObserveCurrentUserException.UnknownException(this.origin)
         }
 
         return authenticator.get()
-                .getCurrentUser()
+                .observeCurrentUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .switchMap { incompleteUserOption ->
@@ -115,7 +115,7 @@ internal class AuthManagerImpl @Inject constructor(
                         }
                     })
                 }.onErrorReturn {
-                    AuthManager.ObserveSignedInUserException.UnknownException(it).left()
+                    AuthManager.ObserveCurrentUserException.UnknownException(it).left()
                 }
     }
 
@@ -593,7 +593,7 @@ internal class AuthManagerImpl @Inject constructor(
         }
 
         return authenticator.get()
-                .getCurrentUser()
+                .observeCurrentUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .firstOrError()

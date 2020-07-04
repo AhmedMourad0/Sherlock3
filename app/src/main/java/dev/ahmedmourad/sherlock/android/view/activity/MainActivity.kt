@@ -34,7 +34,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import timber.log.Timber
@@ -349,16 +349,16 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
                 when (it) {
 
-                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> {
+                    ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> {
                         ContextCompat.getDrawable(this, R.drawable.ic_height) // internet error icon
                     }
 
-                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
+                    is ObserveCurrentUserInteractor.Exception.InternalException -> {
                         Timber.error(RuntimeException(it.toString()), it::toString)
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
 
-                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
+                    is ObserveCurrentUserInteractor.Exception.UnknownException -> {
                         Timber.error(RuntimeException(it.toString()), it::toString)
                         ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
