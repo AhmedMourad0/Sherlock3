@@ -337,7 +337,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
         if (!viewModel.isInPrimaryContentMode.value!!) {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // cancel icon
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -346,7 +346,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
         item.isEnabled = isStateLoaded
         if (!isStateLoaded) {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // loading icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_notes) // loading icon
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -374,7 +374,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
             }, ifRight = { either ->
                 if (either != null) {
                     either.fold(ifLeft = {
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // profile pic with exclamation mark
                     }, ifRight = {
                         item.setActionView(R.layout.item_menu_profile_picture)
                         imageLoader.get().load(

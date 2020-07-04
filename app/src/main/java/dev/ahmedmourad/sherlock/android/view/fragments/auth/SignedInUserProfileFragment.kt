@@ -11,6 +11,7 @@ import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
@@ -22,7 +23,6 @@ import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserIntera
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -35,6 +35,9 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
 
     @Inject
     internal lateinit var dateManager: Lazy<DateManager>
+
+    @Inject
+    internal lateinit var textFormatter: Lazy<TextFormatter>
 
     @Inject
     internal lateinit var viewModelFactory: Provider<AssistedViewModelFactory<SignedInUserProfileViewModel>>
@@ -96,11 +99,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
 
             b.email.text = user.email.value
 
-            b.phoneNumber.text = appCtx.getString(
-                    R.string.phone_number_with_country_code,
-                    user.phoneNumber.countryCode,
-                    user.phoneNumber.number
-            )
+            b.phoneNumber.text = textFormatter.get().formatPhoneNumber(user.phoneNumber)
 
             b.registrationDate.text = dateManager.get().getRelativeDateTimeString(user.registrationDate)
         }
