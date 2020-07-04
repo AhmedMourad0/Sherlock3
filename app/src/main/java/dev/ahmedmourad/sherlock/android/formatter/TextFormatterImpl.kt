@@ -7,6 +7,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.platform.TextManager
@@ -80,6 +81,10 @@ internal class TextFormatterImpl @Inject constructor(
 
             else -> appCtx.getString(R.string.not_available)
         }
+    }
+
+    override fun formatPhoneNumber(phoneNumber: PhoneNumber?): String {
+        return phoneNumber?.fullNumber() ?: appCtx.getString(R.string.not_available)
     }
 
     @ExperimentalStdlibApi

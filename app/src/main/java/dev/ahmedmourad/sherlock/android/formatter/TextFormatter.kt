@@ -4,6 +4,7 @@ import arrow.core.Either
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.AgeRange
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.HeightRange
@@ -25,6 +26,8 @@ internal interface TextFormatter {
     fun formatAge(age: AgeRange?): String
 
     fun formatLocation(location: Location?): String
+
+    fun formatPhoneNumber(phoneNumber: PhoneNumber?): String
 
     fun formatLocation(locationName: String?, locationAddress: String?): String
 
