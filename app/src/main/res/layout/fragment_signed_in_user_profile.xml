@@ -24,7 +24,7 @@
 				android:id="@+id/profile_picture"
 				android:layout_width="0dp"
 				android:layout_height="0dp"
-				android:contentDescription="@string/picture"
+				android:contentDescription="@string/profile_picture"
 				android:scaleType="centerCrop"
 				android:src="@drawable/placeholder"
 				app:civ_border_color="@android:color/white"
@@ -61,6 +61,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginStart="8dp"
 			android:layout_marginEnd="8dp"
+			android:layout_marginBottom="4dp"
 			app:cardCornerRadius="1dp"
 			app:cardElevation="2dp">
 			

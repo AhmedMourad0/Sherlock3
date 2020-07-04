@@ -19,10 +19,12 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import arrow.core.Either
 import arrow.core.getOrElse
 import com.google.android.material.snackbar.Snackbar
+import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
+import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.clearBackStack
 import dev.ahmedmourad.sherlock.android.utils.findNavController
@@ -43,6 +45,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 internal class MainActivity : AppCompatActivity(), BackdropActivity {
+
+    @Inject
+    internal lateinit var imageLoader: Lazy<ImageLoader>
 
     @Inject
     lateinit var viewModelFactory: Provider<AssistedViewModelFactory<MainActivityViewModel>>
@@ -324,60 +329,71 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
-        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
         val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
+                ?: return super.onPrepareOptionsMenu(menu)
 
-        menu?.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
+        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
+
+        menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
         if (!viewModel.isInPrimaryContentMode.value!!) {
-            item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // cancel icon
             return super.onPrepareOptionsMenu(menu)
         }
 
         val userEither = globalViewModel.signedInUser.value
         val isStateLoaded = isUserSignedIn != null && userEither != null
 
-        item?.isEnabled = isStateLoaded
+        item.isEnabled = isStateLoaded
         if (!isStateLoaded) {
-            item?.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // loading icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // loading icon
             return super.onPrepareOptionsMenu(menu)
         }
 
-        item?.icon = if (isUserSignedIn == true) {
+        if (isUserSignedIn == true) {
 
             userEither!!.fold(ifLeft = {
 
                 when (it) {
 
                     ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> {
-                        ContextCompat.getDrawable(this, R.drawable.ic_height) // internet error icon
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_height) // internet error icon
                     }
 
                     is ObserveCurrentUserInteractor.Exception.InternalException -> {
                         Timber.error(RuntimeException(it.toString()), it::toString)
-                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
 
                     is ObserveCurrentUserInteractor.Exception.UnknownException -> {
                         Timber.error(RuntimeException(it.toString()), it::toString)
-                        ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
                     }
                 }
 
             }, ifRight = { either ->
                 if (either != null) {
                     either.fold(ifLeft = {
-                        ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_notes) // profile pic with exclamation mark
                     }, ifRight = {
-                        ContextCompat.getDrawable(this, R.drawable.ic_sherlock) // profile pic
+                        item.setActionView(R.layout.item_menu_profile_picture)
+                        imageLoader.get().load(
+                                it.pictureUrl?.value,
+                                item.actionView.findViewById(R.id.menu_profile_picture_image),
+                                R.drawable.placeholder,
+                                R.drawable.placeholder
+                        )
+                        item.actionView.setOnClickListener {
+                            onOptionsItemSelected(item)
+                        }
                     })
                 } else {
-                    ContextCompat.getDrawable(this, R.drawable.ic_gender) // no user error icon
+                    item.icon = ContextCompat.getDrawable(this, R.drawable.ic_gender) // no user error icon
                 }
             })
 
         } else {
-            ContextCompat.getDrawable(this, R.drawable.ic_location) // sign in icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_location) // sign in icon
         }
 
         return super.onPrepareOptionsMenu(menu)

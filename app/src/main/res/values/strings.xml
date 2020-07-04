@@ -170,5 +170,6 @@
 	<string name="email_already_in_use">This email is already in use by an existing account!</string>
 	<string name="custom_auth_no_response">Authentication was cancelled or has expired!</string>
 	<string name="weak_password">Password is too weak, please enter a stronger one!</string>
+	<string name="profile_picture">Profile Picture</string>
 
 </resources>

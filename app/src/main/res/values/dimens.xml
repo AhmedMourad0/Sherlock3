@@ -6,6 +6,7 @@
 	
 	<dimen name="defaultAppBarElevation">4dp</dimen>
 	<dimen name="backdropTranslationY">36dp</dimen>
+	<dimen name="profilePictureMenuItemVerticalPadding">11dp</dimen>
 	
 	<!-- HomeController -->
 	
