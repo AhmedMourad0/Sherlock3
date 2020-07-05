@@ -10,7 +10,6 @@
 	android:paddingBottom="@dimen/menuItemVerticalPadding">
 	
 	<com.github.ybq.android.spinkit.SpinKitView
-		android:id="@+id/aaaa"
 		style="@style/SpinKitView.Small.ThreeBounce"
 		android:layout_width="28dp"
 		android:layout_height="28dp"
