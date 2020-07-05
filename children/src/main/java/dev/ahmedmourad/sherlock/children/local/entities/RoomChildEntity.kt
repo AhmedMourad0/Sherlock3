@@ -96,7 +96,7 @@ internal data class RoomChildEntity(
                     ?.mapLeft { ModelConversionException(it.toString()) }
                     ?.bind()
 
-            val (appearance) = extractApproximateAppearance()
+            val appearance = !extractApproximateAppearance()
 
             RetrievedChild.of(
                     ChildId(id),
@@ -146,11 +146,11 @@ internal data class RoomChildEntity(
 
             firstName ?: return@fx null
 
-            val (first) = Name.of(firstName).mapLeft { ModelConversionException(it.toString()) }
+            val first = !Name.of(firstName).mapLeft { ModelConversionException(it.toString()) }
 
             lastName ?: return@fx first.left()
 
-            val (last) = Name.of(lastName).mapLeft { ModelConversionException(it.toString()) }
+            val last = !Name.of(lastName).mapLeft { ModelConversionException(it.toString()) }
 
             FullName.of(first, last).right().right().bind()
         }
@@ -183,8 +183,8 @@ internal data class RoomChildEntity(
             minAge ?: return@fx null
             maxAge ?: return@fx null
 
-            val (min) = Age.of(minAge).mapLeft { ModelConversionException(it.toString()) }
-            val (max) = Age.of(maxAge).mapLeft { ModelConversionException(it.toString()) }
+            val min = !Age.of(minAge).mapLeft { ModelConversionException(it.toString()) }
+            val max = !Age.of(maxAge).mapLeft { ModelConversionException(it.toString()) }
 
             AgeRange.of(min, max).mapLeft { ModelConversionException(it.toString()) }.bind()
         }
@@ -196,8 +196,8 @@ internal data class RoomChildEntity(
             minHeight ?: return@fx null
             maxHeight ?: return@fx null
 
-            val (min) = Height.of(minHeight).mapLeft { ModelConversionException(it.toString()) }
-            val (max) = Height.of(maxHeight).mapLeft { ModelConversionException(it.toString()) }
+            val min = !Height.of(minHeight).mapLeft { ModelConversionException(it.toString()) }
+            val max = !Height.of(maxHeight).mapLeft { ModelConversionException(it.toString()) }
 
             HeightRange.of(min, max).mapLeft { ModelConversionException(it.toString()) }.bind()
         }

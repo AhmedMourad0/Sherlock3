@@ -407,7 +407,7 @@ internal fun extractRetrievedChild(
 
     return Either.fx {
 
-        val (appearance) = extractApproximateAppearance(snapshot)
+        val appearance = !extractApproximateAppearance(snapshot)
 
         RetrievedChild.of(
                 ChildId(id),
@@ -428,12 +428,12 @@ private fun extractName(
 
         val first = snapshot.getString(Contract.Database.Children.FIRST_NAME) ?: return@fx null
 
-        val (firstName) = Name.of(first).mapLeft { ModelCreationException(it.toString()) }
+        val firstName = !Name.of(first).mapLeft { ModelCreationException(it.toString()) }
 
         val last = snapshot.getString(Contract.Database.Children.LAST_NAME)
                 ?: return@fx firstName.left()
 
-        val (lastName) = Name.of(last).mapLeft { ModelCreationException(it.toString()) }
+        val lastName = !Name.of(last).mapLeft { ModelCreationException(it.toString()) }
 
         FullName.of(firstName, lastName).right().right().bind()
     }
@@ -453,9 +453,9 @@ private fun extractApproximateAppearance(
         val hair = snapshot.getLong(Contract.Database.Children.HAIR)?.toInt()
                 ?.let { findEnum(it, Hair.values()) }
 
-        val (ageRange) = extractAgeRange(snapshot).mapLeft { ModelCreationException(it.toString()) }
+        val ageRange = !extractAgeRange(snapshot).mapLeft { ModelCreationException(it.toString()) }
 
-        val (heightRange) = extractHeightRange(snapshot).mapLeft { ModelCreationException(it.toString()) }
+        val heightRange = !extractHeightRange(snapshot).mapLeft { ModelCreationException(it.toString()) }
 
         ApproximateAppearance.of(
                 gender,
@@ -474,11 +474,11 @@ private fun extractAgeRange(
 
         val min = snapshot.getLong(Contract.Database.Children.MIN_AGE)?.toInt() ?: return@fx null
 
-        val (minAge) = Age.of(min).mapLeft { ModelCreationException(it.toString()) }
+        val minAge = !Age.of(min).mapLeft { ModelCreationException(it.toString()) }
 
         val max = snapshot.getLong(Contract.Database.Children.MAX_AGE)?.toInt() ?: return@fx null
 
-        val (maxAge) = Age.of(max).mapLeft { ModelCreationException(it.toString()) }
+        val maxAge = !Age.of(max).mapLeft { ModelCreationException(it.toString()) }
 
         AgeRange.of(minAge, maxAge).mapLeft { ModelCreationException(it.toString()) }.bind()
     }
@@ -491,11 +491,11 @@ private fun extractHeightRange(
 
         val min = snapshot.getLong(Contract.Database.Children.MIN_HEIGHT)?.toInt() ?: return@fx null
 
-        val (minHeight) = Height.of(min).mapLeft { ModelCreationException(it.toString()) }
+        val minHeight = !Height.of(min).mapLeft { ModelCreationException(it.toString()) }
 
         val max = snapshot.getLong(Contract.Database.Children.MAX_HEIGHT)?.toInt() ?: return@fx null
 
-        val (maxHeight) = Height.of(max).mapLeft { ModelCreationException(it.toString()) }
+        val maxHeight = !Height.of(max).mapLeft { ModelCreationException(it.toString()) }
 
         HeightRange.of(minHeight, maxHeight).mapLeft { ModelCreationException(it.toString()) }.bind()
     }

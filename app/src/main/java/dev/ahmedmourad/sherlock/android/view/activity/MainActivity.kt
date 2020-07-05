@@ -236,10 +236,11 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
             }
 
             (snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     textAlignment = View.TEXT_ALIGNMENT_CENTER
-                else
+                } else {
                     gravity = Gravity.CENTER
+                }
             }
 
         }.show()
@@ -332,12 +333,14 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
                 ?: return super.onPrepareOptionsMenu(menu)
 
+        item.isEnabled = true
+
         val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
 
         menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
 
         if (!viewModel.isInPrimaryContentMode.value!!) {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_username) // cancel icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_cancel)
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -346,7 +349,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
         item.isEnabled = isStateLoaded
         if (!isStateLoaded) {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_notes) // loading icon
+            item.setActionView(R.layout.content_folding_cube_progress_bar)
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -357,24 +360,36 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 when (it) {
 
                     ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> {
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_height) // internet error icon
+                        item.isEnabled = false
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_no_internet)
                     }
 
                     is ObserveCurrentUserInteractor.Exception.InternalException -> {
+                        item.isEnabled = false
                         Timber.error(RuntimeException(it.toString()), it::toString)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
                     }
 
                     is ObserveCurrentUserInteractor.Exception.UnknownException -> {
+                        item.isEnabled = false
                         Timber.error(RuntimeException(it.toString()), it::toString)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_hair) // error icon
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
                     }
                 }
 
             }, ifRight = { either ->
                 if (either != null) {
                     either.fold(ifLeft = {
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_age) // profile pic with exclamation mark
+                        item.setActionView(R.layout.item_menu_profile_picture_with_warning)
+                        imageLoader.get().load(
+                                it.pictureUrl?.value,
+                                item.actionView.findViewById(R.id.menu_profile_picture_image),
+                                R.drawable.placeholder,
+                                R.drawable.placeholder
+                        )
+                        item.actionView.setOnClickListener {
+                            onOptionsItemSelected(item)
+                        }
                     }, ifRight = {
                         item.setActionView(R.layout.item_menu_profile_picture)
                         imageLoader.get().load(
@@ -388,12 +403,13 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                         }
                     })
                 } else {
-                    item.icon = ContextCompat.getDrawable(this, R.drawable.ic_gender) // no user error icon
+                    item.isEnabled = false
+                    item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
                 }
             })
 
         } else {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_location) // sign in icon
+            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
         }
 
         return super.onPrepareOptionsMenu(menu)

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="wrap_content"
 	android:layout_height="match_parent"
 	android:layout_gravity="center"
+	android:clipChildren="false"
 	android:paddingTop="@dimen/menuItemVerticalPadding"
 	android:paddingBottom="@dimen/menuItemVerticalPadding"
 	android:paddingEnd="@dimen/menuItemEndPadding"
@@ -9,16 +10,12 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	
-	<de.hdodenhof.circleimageview.CircleImageView
-		android:id="@+id/menu_profile_picture_image"
-		android:layout_width="0dp"
-		android:layout_height="0dp"
-		android:contentDescription="@string/profile_picture"
-		android:scaleType="centerCrop"
-		android:src="@drawable/placeholder"
-		app:civ_border_color="@android:color/white"
-		android:elevation="4dp"
-		app:civ_border_width="0dp"
+	<com.github.ybq.android.spinkit.SpinKitView
+		style="@style/SpinKitView.Large.FoldingCube"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		app:SpinKit_Color="@color/colorAccent"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintDimensionRatio="1:1"
 		app:layout_constraintEnd_toEndOf="parent"
