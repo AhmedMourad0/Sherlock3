@@ -172,5 +172,7 @@
 	<string name="weak_password">Password is too weak, please enter a stronger one!</string>
 	<string name="profile_picture">Profile Picture</string>
 	<string name="warning">Warning</string>
+	<string name="settings">Settings</string>
+	<string name="loading">Loading</string>
 
 </resources>

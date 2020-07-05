@@ -60,7 +60,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
-			android:gravity="center_vertical">
+			android:gravity="center">
 			
 			<com.hbb20.CountryCodePicker
 				android:id="@+id/country_code_picker"

@@ -7,6 +7,10 @@
 		android:title="@string/sign_in"
 		app:showAsAction="ifRoom" />
 	<item
+		android:id="@+id/main_menu_settings"
+		android:title="@string/settings"
+		app:showAsAction="never" />
+	<item
 		android:id="@+id/main_menu_sign_out"
 		android:title="@string/sign_out"
 		app:showAsAction="never" />

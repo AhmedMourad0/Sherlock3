@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="wrap_content"
+	android:layout_height="match_parent"
+	android:layout_gravity="center"
+	android:paddingStart="@dimen/menuItemStartPadding"
+	android:paddingTop="@dimen/menuItemVerticalPadding"
+	android:paddingEnd="10dp"
+	android:paddingBottom="@dimen/menuItemVerticalPadding">
+	
+	<com.github.ybq.android.spinkit.SpinKitView
+		android:id="@+id/aaaa"
+		style="@style/SpinKitView.Small.ThreeBounce"
+		android:layout_width="28dp"
+		android:layout_height="28dp"
+		android:layout_gravity="center"
+		app:SpinKit_Color="@color/colorAccent" />
+
+</FrameLayout>
+

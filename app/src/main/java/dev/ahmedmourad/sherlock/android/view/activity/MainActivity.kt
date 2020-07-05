@@ -349,7 +349,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
         item.isEnabled = isStateLoaded
         if (!isStateLoaded) {
-            item.setActionView(R.layout.content_folding_cube_progress_bar)
+            item.setActionView(R.layout.content_indeterminate_progress_bar)
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -404,7 +404,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                     })
                 } else {
                     item.isEnabled = false
-                    item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
+                    item.setActionView(R.layout.content_indeterminate_progress_bar)
                 }
             })
 
