@@ -216,6 +216,12 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
             } else {
                 View.VISIBLE
             }
+
+            if (viewModel.isInPrimaryContentMode.value == true) {
+                supportFragmentManager.beginTransaction()
+                        .hide(authNavHostFragment)
+                        .commitNow()
+            }
         }
 
         binding.dummyView.requestFocusFromTouch()
@@ -430,7 +436,14 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
     }
 
     override fun setInPrimaryContentMode(newValue: Boolean) {
-        viewModel.onIsInPrimaryModeChange(newValue)
+        if (newValue) {
+            viewModel.onIsInPrimaryModeChange(newValue)
+        } else {
+            supportFragmentManager.beginTransaction()
+                    .show(authNavHostFragment)
+                    .commitNow()
+            viewModel.onIsInPrimaryModeChange(newValue)
+        }
     }
 
     private fun refreshPrimaryNavigationFragment() {
