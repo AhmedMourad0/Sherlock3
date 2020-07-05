@@ -1,133 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 	
-	<LinearLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal"
-		android:orientation="vertical"
-		android:paddingStart="@dimen/findChildrenPaddingStart"
-		android:paddingTop="@dimen/findChildrenPaddingTop"
-		android:paddingEnd="@dimen/findChildrenPaddingEnd"
-		android:paddingBottom="@dimen/findChildrenPaddingBottom">
+		android:layout_height="match_parent">
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline5"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_end="12dp" />
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_begin="12dp" />
 		
 		<include
 			android:id="@+id/name"
 			layout="@layout/content_child_name"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-		
-		<LinearLayout
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="28dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="parent" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/location_text_view"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
 			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			android:paddingTop="@dimen/findChildrenLocationPaddingTop"
-			android:paddingBottom="@dimen/displayChildLocationPaddingBottom"
-			tools:ignore="UseCompoundDrawables">
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/location_text_view"
-				android:layout_width="0dp"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:gravity="center_vertical"
-				android:paddingStart="@dimen/findChildrenLocationTextPaddingStart"
-				android:paddingEnd="@dimen/findChildrenLocationTextPaddingEnd"
-				android:text="@string/no_last_known_location_specified" />
-			
-			<ImageView
-				android:id="@+id/location_image_view"
-				android:layout_width="@dimen/findChildrenLocationIconWidth"
-				android:layout_height="@dimen/findChildrenLocationIconHeight"
-				android:layout_marginStart="@dimen/findChildrenLocationIconMarginStart"
-				android:layout_marginEnd="@dimen/findChildrenLocationIconMarginEnd"
-				android:contentDescription="@string/point_location_on_map"
-				app:srcCompat="@drawable/ic_google_maps" />
+			android:paddingStart="0dp"
+			android:paddingEnd="4dp"
+			android:text="@string/no_last_known_location_specified"
+			app:layout_constraintBottom_toBottomOf="@+id/location_image_view"
+			app:layout_constraintEnd_toStartOf="@+id/location_image_view"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="@+id/location_image_view" />
 		
-		</LinearLayout>
+		<ImageView
+			android:id="@+id/location_image_view"
+			android:layout_width="@dimen/findChildrenLocationIconWidth"
+			android:layout_height="@dimen/findChildrenLocationIconHeight"
+			android:layout_marginTop="20dp"
+			android:contentDescription="@string/point_location_on_map"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintTop_toBottomOf="@+id/name"
+			app:srcCompat="@drawable/ic_google_maps" />
 		
-		<LinearLayout
-			android:layout_width="match_parent"
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView3"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			android:paddingBottom="@dimen/displayChildPickersPaddingBottom">
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingStart="@dimen/findChildrenLabelPaddingStart"
-				android:paddingEnd="@dimen/findChildrenLabelPaddingEnd"
-				android:text="@string/age"
-				android:textColor="@android:color/black"
-				android:textSize="@dimen/findChildrenLabelTextSize" />
-			
-			<dev.ahmedmourad.sherlock.android.view.ProperNumberPicker
-				android:id="@+id/age_number_picker"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginEnd="@dimen/displayChildAgePickerMarginEnd"
-				app:maxValue="30"
-				app:minValue="0"
-				app:value="@integer/find_children_age_number_picker_default_value" />
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingStart="@dimen/findChildrenLabelPaddingStart"
-				android:paddingEnd="@dimen/findChildrenLabelPaddingEnd"
-				android:text="@string/height"
-				android:textColor="@android:color/black"
-				android:textSize="@dimen/findChildrenLabelTextSize" />
-			
-			<dev.ahmedmourad.sherlock.android.view.ProperNumberPicker
-				android:id="@+id/height_number_picker"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				app:maxValue="200"
-				app:minValue="40"
-				app:value="@integer/find_children_height_number_picker_default_value" />
+			android:paddingStart="@dimen/findChildrenLabelPaddingStart"
+			android:paddingEnd="@dimen/findChildrenLabelPaddingEnd"
+			android:text="@string/age"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/findChildrenLabelTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/age_number_picker"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="@+id/age_number_picker" />
 		
-		</LinearLayout>
+		<dev.ahmedmourad.sherlock.android.view.ProperNumberPicker
+			android:id="@+id/age_number_picker"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:layout_constraintStart_toEndOf="@+id/materialTextView3"
+			app:layout_constraintTop_toBottomOf="@+id/location_text_view"
+			app:maxValue="30"
+			app:minValue="0"
+			app:value="@integer/find_children_age_number_picker_default_value" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView4"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:paddingStart="@dimen/findChildrenLabelPaddingStart"
+			android:paddingEnd="@dimen/findChildrenLabelPaddingEnd"
+			android:text="@string/height"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/findChildrenLabelTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/age_number_picker"
+			app:layout_constraintStart_toEndOf="@+id/age_number_picker"
+			app:layout_constraintTop_toTopOf="@+id/age_number_picker" />
+		
+		<dev.ahmedmourad.sherlock.android.view.ProperNumberPicker
+			android:id="@+id/height_number_picker"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:layout_constraintBottom_toBottomOf="@+id/age_number_picker"
+			app:layout_constraintStart_toEndOf="@+id/materialTextView4"
+			app:layout_constraintTop_toTopOf="@+id/age_number_picker"
+			app:maxValue="200"
+			app:minValue="40"
+			app:value="@integer/find_children_height_number_picker_default_value" />
 		
 		<include
 			android:id="@+id/gender"
 			layout="@layout/content_child_gender"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/age_number_picker" />
 		
 		<include
 			android:id="@+id/skin"
 			layout="@layout/content_child_skin"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/gender" />
 		
 		<include
 			android:id="@+id/hair"
 			layout="@layout/content_child_hair"
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginBottom="8dp" />
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/skin" />
 		
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/search_button"
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="@dimen/findChildrenButtonMarginStart"
-			android:layout_marginTop="@dimen/findChildrenButtonMarginTop"
-			android:layout_marginEnd="@dimen/findChildrenButtonMarginEnd"
-			android:background="@color/colorAccent"
+			android:layout_marginStart="32dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginEnd="32dp"
+			android:backgroundTint="@color/colorAccent"
 			android:padding="@dimen/findChildrenButtonPadding"
 			android:text="@string/search"
 			android:textColor="@android:color/white"
-			tools:ignore="UnusedAttribute" />
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/hair" />
 	
-	</LinearLayout>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
