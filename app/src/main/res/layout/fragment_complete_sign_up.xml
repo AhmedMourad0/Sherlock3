@@ -6,6 +6,7 @@
 	android:layout_height="match_parent"
 	android:clipToPadding="false"
 	android:paddingTop="36dp"
+	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 	tools:context="dev.ahmedmourad.sherlock.android.view.activity.MainActivity">
 	
 	<androidx.constraintlayout.widget.ConstraintLayout
@@ -48,6 +49,7 @@
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="20dp"
+			app:hintTextColor="@color/colorAccent"
 			app:layout_constraintEnd_toStartOf="@+id/guideline2"
 			app:layout_constraintHorizontal_bias="0.5"
 			app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -73,6 +75,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginStart="8dp"
 			android:layout_marginTop="20dp"
+			app:hintTextColor="@color/colorAccent"
 			app:layout_constraintEnd_toStartOf="@+id/guideline2"
 			app:layout_constraintStart_toEndOf="@+id/country_code_picker"
 			app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
@@ -95,6 +98,7 @@
 			android:id="@+id/textInputLayout3"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			app:hintTextColor="@color/colorAccent"
 			app:layout_constraintEnd_toStartOf="@+id/guideline2"
 			app:layout_constraintStart_toStartOf="@+id/guideline"
 			app:layout_constraintTop_toTopOf="parent">
@@ -116,27 +120,30 @@
 		<com.google.android.material.textview.MaterialTextView
 			android:id="@+id/picture_text_view"
 			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="16dp"
+			android:layout_height="0dp"
 			android:background="?android:attr/selectableItemBackground"
 			android:clickable="true"
 			android:focusable="true"
 			android:gravity="center_vertical|start"
+			android:paddingStart="16dp"
+			android:paddingEnd="0dp"
 			android:text="@string/change_profile_picture"
 			android:textColor="@color/colorAccent"
 			app:layout_constraintBottom_toBottomOf="@+id/picture_image_view"
+			app:layout_constraintEnd_toStartOf="@+id/guideline2"
 			app:layout_constraintStart_toEndOf="@+id/picture_image_view"
 			app:layout_constraintTop_toTopOf="@+id/picture_image_view" />
 		
 		<com.hbb20.CountryCodePicker
 			android:id="@+id/country_code_picker"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
+			android:layout_height="0dp"
 			app:ccp_autoDetectCountry="true"
 			app:ccp_autoDetectLanguage="true"
 			app:ccp_autoFormatNumber="false"
 			app:ccp_countryAutoDetectionPref="SIM_NETWORK_LOCALE"
 			app:ccp_hintExampleNumber="true"
+			android:gravity="center_vertical"
 			app:ccp_hintExampleNumberType="PERSONAL_NUMBER"
 			app:layout_constraintBottom_toBottomOf="@+id/textInputLayout5"
 			app:layout_constraintStart_toStartOf="@+id/guideline"
