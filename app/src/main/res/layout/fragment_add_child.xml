@@ -4,174 +4,203 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:clipToPadding="false"
 	android:paddingBottom="@dimen/addChildPaddingBottom"
-	android:clipToPadding="false">
+	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 	
-	<LinearLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal"
-		android:orientation="vertical"
-		android:paddingStart="@dimen/addChildPaddingStart"
-		android:paddingTop="@dimen/addChildPaddingTop"
-		android:paddingEnd="@dimen/addChildPaddingEnd">
+		android:layout_height="match_parent">
 		
 		<include
 			android:id="@+id/name"
 			layout="@layout/content_child_name"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-		
-		<LinearLayout
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			android:paddingTop="@dimen/addChildLocationPaddingTop"
-			android:paddingBottom="@dimen/addChildLocationPaddingBottom"
-			tools:ignore="UseCompoundDrawables">
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/location_text_view"
-				android:layout_width="0dp"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:gravity="center_vertical"
-				android:paddingStart="@dimen/addChildLocationTextPaddingStart"
-				android:paddingEnd="@dimen/addChildLocationTextPaddingEnd"
-				android:text="@string/no_location_specified" />
-			
-			<ImageView
-				android:id="@+id/location_image_view"
-				android:layout_width="@dimen/addChildLocationIconWidth"
-				android:layout_height="@dimen/addChildLocationIconHeight"
-				android:layout_marginStart="@dimen/addChildLocationIconMarginStart"
-				android:layout_marginEnd="@dimen/addChildLocationIconMarginEnd"
-				android:contentDescription="@string/point_location_on_map"
-				app:srcCompat="@drawable/ic_google_maps" />
+			android:layout_marginTop="28dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="parent" />
 		
-		</LinearLayout>
+		<ImageView
+			android:id="@+id/location_image_view"
+			android:layout_width="@dimen/addChildLocationIconWidth"
+			android:layout_height="@dimen/addChildLocationIconHeight"
+			android:layout_marginTop="20dp"
+			android:contentDescription="@string/point_location_on_map"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintTop_toBottomOf="@+id/name"
+			app:srcCompat="@drawable/ic_google_maps" />
 		
-		<LinearLayout
-			android:layout_width="match_parent"
+		<androidx.constraintlayout.widget.Barrier
+			android:id="@+id/barrier2"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:gravity="center_vertical"
-			android:orientation="horizontal">
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingStart="@dimen/addChildLabelPaddingStart"
-				android:paddingEnd="@dimen/addChildLabelPaddingEnd"
-				android:text="@string/age"
-				android:textColor="@android:color/black"
-				android:textSize="@dimen/addChildLabelTextSize" />
-			
-			<com.jaygoo.widget.RangeSeekBar
-				android:id="@+id/age_seek_bar"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				app:rsb_indicator_height="@dimen/addChildSeekBarIndicatorHeight"
-				app:rsb_indicator_padding_left="@dimen/addChildSeekBarIndicatorPaddingLeft"
-				app:rsb_indicator_padding_right="@dimen/addChildSeekBarIndicatorPaddingRight"
-				app:rsb_indicator_radius="@dimen/addChildSeekBarIndicatorRadius"
-				app:rsb_indicator_show_mode="alwaysShow"
-				app:rsb_max="@integer/add_child_age_seek_bar_max"
-				app:rsb_min="@integer/add_child_age_seek_bar_min"
-				app:rsb_mode="range"
-				app:rsb_progress_color="@color/colorAccent"
-				app:rsb_progress_radius="0.8dp"
-				app:rsb_range_interval="1"
-				app:rsb_tick_mark_mode="number"
-				app:rsb_tick_mark_number="1"
-				app:rsb_tick_mark_text_array="@array/age_marks" />
+			app:barrierDirection="right"
+			app:constraint_referenced_ids="materialTextView,materialTextView2"
+			tools:layout_editor_absoluteX="415dp" />
 		
-		</LinearLayout>
-		
-		<LinearLayout
-			android:layout_width="match_parent"
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline5"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:gravity="center_vertical"
-			android:orientation="horizontal">
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingStart="@dimen/addChildLabelPaddingStart"
-				android:paddingEnd="@dimen/addChildLabelPaddingEnd"
-				android:text="@string/height"
-				android:textColor="@android:color/black"
-				android:textSize="@dimen/addChildLabelTextSize" />
-			
-			<com.jaygoo.widget.RangeSeekBar
-				android:id="@+id/height_seek_bar"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				app:rsb_indicator_height="@dimen/addChildSeekBarIndicatorHeight"
-				app:rsb_indicator_padding_left="@dimen/addChildSeekBarIndicatorPaddingLeft"
-				app:rsb_indicator_padding_right="@dimen/addChildSeekBarIndicatorPaddingRight"
-				app:rsb_indicator_radius="@dimen/addChildSeekBarIndicatorRadius"
-				app:rsb_indicator_show_mode="alwaysShow"
-				app:rsb_max="@integer/add_child_height_seek_bar_max"
-				app:rsb_min="@integer/add_child_height_seek_bar_min"
-				app:rsb_mode="range"
-				app:rsb_progress_color="@color/colorAccent"
-				app:rsb_progress_radius="0.8dp"
-				app:rsb_range_interval="1"
-				app:rsb_tick_mark_mode="number"
-				app:rsb_tick_mark_number="1"
-				app:rsb_tick_mark_text_array="@array/height_marks" />
+			android:orientation="vertical"
+			app:layout_constraintGuide_end="12dp" />
 		
-		</LinearLayout>
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_begin="12dp" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/location_text_view"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:gravity="center_vertical"
+			android:paddingStart="0dp"
+			android:paddingEnd="4dp"
+			android:text="@string/no_location_specified"
+			app:layout_constraintBottom_toBottomOf="@+id/location_image_view"
+			app:layout_constraintEnd_toStartOf="@+id/location_image_view"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="@+id/location_image_view" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/age"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/addChildLabelTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/age_seek_bar"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="@+id/age_seek_bar" />
+		
+		<com.jaygoo.widget.RangeSeekBar
+			android:id="@+id/age_seek_bar"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toEndOf="@id/barrier2"
+			app:layout_constraintTop_toBottomOf="@+id/location_text_view"
+			app:rsb_indicator_height="@dimen/addChildSeekBarIndicatorHeight"
+			app:rsb_indicator_padding_left="@dimen/addChildSeekBarIndicatorPaddingLeft"
+			app:rsb_indicator_padding_right="@dimen/addChildSeekBarIndicatorPaddingRight"
+			app:rsb_indicator_radius="@dimen/addChildSeekBarIndicatorRadius"
+			app:rsb_indicator_show_mode="alwaysShow"
+			app:rsb_max="@integer/add_child_age_seek_bar_max"
+			app:rsb_min="@integer/add_child_age_seek_bar_min"
+			app:rsb_mode="range"
+			app:rsb_progress_color="@color/colorAccent"
+			app:rsb_progress_radius="0.8dp"
+			app:rsb_range_interval="1"
+			app:rsb_tick_mark_mode="number"
+			app:rsb_tick_mark_number="1"
+			app:rsb_tick_mark_text_array="@array/age_marks" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/height"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/addChildLabelTextSize"
+			android:paddingEnd="12dp"
+			android:paddingStart="0dp"
+			app:layout_constraintBottom_toBottomOf="@+id/height_seek_bar"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toTopOf="@+id/height_seek_bar" />
+		
+		<com.jaygoo.widget.RangeSeekBar
+			android:id="@+id/height_seek_bar"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			android:layout_weight="1"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toEndOf="@id/barrier2"
+			app:layout_constraintTop_toBottomOf="@+id/age_seek_bar"
+			app:rsb_indicator_height="@dimen/addChildSeekBarIndicatorHeight"
+			app:rsb_indicator_padding_left="@dimen/addChildSeekBarIndicatorPaddingLeft"
+			app:rsb_indicator_padding_right="@dimen/addChildSeekBarIndicatorPaddingRight"
+			app:rsb_indicator_radius="@dimen/addChildSeekBarIndicatorRadius"
+			app:rsb_indicator_show_mode="alwaysShow"
+			app:rsb_max="@integer/add_child_height_seek_bar_max"
+			app:rsb_min="@integer/add_child_height_seek_bar_min"
+			app:rsb_mode="range"
+			app:rsb_progress_color="@color/colorAccent"
+			app:rsb_progress_radius="0.8dp"
+			app:rsb_range_interval="1"
+			app:rsb_tick_mark_mode="number"
+			app:rsb_tick_mark_number="1"
+			app:rsb_tick_mark_text_array="@array/height_marks" />
 		
 		<include
 			android:id="@+id/gender"
 			layout="@layout/content_child_gender"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/height_seek_bar" />
 		
 		<include
 			android:id="@+id/skin"
 			layout="@layout/content_child_skin"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/gender" />
 		
 		<include
 			android:id="@+id/hair"
 			layout="@layout/content_child_hair"
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginBottom="@dimen/addChildHairPaddingBottom" />
+			android:layout_marginTop="20dp"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/skin" />
 		
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+		<de.hdodenhof.circleimageview.CircleImageView
+			android:id="@+id/picture_image_view"
+			android:layout_width="@dimen/addChildPictureWidth"
+			android:layout_height="@dimen/addChildPictureHeight"
+			android:layout_marginTop="20dp"
+			android:src="@drawable/placeholder"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/hair" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/picture_text_view"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
 			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			android:paddingBottom="@dimen/addChildPicturePaddingBottom">
-			
-			<de.hdodenhof.circleimageview.CircleImageView
-				android:id="@+id/picture_image_view"
-				android:layout_width="@dimen/addChildPictureWidth"
-				android:layout_height="@dimen/addChildPictureHeight"
-				android:src="@drawable/placeholder" />
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/picture_text_view"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:padding="@dimen/addChildPictureTextPadding"
-				android:text="@string/choose_a_picture"
-				android:textColor="@color/colorAccent"
-				android:textSize="@dimen/addChildPictureTextSize" />
-		
-		</LinearLayout>
+			android:paddingStart="16dp"
+			android:paddingEnd="0dp"
+			android:text="@string/choose_a_picture"
+			android:textColor="@color/colorAccent"
+			android:textSize="@dimen/addChildPictureTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/picture_image_view"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toEndOf="@+id/picture_image_view"
+			app:layout_constraintTop_toTopOf="@+id/picture_image_view" />
 		
 		<com.google.android.material.textfield.TextInputLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
+			android:id="@+id/textInputLayout2"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			app:hintTextColor="@color/colorAccent"
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/picture_image_view">
 			
 			<com.google.android.material.textfield.TextInputEditText
 				android:id="@+id/notes_edit_text"
@@ -184,17 +213,19 @@
 		
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/publish_button"
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="@dimen/addChildButtonMarginStart"
-			android:layout_marginTop="@dimen/addChildButtonMarginTop"
-			android:layout_marginEnd="@dimen/addChildButtonMarginEnd"
+			android:layout_marginStart="32dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginEnd="32dp"
 			android:backgroundTint="@color/colorAccent"
 			android:padding="@dimen/addChildButtonPadding"
 			android:text="@string/publish"
 			android:textColor="@android:color/white"
-			tools:ignore="UnusedAttribute" />
+			app:layout_constraintEnd_toStartOf="@+id/guideline5"
+			app:layout_constraintStart_toStartOf="@+id/guideline3"
+			app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
 	
-	</LinearLayout>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
