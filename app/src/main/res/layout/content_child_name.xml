@@ -2,15 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:baselineAligned="false"
 	android:gravity="center_vertical"
-	android:orientation="horizontal"
-	android:paddingBottom="@dimen/namePaddingBottom">
+	android:orientation="horizontal">
 	
 	<com.google.android.material.textfield.TextInputLayout
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+		app:hintTextColor="@color/colorAccent"
 		android:paddingStart="@dimen/nameFirstNamePaddingStart"
 		android:paddingEnd="@dimen/nameTextSpacing">
 		
@@ -28,7 +29,8 @@
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
 		android:paddingEnd="@dimen/nameLastNamePaddingEnd"
-		android:paddingStart="@dimen/nameTextSpacing">
+		android:paddingStart="@dimen/nameTextSpacing"
+		app:hintTextColor="@color/colorAccent">
 		
 		<com.google.android.material.textfield.TextInputEditText
 			android:id="@+id/last_name_edit_text"
