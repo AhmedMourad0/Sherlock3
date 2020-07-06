@@ -12,7 +12,7 @@ import dev.ahmedmourad.sherlock.android.loader.GlideImageLoader
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.pickers.images.EsafirmImagePicker
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
-import dev.ahmedmourad.sherlock.android.pickers.places.GooglePlacePicker
+import dev.ahmedmourad.sherlock.android.pickers.places.PingPlacePicker
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactoryImpl
@@ -46,7 +46,7 @@ internal interface AppBindingsModule {
 
     @Binds
     fun bindPlacePicker(
-            impl: GooglePlacePicker
+            impl: PingPlacePicker
     ): PlacePicker
 
     @Binds

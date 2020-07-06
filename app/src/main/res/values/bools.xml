@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<bool name="enable_nearby_search">true</bool>
+	<bool name="show_confirmation_photo">true</bool>
+	<bool name="show_confirmation_map">true</bool>
+	<bool name="auto_center_on_marker_click">false</bool>
+</resources>
