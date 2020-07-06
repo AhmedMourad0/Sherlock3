@@ -10,7 +10,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import splitties.init.appCtx
 import javax.inject.Inject
 
 @Reusable
@@ -30,10 +29,9 @@ internal class AndroidConnectivityManager @Inject constructor() : ConnectivityMa
 
     override fun observeInternetConnectivity():
             Flowable<Either<ConnectivityManager.ObserveInternetConnectivityException, Boolean>> {
-        return ReactiveNetwork.observeNetworkConnectivity(appCtx)
+        return ReactiveNetwork.observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .switchMapSingle { ReactiveNetwork.checkInternetConnectivity() }
                 .toFlowable(BackpressureStrategy.LATEST)
                 .map<Either<ConnectivityManager.ObserveInternetConnectivityException, Boolean>> {
                     it.right()
