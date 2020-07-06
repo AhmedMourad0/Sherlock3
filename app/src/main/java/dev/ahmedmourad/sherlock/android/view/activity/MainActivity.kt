@@ -91,9 +91,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setupBackdrop()
         setupNavigation()
 
-        binding.root.post {
-            showConnectivitySnackBar(Connectivity.CONNECTING)
-        }
+        showConnectivitySnackBar(Connectivity.CONNECTING)
 
         observe(globalViewModel.internetConnectivity) { either ->
             either.fold(ifLeft = {
@@ -474,6 +472,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         }
         foregroundAnimator.removeAllUpdateListeners()
         foregroundAnimator.removeAllListeners()
+        signOutDisposable?.dispose()
         super.onStop()
     }
 

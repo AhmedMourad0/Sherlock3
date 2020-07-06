@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import kotlinx.android.parcel.Parcelize
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location as DomainLocation
 
+internal typealias StartActivityForResult = (Intent, Int) -> Unit
+
 internal typealias OnError = (Throwable) -> Unit
 internal typealias OnSelect = (PlacePicker.Location) -> Unit
 
@@ -20,11 +22,11 @@ internal interface PlacePicker {
 
     @Parcelize
     data class Location(
-            val id: String,
-            val name: String,
-            val address: String,
-            val latitude: Double,
-            val longitude: Double
+            val id: String?,
+            val name: String?,
+            val address: String?,
+            val latitude: Double?,
+            val longitude: Double?
     ) : Parcelable {
         companion object {
             fun from(location: DomainLocation): Location {

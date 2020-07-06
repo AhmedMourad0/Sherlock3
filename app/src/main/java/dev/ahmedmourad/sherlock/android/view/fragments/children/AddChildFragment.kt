@@ -379,8 +379,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         setLocationEnabled(true)
         setPictureEnabled(true)
 
-        if (resultCode != RESULT_OK)
+        if (resultCode != RESULT_OK) {
             return
+        }
 
         checkNotNull(data) {
             Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()

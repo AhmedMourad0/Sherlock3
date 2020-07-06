@@ -272,8 +272,9 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
         setLocationEnabled(true)
 
-        if (resultCode != RESULT_OK)
+        if (resultCode != RESULT_OK) {
             return
+        }
 
         checkNotNull(data) {
             Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()

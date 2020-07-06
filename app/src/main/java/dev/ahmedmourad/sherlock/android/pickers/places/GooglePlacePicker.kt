@@ -9,8 +9,6 @@ import splitties.init.appCtx
 import javax.inject.Inject
 import com.google.android.gms.location.places.ui.PlacePicker as DelegatePlacePicker
 
-private typealias StartActivityForResult = (Intent, Int) -> Unit
-
 internal class GooglePlacePicker @Inject constructor() : PlacePicker {
 
     private val requestCode = (0..65535).random()
