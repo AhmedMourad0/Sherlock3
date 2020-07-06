@@ -4,23 +4,91 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:paddingTop="36dp"
 	android:clipToPadding="false"
+	android:paddingTop="36dp"
 	tools:context="dev.ahmedmourad.sherlock.android.view.activity.MainActivity">
 	
-	<LinearLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
-		android:orientation="vertical">
+		android:layout_height="match_parent">
+		
+		<ImageView
+			android:id="@+id/sign_in_with_google_image_view"
+			android:layout_width="44dp"
+			android:layout_height="44dp"
+			android:layout_marginTop="12dp"
+			android:contentDescription="@string/sign_in_with_google"
+			android:padding="4dp"
+			android:src="@mipmap/google_circular"
+			app:layout_constraintEnd_toStartOf="@id/sign_in_with_facebook_image_view"
+			app:layout_constraintHorizontal_chainStyle="packed"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toBottomOf="@+id/materialTextView5" />
+		
+		<ImageView
+			android:id="@+id/sign_in_with_facebook_image_view"
+			android:layout_width="44dp"
+			android:layout_height="44dp"
+			android:layout_marginStart="16dp"
+			android:contentDescription="@string/sign_in_with_facebook"
+			android:padding="4dp"
+			android:src="@mipmap/facebook_circular"
+			app:layout_constraintBottom_toBottomOf="@+id/sign_in_with_google_image_view"
+			app:layout_constraintEnd_toStartOf="@id/sign_in_with_twitter_image_view"
+			app:layout_constraintStart_toEndOf="@+id/sign_in_with_google_image_view"
+			app:layout_constraintTop_toTopOf="@+id/sign_in_with_google_image_view" />
+		
+		<ImageView
+			android:id="@+id/sign_in_with_twitter_image_view"
+			android:layout_width="44dp"
+			android:layout_height="44dp"
+			android:layout_marginStart="16dp"
+			android:contentDescription="@string/sign_in_with_twitter"
+			android:padding="4dp"
+			android:src="@mipmap/twitter_circular"
+			app:layout_constraintBottom_toBottomOf="@+id/sign_in_with_facebook_image_view"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintStart_toEndOf="@+id/sign_in_with_facebook_image_view"
+			app:layout_constraintTop_toTopOf="@+id/sign_in_with_facebook_image_view" />
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline6"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_begin="36dp" />
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline8"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_end="36dp" />
+		
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/sign_in_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			android:backgroundTint="@color/colorAccent"
+			android:paddingStart="72dp"
+			android:paddingTop="12dp"
+			android:paddingEnd="72dp"
+			android:paddingBottom="12dp"
+			android:text="@string/sign_in"
+			android:textColor="@android:color/white"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toBottomOf="@+id/textInputLayout6" />
 		
 		<com.google.android.material.textfield.TextInputLayout
-			android:layout_width="match_parent"
+			android:id="@+id/textInputLayout"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="36dp"
-			android:layout_marginEnd="36dp"
-			android:layout_marginBottom="20dp"
-			app:hintTextColor="@color/colorAccent">
+			app:hintTextColor="@color/colorAccent"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toTopOf="parent">
 			
 			<com.google.android.material.textfield.TextInputEditText
 				android:id="@+id/email_edit_Text"
@@ -37,116 +105,89 @@
 		</com.google.android.material.textfield.TextInputLayout>
 		
 		<com.google.android.material.textfield.TextInputLayout
-			android:layout_width="match_parent"
+			android:id="@+id/textInputLayout6"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="36dp"
-			android:layout_marginEnd="36dp"
-			app:passwordToggleEnabled="true"
-			app:hintTextColor="@color/colorAccent">
+			android:layout_marginTop="20dp"
+			app:hintTextColor="@color/colorAccent"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+			app:passwordToggleEnabled="true">
 			
 			<com.google.android.material.textfield.TextInputEditText
 				android:id="@+id/password_edit_Text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:autofillHints="password"
 				android:fontFamily="sans-serif-light"
 				android:hint="@string/password"
 				android:imeOptions="actionDone"
-				android:autofillHints="password"
 				android:inputType="textVisiblePassword"
 				android:maxLines="1"
 				tools:targetApi="o" />
 		
 		</com.google.android.material.textfield.TextInputLayout>
 		
-		<com.google.android.material.button.MaterialButton
-			android:id="@+id/sign_in_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingStart="72dp"
-			android:paddingEnd="72dp"
-			android:paddingTop="12dp"
-			android:paddingBottom="12dp"
-			android:layout_marginTop="20dp"
-			android:layout_marginStart="16dp"
-			android:layout_marginEnd="16dp"
-			android:backgroundTint="@color/colorAccent"
-			android:text="@string/sign_in"
-			android:textColor="@android:color/white" />
-		
 		<com.google.android.material.textview.MaterialTextView
 			android:id="@+id/forgot_password_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="start"
-			android:layout_marginStart="36dp"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="8dp"
 			android:background="?android:attr/selectableItemBackground"
 			android:clickable="true"
 			android:focusable="true"
+			android:gravity="center_vertical"
+			android:paddingStart="0dp"
+			android:paddingTop="8dp"
+			android:paddingEnd="8dp"
+			android:paddingBottom="8dp"
 			android:text="@string/forgot_my_password"
-			android:textColor="@color/colorAccent" />
+			android:textColor="@color/colorAccent"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
 		
 		<com.google.android.material.textview.MaterialTextView
 			android:id="@+id/or_sign_up_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="end"
-			android:layout_marginEnd="36dp"
-			android:layout_marginBottom="24dp"
+			android:layout_marginTop="28dp"
 			android:background="?android:attr/selectableItemBackground"
 			android:clickable="true"
 			android:focusable="true"
+			android:gravity="center_vertical"
+			android:paddingStart="8dp"
+			android:paddingTop="8dp"
+			android:paddingEnd="0dp"
+			android:paddingBottom="8dp"
 			android:text="@string/or_sign_up"
-			android:textColor="@color/colorAccent" />
-		
-		<View
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:background="@color/colorDivider" />
+			android:textColor="@color/colorAccent"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
 		
 		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView5"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
 			android:layout_gravity="center_horizontal"
-			android:text="@string/sign_in_with" />
+			android:layout_marginTop="16dp"
+			android:text="@string/sign_in_with"
+			app:layout_constraintEnd_toStartOf="@+id/guideline8"
+			app:layout_constraintStart_toStartOf="@+id/guideline6"
+			app:layout_constraintTop_toBottomOf="@+id/divider" />
 		
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
-			android:layout_marginBottom="40dp"
-			android:gravity="center_horizontal"
-			android:orientation="horizontal">
-			
-			<ImageView
-				android:id="@+id/sign_in_with_google_image_view"
-				android:layout_width="44dp"
-				android:layout_height="44dp"
-				android:contentDescription="@string/sign_in_with_google"
-				android:padding="4dp"
-				android:src="@mipmap/google_circular" />
-			
-			<ImageView
-				android:id="@+id/sign_in_with_facebook_image_view"
-				android:layout_width="44dp"
-				android:layout_height="44dp"
-				android:padding="4dp"
-				android:layout_marginStart="16dp"
-				android:contentDescription="@string/sign_in_with_facebook"
-				android:src="@mipmap/facebook_circular" />
-			
-			<ImageView
-				android:id="@+id/sign_in_with_twitter_image_view"
-				android:layout_width="44dp"
-				android:layout_height="44dp"
-				android:padding="4dp"
-				android:layout_marginStart="16dp"
-				android:contentDescription="@string/sign_in_with_twitter"
-				android:src="@mipmap/twitter_circular" />
-		
-		</LinearLayout>
+		<include
+			android:id="@+id/divider"
+			layout="@layout/content_divider"
+			android:layout_width="0dp"
+			android:layout_height="1dp"
+			android:layout_marginTop="16dp"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/or_sign_up_text_view" />
 	
-	</LinearLayout>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
