@@ -108,7 +108,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/child_age"
@@ -130,7 +134,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/child_gender"
@@ -152,7 +160,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/child_height"
@@ -174,7 +186,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/child_skin"
@@ -196,7 +212,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/child_hair"
@@ -264,7 +284,11 @@
 					<include
 						layout="@layout/content_divider"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="1dp"
+						android:layout_marginStart="@dimen/dividerMarginStart"
+						android:layout_marginTop="@dimen/dividerMarginTop"
+						android:layout_marginEnd="@dimen/dividerMarginEnd"
+						android:layout_marginBottom="@dimen/dividerMarginBottom" />
 					
 					<com.google.android.material.textview.MaterialTextView
 						android:id="@+id/notes"
