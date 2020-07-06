@@ -8,42 +8,16 @@
 	android:paddingBottom="24dp"
 	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 	
-	<LinearLayout
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:orientation="vertical">
-		
-		<androidx.constraintlayout.widget.ConstraintLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:paddingStart="110dp"
-			android:paddingEnd="110dp">
-			
-			<de.hdodenhof.circleimageview.CircleImageView
-				android:id="@+id/profile_picture"
-				android:layout_width="0dp"
-				android:layout_height="0dp"
-				android:contentDescription="@string/profile_picture"
-				android:scaleType="centerCrop"
-				android:src="@drawable/placeholder"
-				app:civ_border_color="@android:color/white"
-				app:civ_border_width="4dp"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintDimensionRatio="1:1"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent" />
-		
-		</androidx.constraintlayout.widget.ConstraintLayout>
+		android:layout_height="wrap_content">
 		
 		<com.google.android.material.textview.MaterialTextView
 			android:id="@+id/name"
-			android:layout_width="match_parent"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_vertical"
 			android:layout_marginTop="8dp"
-			android:layout_marginBottom="24dp"
 			android:ellipsize="end"
 			android:fontFamily="sans-serif"
 			android:gravity="center"
@@ -54,16 +28,40 @@
 			android:text="@string/not_available"
 			android:textColor="@android:color/black"
 			android:textSize="24sp"
-			android:textStyle="bold" />
+			android:textStyle="bold"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
+		
+		<de.hdodenhof.circleimageview.CircleImageView
+			android:id="@+id/profile_picture"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:layout_marginStart="100dp"
+			android:layout_marginEnd="100dp"
+			android:contentDescription="@string/profile_picture"
+			android:scaleType="centerCrop"
+			android:src="@drawable/placeholder"
+			app:civ_border_color="@android:color/white"
+			app:civ_border_width="0dp"
+			app:layout_constraintDimensionRatio="1:1"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
 		
 		<com.google.android.material.card.MaterialCardView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="8dp"
+			android:layout_marginTop="24dp"
 			android:layout_marginEnd="8dp"
 			android:layout_marginBottom="4dp"
 			app:cardCornerRadius="1dp"
-			app:cardElevation="2dp">
+			app:cardElevation="2dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/name">
 			
 			<LinearLayout
 				android:layout_width="match_parent"
@@ -96,12 +94,12 @@
 					android:textColor="@android:color/black"
 					android:textSize="18sp" />
 				
-				<View
+				<include
+					layout="@layout/content_divider"
 					android:layout_width="match_parent"
-					android:layout_height="@dimen/dividerHeight"
+					android:layout_height="1dp"
 					android:layout_marginTop="24dp"
-					android:layout_marginBottom="24dp"
-					android:background="@color/colorDivider" />
+					android:layout_marginBottom="24dp" />
 				
 				<com.google.android.material.textview.MaterialTextView
 					android:layout_width="match_parent"
@@ -125,12 +123,12 @@
 					android:textColor="@android:color/black"
 					android:textSize="18sp" />
 				
-				<View
+				<include
+					layout="@layout/content_divider"
 					android:layout_width="match_parent"
-					android:layout_height="@dimen/dividerHeight"
+					android:layout_height="1dp"
 					android:layout_marginTop="24dp"
-					android:layout_marginBottom="24dp"
-					android:background="@color/colorDivider" />
+					android:layout_marginBottom="24dp" />
 				
 				<com.google.android.material.textview.MaterialTextView
 					android:layout_width="match_parent"
@@ -158,6 +156,6 @@
 		
 		</com.google.android.material.card.MaterialCardView>
 	
-	</LinearLayout>
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
