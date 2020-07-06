@@ -12,7 +12,7 @@
 	
 	<!-- HomeController -->
 	
-	<dimen name="homeRecyclerVerticalPadding">20dp</dimen>
+	<dimen name="homeRecyclerVerticalPadding">28dp</dimen>
 	<dimen name="homeRecyclerHorizontalPadding">8dp</dimen>
 	
 	<!-- AddChildController -->
@@ -159,8 +159,8 @@
 	
 	<dimen name="sectionNamePaddingStart">4dp</dimen>
 	<dimen name="sectionNamePaddingEnd">4dp</dimen>
-	<dimen name="sectionNamePaddingTop">8dp</dimen>
-	<dimen name="sectionNamePaddingBottom">12dp</dimen>
+	<dimen name="sectionNamePaddingTop">10dp</dimen>
+	<dimen name="sectionNamePaddingBottom">10dp</dimen>
 	
 	<dimen name="sectionCardCornerRadius">1dp</dimen>
 	<dimen name="sectionCardElevation">2dp</dimen>
