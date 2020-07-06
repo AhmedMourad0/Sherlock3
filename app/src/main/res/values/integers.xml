@@ -2,9 +2,9 @@
 <resources>
 	<integer name="home_column_count">2</integer>
 	<integer name="add_child_age_seek_bar_min">0</integer>
-	<integer name="add_child_age_seek_bar_max">200</integer>
-	<integer name="add_child_height_seek_bar_min">20</integer>
-	<integer name="add_child_height_seek_bar_max">300</integer>
-	<integer name="find_children_age_number_picker_default_value">15</integer>
-	<integer name="find_children_height_number_picker_default_value">120</integer>
+	<integer name="add_child_age_seek_bar_max">30</integer>
+	<integer name="add_child_height_seek_bar_min">30</integer>
+	<integer name="add_child_height_seek_bar_max">200</integer>
+	<integer name="find_children_age_number_picker_default_value">8</integer>
+	<integer name="find_children_height_number_picker_default_value">80</integer>
 </resources>
