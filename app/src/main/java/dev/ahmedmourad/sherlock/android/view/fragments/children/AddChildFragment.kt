@@ -316,7 +316,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             b.heightSeekBar.setIndicatorTextDecimalFormat("###")
             b.heightSeekBar.setValue(
                     viewModel.minHeight.value?.toFloat() ?: 50f,
-                    viewModel.maxHeight.value?.toFloat() ?: 70f
+                    viewModel.maxHeight.value?.toFloat() ?: 80f
             )
             b.heightSeekBar.setOnRangeChangedListener(object : DefaultOnRangeChangedListener {
                 override fun onRangeChanged(view: RangeSeekBar?, min: Float, max: Float, isFromUser: Boolean) {

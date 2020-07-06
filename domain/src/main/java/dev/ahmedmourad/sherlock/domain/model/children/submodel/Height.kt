@@ -12,8 +12,8 @@ data class Height private constructor(val value: Int) {
 
     companion object {
 
-        private const val MIN_VALUE = 20
-        private const val MAX_VALUE = 300
+        private const val MIN_VALUE = 30
+        private const val MAX_VALUE = 200
 
         fun of(value: Int): Either<Exception, Height> {
             return validate(value)?.left() ?: Height(value).right()

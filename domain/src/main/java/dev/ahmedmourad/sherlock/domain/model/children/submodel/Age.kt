@@ -13,7 +13,7 @@ data class Age private constructor(val value: Int) {
     companion object {
 
         private const val MIN_VALUE = 0
-        private const val MAX_VALUE = 200
+        private const val MAX_VALUE = 30
 
         fun of(value: Int): Either<Exception, Age> {
             return validate(value)?.left() ?: Age(value).right()
