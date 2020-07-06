@@ -2,8 +2,4 @@
 <View xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="@dimen/dividerHeight"
-	android:layout_marginStart="@dimen/dividerMarginStart"
-	android:layout_marginTop="@dimen/dividerMarginTop"
-	android:layout_marginEnd="@dimen/dividerMarginEnd"
-	android:layout_marginBottom="@dimen/dividerMarginBottom"
 	android:background="@color/colorDivider" />
