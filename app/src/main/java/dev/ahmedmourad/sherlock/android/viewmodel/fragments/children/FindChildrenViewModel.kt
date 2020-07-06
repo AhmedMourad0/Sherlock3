@@ -184,17 +184,15 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
                 }.bind()
             }
 
-            val tempLocation = coordinates?.let { c ->
-                location.value?.let { l ->
-                    validateLocation(
-                            l.id,
-                            l.name,
-                            l.address,
-                            c
-                    ).mapLeft {
-                        savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                    }.bind()
-                }
+            val tempLocation = location.value?.let { l ->
+                validateLocation(
+                        l.id,
+                        l.name,
+                        l.address,
+                        coordinates
+                ).mapLeft {
+                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
+                }.bind()
             }
 
             val location = !validateLocation(tempLocation).mapLeft {

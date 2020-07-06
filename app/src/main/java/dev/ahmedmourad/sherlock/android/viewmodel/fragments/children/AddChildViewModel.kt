@@ -260,17 +260,15 @@ internal class AddChildViewModel(
                 }.bind()
             }
 
-            val location = coordinates?.let { coords ->
-                location.value?.let { loc ->
-                    validateLocation(
-                            loc.id,
-                            loc.name,
-                            loc.address,
-                            coords
-                    ).mapLeft {
-                        savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                    }.bind()
-                }
+            val location = location.value?.let { loc ->
+                validateLocation(
+                        loc.id,
+                        loc.name,
+                        loc.address,
+                        coordinates
+                ).mapLeft {
+                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
+                }.bind()
             }
 
             val picturePath = picturePath.value?.let { picturePath ->

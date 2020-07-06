@@ -149,7 +149,9 @@ internal fun validateHair(hair: Int?): Either<String, Hair> {
             ?: appCtx.getString(R.string.hair_color_missing).left()
 }
 
-internal fun validateCoordinates(latitude: Double, longitude: Double): Either<String, Coordinates> {
+internal fun validateCoordinates(latitude: Double?, longitude: Double?): Either<String, Coordinates?> {
+    latitude ?: return null.right()
+    longitude ?: return null.right()
     return Coordinates.of(latitude, longitude).mapLeft(Coordinates.Exception::localizedMessage)
 }
 
@@ -158,14 +160,15 @@ internal fun validateLocation(location: Location?): Either<String, Location> {
 }
 
 internal fun validateLocation(
-        id: String,
-        name: String,
-        address: String,
-        coordinates: Coordinates
-): Either<String, Location> {
+        id: String?,
+        name: String?,
+        address: String?,
+        coordinates: Coordinates?
+): Either<String, Location?> {
+    coordinates ?: return null.right()
     return Location.of(id,
-            name.trim(),
-            address.trim(),
+            name?.trim(),
+            address?.trim(),
             coordinates
     ).right()
 }
