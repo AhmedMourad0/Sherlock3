@@ -8,6 +8,7 @@ import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import dagger.Reusable
 import splitties.init.appCtx
 import java.io.ByteArrayOutputStream
@@ -34,6 +35,7 @@ internal class GlideImageLoader @Inject constructor() : ImageLoader {
         return try {
             glide.asBitmap()
                     .load(src)
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .submit()
                     .get()
                     .right()
