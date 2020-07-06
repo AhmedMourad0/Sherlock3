@@ -3,6 +3,8 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:clipToPadding="false"
+	android:paddingBottom="@dimen/addChildPaddingBottom"
 	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 	
 	<androidx.constraintlayout.widget.ConstraintLayout
@@ -102,7 +104,7 @@
 			app:layout_constraintStart_toEndOf="@+id/materialTextView4"
 			app:layout_constraintTop_toTopOf="@+id/age_number_picker"
 			app:maxValue="200"
-			app:minValue="40"
+			app:minValue="30"
 			app:value="@integer/find_children_height_number_picker_default_value" />
 		
 		<include
