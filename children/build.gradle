@@ -5,10 +5,10 @@ apply plugin: "kotlin-kapt"
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -55,9 +55,9 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation 'com.google.firebase:firebase-core:17.5.0'
     api "com.google.firebase:firebase-storage:19.1.1"
-    api "com.google.firebase:firebase-firestore-ktx:21.4.3"
+    api "com.google.firebase:firebase-firestore-ktx:21.5.0"
 
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"

@@ -4,10 +4,10 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "de.mannodermaus.android-junit5"
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -62,13 +62,13 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.appcompat:appcompat:1.2.0"
 
-    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation 'com.google.firebase:firebase-core:17.5.0'
     api "com.google.firebase:firebase-storage:19.1.1"
-    api "com.google.firebase:firebase-firestore-ktx:21.4.3"
-    api "com.google.firebase:firebase-auth:19.3.1"
-    implementation "com.google.android.gms:play-services-auth:18.0.0"
+    api "com.google.firebase:firebase-firestore-ktx:21.5.0"
+    api "com.google.firebase:firebase-auth:19.3.2"
+    implementation "com.google.android.gms:play-services-auth:18.1.0"
 
     implementation 'com.facebook.android:facebook-login:7.1.0'
     implementation "androidx.browser:browser:1.2.0"
