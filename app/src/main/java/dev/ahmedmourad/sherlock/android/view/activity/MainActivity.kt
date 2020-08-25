@@ -1,13 +1,10 @@
 package dev.ahmedmourad.sherlock.android.view.activity
 
 import android.animation.ValueAnimator
-import android.os.Build
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,14 +15,12 @@ import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import arrow.core.Either
 import arrow.core.getOrElse
-import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.ActivityMainBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
-import dev.ahmedmourad.sherlock.android.model.common.Connectivity
 import dev.ahmedmourad.sherlock.android.utils.clearBackStack
 import dev.ahmedmourad.sherlock.android.utils.findNavController
 import dev.ahmedmourad.sherlock.android.utils.hideSoftKeyboard
@@ -91,17 +86,6 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setupBackdrop()
         setupNavigation()
 
-        showConnectivitySnackBar(Connectivity.CONNECTING)
-
-        observe(globalViewModel.internetConnectivity) { either ->
-            either.fold(ifLeft = {
-                showConnectivitySnackBar(Connectivity.CONNECTING)
-                Timber.error(RuntimeException(it.toString()), it::toString)
-            }, ifRight = {
-                showConnectivitySnackBar(getConnectivity(it))
-            })
-        }
-
         observe(globalViewModel.userAuthState) { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
@@ -155,10 +139,6 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         appNavHostFragment = supportFragmentManager.findFragmentById(R.id.app_nav_host_fragment)!!
         authNavHostFragment = supportFragmentManager.findFragmentById(R.id.auth_nav_host_fragment)!!
         addOnBackPressedCallback()
-    }
-
-    private fun getConnectivity(isConnected: Boolean): Connectivity {
-        return if (isConnected) Connectivity.CONNECTED else Connectivity.DISCONNECTED
     }
 
     private fun addOnBackPressedCallback() {
@@ -223,31 +203,6 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         }
 
         binding.dummyView.requestFocusFromTouch()
-    }
-
-    private fun showConnectivitySnackBar(connectivity: Connectivity) {
-
-        val duration = if (connectivity.isIndefinite) {
-            Snackbar.LENGTH_INDEFINITE
-        } else {
-            Snackbar.LENGTH_SHORT
-        }
-
-        Snackbar.make(binding.root, connectivity.message, duration).apply {
-
-            val snackBarView = view.apply {
-                setBackgroundColor(ContextCompat.getColor(this@MainActivity, connectivity.color))
-            }
-
-            (snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                } else {
-                    gravity = Gravity.CENTER
-                }
-            }
-
-        }.show()
     }
 
     private fun createForegroundAnimator(): ValueAnimator {
@@ -354,6 +309,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         item.isEnabled = isStateLoaded
         if (!isStateLoaded) {
             item.setActionView(R.layout.content_indeterminate_progress_bar)
+            setInPrimaryContentMode(true)
             return super.onPrepareOptionsMenu(menu)
         }
 
@@ -366,18 +322,21 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                     ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> {
                         item.isEnabled = false
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_no_internet)
+                        setInPrimaryContentMode(true)
                     }
 
                     is ObserveCurrentUserInteractor.Exception.InternalException -> {
                         item.isEnabled = false
                         Timber.error(RuntimeException(it.toString()), it::toString)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
+                        setInPrimaryContentMode(true)
                     }
 
                     is ObserveCurrentUserInteractor.Exception.UnknownException -> {
                         item.isEnabled = false
                         Timber.error(RuntimeException(it.toString()), it::toString)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
+                        setInPrimaryContentMode(true)
                     }
                 }
 
@@ -409,6 +368,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 } else {
                     item.isEnabled = false
                     item.setActionView(R.layout.content_indeterminate_progress_bar)
+                    setInPrimaryContentMode(true)
                 }
             })
 
