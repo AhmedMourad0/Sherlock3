@@ -19,7 +19,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
-import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
+import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.android.utils.backgroundContextChannelId
 import dev.ahmedmourad.sherlock.android.view.activity.MainActivity
 import dev.ahmedmourad.sherlock.android.view.fragments.children.AddChildFragmentArgs
@@ -62,16 +62,16 @@ internal class SherlockService : Service() {
             ACTION_PUBLISH_CHILD -> handleActionPublishFound(
                     requireNotNull(
                             intent.getBundleExtra(EXTRA_CHILD)
-                    ).unbundle(AppPublishedChild.serializer())
+                    ).unbundle(AppChildToPublish.serializer())
             )
         }
 
         return START_REDELIVER_INTENT
     }
 
-    private fun handleActionPublishFound(appChild: AppPublishedChild) {
+    private fun handleActionPublishFound(appChild: AppChildToPublish) {
 
-        val child = appChild.toPublishedChild(imageLoader.get())
+        val child = appChild.toChildToPublish(imageLoader.get())
 
         startForeground(NOTIFICATION_ID_PUBLISH_CHILD, createPublishingNotification(appChild))
 
@@ -97,13 +97,13 @@ internal class SherlockService : Service() {
                 })
     }
 
-    private fun createPublishingNotification(child: AppPublishedChild): Notification {
+    private fun createPublishingNotification(child: AppChildToPublish): Notification {
 
         val pendingIntent = NavDeepLinkBuilder(applicationContext)
                 .setGraph(R.navigation.app_nav_graph)
                 .setDestination(R.id.addChildFragment)
                 .setComponentName(MainActivity::class.java)
-                .setArguments(AddChildFragmentArgs(child.bundle(AppPublishedChild.serializer().nullable)).toBundle())
+                .setArguments(AddChildFragmentArgs(child.bundle(AppChildToPublish.serializer().nullable)).toBundle())
                 .createPendingIntent()
 
         val name = child.name
@@ -171,7 +171,7 @@ internal class SherlockService : Service() {
 
     private fun showPublishingFailedNotification(
             e: AddChildInteractor.Exception,
-            child: AppPublishedChild
+            child: AppChildToPublish
     ) {
 
         Timber.error(RuntimeException(e.toString()), e::toString)
@@ -249,18 +249,18 @@ internal class SherlockService : Service() {
         const val NOTIFICATION_ID_PUBLISHED_SUCCESSFULLY = 1427
         const val NOTIFICATION_ID_PUBLISHING_FAILED = 3675
 
-        fun createIntent(child: AppPublishedChild) = Intent(appCtx, SherlockService::class.java).apply {
+        fun createIntent(child: AppChildToPublish) = Intent(appCtx, SherlockService::class.java).apply {
             action = ACTION_PUBLISH_CHILD
-            putExtra(EXTRA_CHILD, child.bundle(AppPublishedChild.serializer()))
+            putExtra(EXTRA_CHILD, child.bundle(AppChildToPublish.serializer()))
         }
     }
 }
 
-internal interface SherlockServiceIntentFactory : (AppPublishedChild) -> Intent
+internal interface SherlockServiceIntentFactory : (AppChildToPublish) -> Intent
 
 @Reusable
 internal class SherlockServiceIntentFactoryImpl @Inject constructor() : SherlockServiceIntentFactory {
-    override fun invoke(child: AppPublishedChild): Intent {
+    override fun invoke(child: AppChildToPublish): Intent {
         return SherlockService.createIntent(child)
     }
 }

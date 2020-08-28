@@ -8,7 +8,8 @@ import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import dev.ahmedmourad.sherlock.domain.model.EitherSerializer
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location
@@ -20,7 +21,8 @@ import timber.log.error
 
 @Serializable
 @NoCopy
-internal data class AppPublishedChild private constructor(
+internal data class AppChildToPublish private constructor(
+        val user: SimpleRetrievedUser,
         val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val location: Location?,
@@ -28,8 +30,9 @@ internal data class AppPublishedChild private constructor(
         val picturePath: PicturePath?
 ) {
 
-    fun toPublishedChild(imageLoader: ImageLoader): PublishedChild {
-        return PublishedChild.of(
+    fun toChildToPublish(imageLoader: ImageLoader): ChildToPublish {
+        return ChildToPublish.of(
+                user,
                 name,
                 notes,
                 location,
@@ -42,20 +45,23 @@ internal data class AppPublishedChild private constructor(
     }
 
     companion object {
-        fun of(name: Either<Name, FullName>?,
+        fun of(user: SimpleRetrievedUser,
+               name: Either<Name, FullName>?,
                notes: String?,
                location: Location?,
                appearance: ApproximateAppearance,
                picturePath: PicturePath?,
                imageLoader: ImageLoader
-        ): Either<PublishedChild.Exception, AppPublishedChild> {
-            return PublishedChild.validate(
+        ): Either<ChildToPublish.Exception, AppChildToPublish> {
+            return ChildToPublish.validate(
+                    user,
                     name,
                     notes,
                     location,
                     appearance,
                     imageLoader.getBytesOrNull(picturePath?.value)
-            )?.left() ?: AppPublishedChild(name, notes, location, appearance, picturePath).right()
+            )?.left()
+                    ?: AppChildToPublish(user, name, notes, location, appearance, picturePath).right()
         }
     }
 }

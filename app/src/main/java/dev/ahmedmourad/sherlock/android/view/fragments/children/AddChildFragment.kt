@@ -21,7 +21,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentAddChildBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
-import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
+import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.android.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
@@ -66,7 +66,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         SimpleSavedStateViewModelFactory(
                 this,
                 viewModelFactory,
-                AddChildViewModel.defaultArgs(args.child.unbundle(AppPublishedChild.serializer().nullable))
+                AddChildViewModel.defaultArgs(args.child.unbundle(AppChildToPublish.serializer().nullable))
         )
     }
 
@@ -85,7 +85,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddChildBinding.bind(view)
 
-        setUserInteractionsEnabled(args.child.unbundle(AppPublishedChild.serializer().nullable) == null)
+        setUserInteractionsEnabled(args.child.unbundle(AppChildToPublish.serializer().nullable) == null)
 
         initializeSkinColorViews()
         initializeHairColorViews()
@@ -112,8 +112,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
-                    b.locationTextView,
-                    b.pictureImageView,
+                    b.location,
+                    b.profilePicture,
                     b.publishButton,
                     b.skin.skinWhite,
                     b.skin.skinWheat,
@@ -165,7 +165,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun publish() {
         setUserInteractionsEnabled(false)
-        viewModel.onPublish()
+        viewModel.onPublish(globalViewModel.signedInUserSimplified.value)
     }
 
     private fun handlePublishingStateValue(value: PublishingState?) {
@@ -215,9 +215,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     b.gender.genderRadioGroup,
                     b.ageSeekBar,
                     b.heightSeekBar,
-                    b.locationTextView,
+                    b.location,
                     b.locationImageView,
-                    b.pictureImageView,
+                    b.profilePicture,
                     b.pictureTextView,
                     b.notesEditText,
                     b.publishButton
@@ -332,7 +332,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.pictureImageView,
+                        b.profilePicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
@@ -343,9 +343,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private fun initializeLocationTextView() {
         observe(viewModel.location) { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
-                binding?.locationTextView?.text = location.name
+                binding?.location?.text = location.name
             } else {
-                binding?.locationTextView?.setText(R.string.no_location_specified)
+                binding?.location?.setText(R.string.no_location_specified)
             }
         }
     }
@@ -369,7 +369,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.pictureImageView.isEnabled = enabled
+            b.profilePicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }
@@ -397,7 +397,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     private fun setLocationEnabled(enabled: Boolean) {
         binding?.let { b ->
             b.locationImageView.isEnabled = enabled
-            b.locationTextView.isEnabled = enabled
+            b.location.isEnabled = enabled
         }
     }
 
@@ -422,9 +422,9 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
             R.id.hair_dark -> hairColorSelector.select(Hair.DARK)
 
-            R.id.location_image_view, R.id.location_text_view -> startPlacePicker()
+            R.id.location_image_view, R.id.location -> startPlacePicker()
 
-            R.id.picture_image_view, R.id.picture_text_view -> startImagePicker()
+            R.id.child_picture, R.id.picture_text_view -> startImagePicker()
 
             R.id.publish_button -> publish()
         }
