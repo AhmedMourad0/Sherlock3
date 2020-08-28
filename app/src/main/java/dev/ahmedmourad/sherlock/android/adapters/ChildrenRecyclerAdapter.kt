@@ -51,15 +51,23 @@ internal class ChildrenRecyclerAdapter(
 
             imageLoader.get().load(
                     result.a.pictureUrl?.value,
-                    binding.pictureImageView,
+                    binding.childPicture,
                     R.drawable.placeholder,
                     R.drawable.placeholder
             )
 
+            imageLoader.get().load(
+                    result.a.user.pictureUrl?.value,
+                    binding.userProfilePicture,
+                    R.drawable.placeholder,
+                    R.drawable.placeholder
+            )
+
+            binding.userDisplayName.text = textFormatter.get().formatDisplayName(result.a.user.displayName)
             //TODO: this needs to change with time
-            binding.dateTextView.text = dateManager.get().getRelativeDateTimeString(result.a.publicationDate)
-            binding.notesTextView.text = textFormatter.get().formatNotes(result.a.notes)
-            binding.locationTextView.text = textFormatter.get().formatLocation(result.a.locationName, result.a.locationAddress)
+            binding.timestamp.text = dateManager.get().getRelativeDateTimeString(result.a.timestamp)
+            binding.notes.text = textFormatter.get().formatNotes(result.a.notes)
+            binding.location.text = textFormatter.get().formatLocation(result.a.locationName, result.a.locationAddress)
 
             itemView.setOnClickListener { onChildSelectedListener(result) }
         }
