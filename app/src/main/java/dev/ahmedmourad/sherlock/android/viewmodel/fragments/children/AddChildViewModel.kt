@@ -8,10 +8,11 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import arrow.core.toOption
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
-import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
+import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
@@ -24,6 +25,7 @@ import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.constants.findEnum
+import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.BackpressureStrategy
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -63,6 +65,8 @@ internal class AddChildViewModel(
     val picturePath: LiveData<ImagePicker.PicturePath?>
             by lazy { savedStateHandle.getLiveData<ImagePicker.PicturePath?>(KEY_PICTURE_PATH, null) }
 
+    val userError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
     val firstNameError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_FIRST_NAME, null) }
     val lastNameError: LiveData<String?>
@@ -138,6 +142,10 @@ internal class AddChildViewModel(
         savedStateHandle.set(KEY_PICTURE_PATH, newValue)
     }
 
+    fun onUserErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_USER, null)
+    }
+
     fun onFirstNameErrorDismissed() {
         savedStateHandle.set(KEY_ERROR_FIRST_NAME, null)
     }
@@ -199,14 +207,18 @@ internal class AddChildViewModel(
                 .toLiveData()
     }
 
-    fun onPublish() {
-        toPublishedChild()?.let {
+    fun onPublish(user: SignedInUser?) {
+        toPublishedChild(user)?.let {
             ContextCompat.startForegroundService(appCtx, serviceFactory.get().invoke(it))
         }
     }
 
-    private fun toPublishedChild(): AppPublishedChild? {
-        return Either.fx<Unit, AppPublishedChild> {
+    private fun toPublishedChild(user: SignedInUser?): AppChildToPublish? {
+        return Either.fx<Unit, AppChildToPublish> {
+
+            val u = !user.toOption().toEither {
+                savedStateHandle.set(KEY_ERROR_USER, "This action requires authentication")
+            }
 
             val firstName = !validateName(firstName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
@@ -278,6 +290,7 @@ internal class AddChildViewModel(
             }?.bind()
 
             validateAppPublishedChild(
+                    u.simplify(),
                     name,
                     notes.value,
                     location,
@@ -334,6 +347,8 @@ internal class AddChildViewModel(
         private const val KEY_PICTURE_PATH =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.PICTURE_PATH"
 
+        private const val KEY_ERROR_USER =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_USER"
         private const val KEY_ERROR_FIRST_NAME =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_FIRST_NAME"
         private const val KEY_ERROR_LAST_NAME =
@@ -361,7 +376,7 @@ internal class AddChildViewModel(
         private const val KEY_ERROR_CHILD =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_CHILD"
 
-        fun defaultArgs(child: AppPublishedChild?): Bundle? {
+        fun defaultArgs(child: AppChildToPublish?): Bundle? {
             return child?.let { c ->
                 Bundle(12).apply {
 

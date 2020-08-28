@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
+import arrow.core.toOption
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
+import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import javax.inject.Inject
 
@@ -33,6 +35,8 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
     val height: LiveData<Int?>
             by lazy { savedStateHandle.getLiveData<Int?>(KEY_HEIGHT, null) }
 
+    val userError: LiveData<String?>
+            by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
     val firstNameError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_FIRST_NAME, null) }
     val lastNameError: LiveData<String?>
@@ -88,6 +92,10 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
         savedStateHandle.set(KEY_HEIGHT, newValue)
     }
 
+    fun onUserErrorDismissed() {
+        savedStateHandle.set(KEY_ERROR_USER, null)
+    }
+
     fun onFirstNameErrorDismissed() {
         savedStateHandle.set(KEY_ERROR_FIRST_NAME, null)
     }
@@ -133,8 +141,12 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
     }
 
 
-    fun toChildQuery(): ChildQuery? {
+    fun toChildQuery(user: SignedInUser?): ChildQuery? {
         return Either.fx<Unit, ChildQuery> {
+
+            val u = !user.toOption().toEither {
+                savedStateHandle.set(KEY_ERROR_USER, "This action requires authentication")
+            }
 
             val firstName = !validateName(firstName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
@@ -200,6 +212,7 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
             }
 
             validateChildQuery(
+                    u.simplify(),
                     fullName,
                     location,
                     appearance
@@ -236,6 +249,8 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
         private const val KEY_HEIGHT =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.HEIGHT"
 
+        private const val KEY_ERROR_USER =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_USER"
         private const val KEY_ERROR_FIRST_NAME =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ERROR_FIRST_NAME"
         private const val KEY_ERROR_LAST_NAME =
