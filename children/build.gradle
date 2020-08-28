@@ -3,6 +3,7 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "de.mannodermaus.android-junit5"
+apply plugin: 'com.squareup.sqldelight'
 
 android {
     compileSdkVersion 30
@@ -14,14 +15,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         multiDexEnabled true
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [
-                        "room.schemaLocation": "$projectDir/schemas".toString(),
-                        "room.incremental":"true"
-                ]
-            }
-        }
     }
     buildTypes {
         release {
@@ -48,6 +41,12 @@ android {
             }
         }
     }
+    configurations {
+        implementation.exclude module:'proto-google-common-protos'
+        implementation.exclude module:'protolite-well-known-types'
+        implementation.exclude module:'protobuf-lite'
+        implementation.exclude module:'protobuf-javalite'
+    }
 }
 
 dependencies {
@@ -64,11 +63,10 @@ dependencies {
 
     implementation "com.louiscad.splitties:splitties-appctx:$splittiesVersion"
 
-    api "androidx.room:room-runtime:2.2.5"
-    implementation "androidx.room:room-rxjava2:2.2.5"
-    kapt "androidx.room:room-compiler:$roomVersion"
-
     implementation "com.jakewharton.timber:timber-android:$timberVersion"
+
+    implementation "com.squareup.sqldelight:android-driver:1.4.1"
+    implementation "com.squareup.sqldelight:rxjava2-extensions:1.2.1"
 
     testImplementation "junit:junit:4.13"
     testImplementation 'org.mockito:mockito-core:3.3.3'
@@ -95,3 +93,12 @@ configurations.all {
         }
     }
 }
+sqldelight {
+    ChildrenDatabase {
+        packageName = "dev.ahmedmourad.sherlock.children.local"
+        sourceFolders = ["sqldelight"]
+        schemaOutputDirectory = file("src/main/java/dev/ahmedmourad/sherlock/children/local")
+        dialect = "sqlite:3.24"
+    }
+}
+

@@ -1,0 +1,41 @@
+
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT NOT NULL PRIMARY KEY,
+    display_name TEXT NOT NULL,
+    picture_url TEXT,
+    timestamp INTEGER,
+    last_login_timestamp INTEGER,
+    email TEXT,
+    username TEXT,
+    phone_number TEXT
+);
+
+insertOrReplaceSimple:
+INSERT OR REPLACE INTO users (
+    id,
+    display_name,
+    picture_url
+) VALUES (?, ?, ?);
+
+insert:
+INSERT INTO users (
+    id,
+    display_name,
+    picture_url,
+    timestamp,
+    last_login_timestamp,
+    email,
+    username,
+    phone_number
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateSimple:
+UPDATE
+    users
+SET
+    display_name = ?,
+    picture_url = ?
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM users;

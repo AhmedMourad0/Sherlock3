@@ -16,7 +16,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.4.2.0"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
-        classpath "dev.ahmedmourad.nocopy:nocopy-gradle-plugin:0.2.0-SNAPSHOT"
+        classpath "dev.ahmedmourad.nocopy:nocopy-gradle-plugin:1.1.0"
+        classpath 'com.squareup.sqldelight:gradle-plugin:1.4.1'
     }
 }
 

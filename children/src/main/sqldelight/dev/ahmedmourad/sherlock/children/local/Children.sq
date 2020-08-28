@@ -1,0 +1,140 @@
+
+CREATE TABLE IF NOT EXISTS children (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    timestamp INTEGER NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    location_id TEXT,
+    location_name TEXT,
+    location_address TEXT,
+    location_latitude REAL,
+    location_longitude REAL,
+    gender INTEGER,
+    skin INTEGER,
+    hair INTEGER,
+    min_age INTEGER,
+    max_age INTEGER,
+    min_height INTEGER,
+    max_height INTEGER,
+    picture_url TEXT,
+    weight REAL,
+    notes TEXT
+);
+
+insertOrReplaceSimple:
+INSERT OR REPLACE INTO children (
+    id,
+    user_id,
+    timestamp,
+    first_name,
+    last_name,
+    location_name,
+    location_address,
+    picture_url,
+    weight,
+    notes
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insert:
+INSERT INTO children (
+    id,
+    user_id,
+    timestamp,
+    first_name,
+    last_name,
+    location_id,
+    location_name,
+    location_address,
+    location_latitude,
+    location_longitude,
+    gender,
+    skin,
+    hair,
+    min_age,
+    max_age,
+    min_height,
+    max_height,
+    picture_url,
+    weight,
+    notes
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+findAllSimpleWhereWeightExists:
+SELECT
+    children.id,
+    children.timestamp,
+    children.first_name,
+    children.last_name,
+    children.location_name,
+    children.location_address,
+    children.picture_url,
+    children.weight,
+    children.notes,
+    users.id,
+    users.display_name,
+    users.picture_url
+FROM
+    children INNER JOIN users
+WHERE weight IS NOT NULL;
+
+findChildById:
+SELECT
+    children.timestamp,
+    children.first_name,
+    children.last_name,
+    children.picture_url,
+    children.location_id,
+    children.location_name,
+    children.location_address,
+    children.location_latitude,
+    children.location_longitude,
+    children.gender,
+    children.skin,
+    children.hair,
+    children.min_age,
+    children.max_age,
+    children.min_height,
+    children.max_height,
+    children.weight,
+    children.notes,
+    users.id,
+    users.display_name,
+    users.picture_url
+FROM
+    children INNER JOIN users
+WHERE children.id = ?;
+
+findWeightById:
+SELECT
+    weight
+FROM
+    children
+WHERE id = ?;
+
+updateRetainingWeight:
+UPDATE
+    children
+SET
+    user_id = ?,
+    timestamp = ?,
+    first_name = ?,
+    last_name = ?,
+    location_id = ?,
+    location_name = ?,
+    location_address = ?,
+    location_latitude = ?,
+    location_longitude = ?,
+    gender = ?,
+    skin = ?,
+    hair = ?,
+    min_age = ?,
+    max_age = ?,
+    min_height = ?,
+    max_height = ?,
+    picture_url = ?,
+    notes = ?
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM children;
