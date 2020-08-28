@@ -184,6 +184,8 @@ internal fun FindChildrenInteractor.Exception.localizedMessage(): String {
             appCtx.getString(R.string.internet_connection_needed)
         FindChildrenInteractor.Exception.NoSignedInUserException ->
             appCtx.getString(R.string.authentication_needed)
+        is FindChildrenInteractor.Exception.InternalException ->
+            somethingWentWrong(this.origin)
         is FindChildrenInteractor.Exception.UnknownException ->
             somethingWentWrong(this.origin)
     }

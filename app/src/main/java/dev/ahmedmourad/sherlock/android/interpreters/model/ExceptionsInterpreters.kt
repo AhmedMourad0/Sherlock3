@@ -3,7 +3,7 @@ package dev.ahmedmourad.sherlock.android.interpreters.model
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import splitties.init.appCtx
@@ -69,9 +69,9 @@ internal fun ApproximateAppearance.Exception.localizedMessage(): String {
     }
 }
 
-internal fun PublishedChild.Exception.localizedMessage(): String {
+internal fun ChildToPublish.Exception.localizedMessage(): String {
     return when (this) {
-        PublishedChild.Exception.NotEnoughDetailsException ->
+        ChildToPublish.Exception.NotEnoughDetailsException ->
             appCtx.getString(R.string.child_not_enough_details)
     }
 }

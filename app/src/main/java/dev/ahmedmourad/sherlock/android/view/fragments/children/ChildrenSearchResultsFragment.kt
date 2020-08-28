@@ -80,10 +80,17 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
                 //TODO: show error image with retry option when appropriate
                 @Suppress("IMPLICIT_CAST_TO_ANY")
                 when (e) {
+
                     FindChildrenInteractor.Exception.NoInternetConnectionException -> Unit
+
                     FindChildrenInteractor.Exception.NoSignedInUserException -> {
                         (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                     }
+
+                    is FindChildrenInteractor.Exception.InternalException -> {
+                        Timber.error(RuntimeException(e.toString()), e::toString)
+                    }
+
                     is FindChildrenInteractor.Exception.UnknownException -> {
                         Timber.error(RuntimeException(e.toString()), e::toString)
                     }
