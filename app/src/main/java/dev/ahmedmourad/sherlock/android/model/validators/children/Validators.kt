@@ -6,12 +6,13 @@ import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.interpreters.model.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
-import dev.ahmedmourad.sherlock.android.model.children.AppPublishedChild
+import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
@@ -206,29 +207,33 @@ internal fun validateExactAppearance(
 }
 
 internal fun validateAppPublishedChild(
+        user: SimpleRetrievedUser,
         name: Either<Name, FullName>?,
         notes: String?,
         location: Location?,
         appearance: ApproximateAppearance,
         picturePath: PicturePath?,
         imageLoader: ImageLoader
-): Either<String, AppPublishedChild> {
-    return AppPublishedChild.of(
+): Either<String, AppChildToPublish> {
+    return AppChildToPublish.of(
+            user,
             name,
             notes?.trim(),
             location,
             appearance,
             picturePath,
             imageLoader
-    ).mapLeft(PublishedChild.Exception::localizedMessage)
+    ).mapLeft(ChildToPublish.Exception::localizedMessage)
 }
 
 internal fun validateChildQuery(
+        user: SimpleRetrievedUser,
         fullName: FullName,
         location: Location,
         appearance: ExactAppearance
 ): Either<String, ChildQuery> {
     return ChildQuery.of(
+            user,
             fullName,
             location,
             appearance
