@@ -7,6 +7,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
@@ -43,6 +44,14 @@ internal class TextFormatterImpl @Inject constructor(
     override fun formatNotes(notes: String?): String {
         return if (notes != null && notes.isNotBlank()) {
             notes
+        } else {
+            appCtx.getString(R.string.not_available)
+        }
+    }
+
+    override fun formatDisplayName(displayName: DisplayName?): String {
+        return if (displayName != null && displayName.value.isNotBlank()) {
+            displayName.value
         } else {
             appCtx.getString(R.string.not_available)
         }

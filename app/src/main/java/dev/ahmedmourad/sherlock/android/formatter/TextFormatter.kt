@@ -4,6 +4,7 @@ import arrow.core.Either
 import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
+import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.AgeRange
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
@@ -22,6 +23,8 @@ internal interface TextFormatter {
     fun formatName(name: Either<Name, FullName>?): String
 
     fun formatNotes(notes: String?): String
+
+    fun formatDisplayName(displayName: DisplayName?): String
 
     fun formatAge(age: AgeRange?): String
 
