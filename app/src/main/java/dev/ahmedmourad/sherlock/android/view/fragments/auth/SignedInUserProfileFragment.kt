@@ -101,7 +101,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
 
             b.phoneNumber.text = textFormatter.get().formatPhoneNumber(user.phoneNumber)
 
-            b.registrationDate.text = dateManager.get().getRelativeDateTimeString(user.registrationDate)
+            b.timestamp.text = dateManager.get().getRelativeDateTimeString(user.timestamp)
         }
     }
 

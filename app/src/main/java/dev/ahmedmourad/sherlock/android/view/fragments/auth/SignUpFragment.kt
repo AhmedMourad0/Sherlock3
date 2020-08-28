@@ -68,7 +68,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         initializePictureImageView()
         addErrorObservers()
         binding?.let { b ->
-            arrayOf(b.pictureImageView,
+            arrayOf(b.profilePicture,
                     b.pictureTextView,
                     b.signUpButton,
                     b.orSignInTextView,
@@ -149,7 +149,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.pictureImageView,
+                        b.profilePicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
 
@@ -275,7 +275,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.pictureImageView.isEnabled = enabled
+            b.profilePicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }
@@ -319,7 +319,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
             R.id.sign_up_with_twitter_image_view -> signUpWithTwitter()
 
-            R.id.picture_text_view, R.id.picture_image_view -> startImagePicker()
+            R.id.picture_text_view, R.id.child_picture -> startImagePicker()
 
             R.id.or_sign_in_text_view -> {
                 findNavController().popBackStack()

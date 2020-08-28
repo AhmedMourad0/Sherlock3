@@ -93,7 +93,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
-                    b.locationTextView,
+                    b.location,
                     b.skin.skinWhite,
                     b.skin.skinWheat,
                     b.skin.skinDark,
@@ -221,9 +221,9 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     private fun initializeLocationTextView() {
         observe(viewModel.location) { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
-                binding?.locationTextView?.text = location.name
+                binding?.location?.text = location.name
             } else {
-                binding?.locationTextView?.setText(R.string.no_location_specified)
+                binding?.location?.setText(R.string.no_location_specified)
             }
         }
     }
@@ -237,7 +237,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 if (user == null) {
                     (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                 } else {
-                    viewModel.toChildQuery()?.let {
+                    viewModel.toChildQuery(globalViewModel.signedInUserSimplified.value)?.let {
                         findNavController().navigate(
                                 FindChildrenFragmentDirections
                                         .actionFindChildrenFragmentToChildrenSearchResultsFragment(
@@ -264,7 +264,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     private fun setLocationEnabled(enabled: Boolean) {
         binding?.let { b ->
             b.locationImageView.isEnabled = enabled
-            b.locationTextView.isEnabled = enabled
+            b.location.isEnabled = enabled
         }
     }
 
@@ -307,7 +307,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
             R.id.hair_dark -> hairColorSelector.select(Hair.DARK)
 
-            R.id.location_image_view, R.id.location_text_view -> startPlacePicker()
+            R.id.location_image_view, R.id.location -> startPlacePicker()
 
             R.id.search_button -> search()
         }

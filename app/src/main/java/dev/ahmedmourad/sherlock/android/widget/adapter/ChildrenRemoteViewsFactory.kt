@@ -51,7 +51,7 @@ internal class ChildrenRemoteViewsFactory(
         //TODO: needs to change over time
         views.setTextViewText(
                 R.id.widget_result_date,
-                dateManager.get().getRelativeDateTimeString(result.a.publicationDate)
+                dateManager.get().getRelativeDateTimeString(result.a.timestamp)
         )
 
         views.setTextViewText(

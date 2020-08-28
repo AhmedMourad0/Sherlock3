@@ -75,7 +75,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         addErrorObservers()
 
         binding?.let { b ->
-            arrayOf(b.pictureImageView,
+            arrayOf(b.profilePicture,
                     b.pictureTextView,
                     b.completeButton
             ).forEach { it.setOnClickListener(this) }
@@ -136,7 +136,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             if (viewModel.picture.value != null) {
                 imageLoader.get().load(
                         viewModel.picture.value?.value,
-                        b.pictureImageView,
+                        b.profilePicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
@@ -149,7 +149,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.pictureImageView,
+                        b.profilePicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
@@ -199,7 +199,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.pictureImageView.isEnabled = enabled
+            b.profilePicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }
@@ -234,7 +234,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     override fun onClick(v: View) {
         when (v.id) {
             R.id.complete_button -> completeSignUp()
-            R.id.picture_text_view, R.id.picture_image_view -> startImagePicker()
+            R.id.picture_text_view, R.id.child_picture -> startImagePicker()
         }
     }
 }
