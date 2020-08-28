@@ -12,15 +12,12 @@ import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.mapper.toRemoteSignUpUser
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
-import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
-import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.model.auth.*
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
+import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -30,12 +27,11 @@ import javax.inject.Inject
 internal class AuthManagerImpl @Inject constructor(
         @InternalApi private val authenticator: Lazy<Authenticator>,
         @InternalApi private val remoteRepository: Lazy<RemoteRepository>,
-        @InternalApi private val imageRepository: Lazy<ImageRepository>,
-        @InternalApi private val userAuthStateObservable: Lazy<UserAuthStateObservable>
+        @InternalApi private val imageRepository: Lazy<ImageRepository>
 ) : AuthManager {
 
     override fun observeUserAuthState(): Flowable<Either<AuthManager.ObserveUserAuthStateException, Boolean>> {
-        return userAuthStateObservable.get()
+        return authenticator.get()
                 .observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -119,6 +115,31 @@ internal class AuthManagerImpl @Inject constructor(
                 }
     }
 
+    override fun findSimpleUsers(
+            ids: Collection<UserId>
+    ): Flowable<Either<AuthManager.FindSimpleUsersException, List<SimpleRetrievedUser>>> {
+
+        fun RemoteRepository.FindSimpleUsersException.map() = when (this) {
+
+            RemoteRepository.FindSimpleUsersException.NoInternetConnectionException ->
+                AuthManager.FindSimpleUsersException.NoInternetConnectionException
+
+            RemoteRepository.FindSimpleUsersException.NoSignedInUserException ->
+                AuthManager.FindSimpleUsersException.NoSignedInUserException
+
+            is RemoteRepository.FindSimpleUsersException.InternalException ->
+                AuthManager.FindSimpleUsersException.InternalException(this.origin)
+
+            is RemoteRepository.FindSimpleUsersException.UnknownException ->
+                AuthManager.FindSimpleUsersException.UnknownException(this.origin)
+        }
+
+        return remoteRepository.get()
+                .findSimpleUsers(ids)
+                .map { either ->
+                    either.mapLeft { it.map() }
+                }
+    }
 
     override fun signIn(
             credentials: UserCredentials

@@ -141,7 +141,7 @@
 					android:textSize="14sp" />
 				
 				<com.google.android.material.textview.MaterialTextView
-					android:id="@+id/registration_date"
+					android:id="@+id/timestamp"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_vertical"

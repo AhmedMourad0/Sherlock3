@@ -5,18 +5,19 @@ import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.model.EitherSerializer
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import kotlinx.serialization.Serializable
 
-//TODO: add user id
 @Serializable
 @NoCopy
 data class SimpleRetrievedChild private constructor(
         val id: ChildId,
-        val publicationDate: Long,
+        val user: SimpleRetrievedUser,
+        val timestamp: Long,
         val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val locationName: String?,
@@ -27,20 +28,22 @@ data class SimpleRetrievedChild private constructor(
     companion object {
 
         fun of(id: ChildId,
-               publicationDate: Long,
+               user: SimpleRetrievedUser,
+               timestamp: Long,
                name: Either<Name, FullName>?,
                notes: String?,
                locationName: String?,
                locationAddress: String?,
                pictureUrl: Url?
         ): Either<Exception, SimpleRetrievedChild> {
-            return validate(id, publicationDate, name, notes, locationName, locationAddress, pictureUrl)?.left()
-                    ?: SimpleRetrievedChild(id, publicationDate, name, notes, locationName, locationAddress, pictureUrl).right()
+            return validate(id, user, timestamp, name, notes, locationName, locationAddress, pictureUrl)?.left()
+                    ?: SimpleRetrievedChild(id, user, timestamp, name, notes, locationName, locationAddress, pictureUrl).right()
         }
 
         @Suppress("UNUSED_PARAMETER")
         fun validate(id: ChildId,
-                     publicationDate: Long,
+                     user: SimpleRetrievedUser,
+                     timestamp: Long,
                      name: Either<Name, FullName>?,
                      notes: String?,
                      locationName: String?,

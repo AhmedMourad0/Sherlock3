@@ -4,7 +4,14 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.*
 
 @Serializer(forClass = Either::class)
 class EitherSerializer<A : Any, B : Any>(
@@ -12,29 +19,30 @@ class EitherSerializer<A : Any, B : Any>(
         private val rightSerializer: KSerializer<B?>
 ) : KSerializer<Either<A?, B?>> {
 
-    @OptIn(ImplicitReflectionSerializer::class)
-    override val descriptor: SerialDescriptor = SerialDescriptor("arrow.core.Either") {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("arrow.core.Either") {
         element<Boolean>("isRight")
         element("a", leftSerializer.descriptor)
         element("b", rightSerializer.descriptor)
     }
 
+    @ExperimentalSerializationApi
     override fun serialize(encoder: Encoder, value: Either<A?, B?>) {
         encoder.encodeStructure(descriptor) {
             encodeBooleanElement(descriptor, 0, value.isRight())
             when (value) {
                 is Either.Left -> {
-                    encodeNullableSerializableElement<A>(descriptor, 1, leftSerializer, value.a)
-                    encodeNullableSerializableElement<B>(descriptor, 2, rightSerializer, null)
+                    encodeNullableSerializableElement(descriptor, 1, leftSerializer, value.a)
+                    encodeNullableSerializableElement(descriptor, 2, rightSerializer, null)
                 }
                 is Either.Right -> {
-                    encodeNullableSerializableElement<A>(descriptor, 1, leftSerializer, null)
-                    encodeNullableSerializableElement<B>(descriptor, 2, rightSerializer, value.b)
+                    encodeNullableSerializableElement(descriptor, 1, leftSerializer, null)
+                    encodeNullableSerializableElement(descriptor, 2, rightSerializer, value.b)
                 }
             }.exhaust()
         }
     }
 
+    @ExperimentalSerializationApi
     override fun deserialize(decoder: Decoder): Either<A?, B?> {
         var isRight: Boolean? = null
         var a: A? = null
@@ -42,10 +50,10 @@ class EitherSerializer<A : Any, B : Any>(
         decoder.decodeStructure(descriptor) {
             loop@ while (true) {
                 when (val i = decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
+                    CompositeDecoder.DECODE_DONE -> break@loop
                     0 -> isRight = decodeBooleanElement(descriptor, i)
-                    1 -> a = decodeNullableSerializableElement<A>(descriptor, i, leftSerializer)
-                    2 -> b = decodeNullableSerializableElement<B>(descriptor, i, rightSerializer)
+                    1 -> a = decodeNullableSerializableElement(descriptor, i, leftSerializer)
+                    2 -> b = decodeNullableSerializableElement(descriptor, i, rightSerializer)
                     else -> throw SerializationException("Unknown index: $i")
                 }
             }

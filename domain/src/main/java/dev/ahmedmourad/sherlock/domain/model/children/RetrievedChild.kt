@@ -7,6 +7,7 @@ import arrow.core.right
 import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import dev.ahmedmourad.sherlock.domain.model.EitherSerializer
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location
@@ -17,12 +18,12 @@ import kotlinx.serialization.Serializable
 import timber.log.Timber
 import timber.log.error
 
-//TODO: add user id
 @Serializable
 @NoCopy
 data class RetrievedChild private constructor(
         val id: ChildId,
-        val publicationDate: Long,
+        val user: SimpleRetrievedUser,
+        val timestamp: Long,
         val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val location: Location?,
@@ -33,7 +34,8 @@ data class RetrievedChild private constructor(
     fun simplify(): SimpleRetrievedChild {
         return SimpleRetrievedChild.of(
                 id,
-                publicationDate,
+                user,
+                timestamp,
                 name,
                 notes,
                 location?.name,
@@ -48,20 +50,22 @@ data class RetrievedChild private constructor(
     companion object {
 
         fun of(id: ChildId,
-               publicationDate: Long,
+               user: SimpleRetrievedUser,
+               timestamp: Long,
                name: Either<Name, FullName>?,
                notes: String?,
                location: Location?,
                appearance: ApproximateAppearance,
                pictureUrl: Url?
         ): Either<Exception, RetrievedChild> {
-            return validate(id, publicationDate, name, notes, location, appearance, pictureUrl)?.left()
-                    ?: RetrievedChild(id, publicationDate, name, notes, location, appearance, pictureUrl).right()
+            return validate(id, user, timestamp, name, notes, location, appearance, pictureUrl)?.left()
+                    ?: RetrievedChild(id, user, timestamp, name, notes, location, appearance, pictureUrl).right()
         }
 
         @Suppress("UNUSED_PARAMETER")
         fun validate(id: ChildId,
-                     publicationDate: Long,
+                     user: SimpleRetrievedUser,
+                     timestamp: Long,
                      name: Either<Name, FullName>?,
                      notes: String?,
                      location: Location?,

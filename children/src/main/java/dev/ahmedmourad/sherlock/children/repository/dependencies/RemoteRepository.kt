@@ -3,8 +3,9 @@ package dev.ahmedmourad.sherlock.children.repository.dependencies
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.domain.filter.Filter
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
+import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -15,7 +16,7 @@ internal interface RemoteRepository {
 
     fun publish(
             childId: ChildId,
-            child: PublishedChild,
+            child: ChildToPublish,
             pictureUrl: Url?
     ): Single<Either<PublishException, RetrievedChild>>
 
@@ -26,7 +27,7 @@ internal interface RemoteRepository {
     fun findAll(
             query: ChildQuery,
             filter: Filter<RetrievedChild>
-    ): Flowable<Either<FindAllException, Map<RetrievedChild, Weight>>>
+    ): Flowable<Either<FindAllException, Map<SimpleRetrievedChild, Weight>>>
 
     fun clear(): Single<Either<ClearException, Unit>>
 
@@ -46,6 +47,7 @@ internal interface RemoteRepository {
     sealed class FindAllException {
         object NoInternetConnectionException : FindAllException()
         object NoSignedInUserException : FindAllException()
+        data class InternalException(val origin: Throwable) : FindAllException()
         data class UnknownException(val origin: Throwable) : FindAllException()
     }
 

@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @NoCopy
 data class SignedInUser private constructor(
         val id: UserId,
-        val registrationDate: Long,
+        val timestamp: Long,
         val email: Email,
         val displayName: DisplayName,
         val username: Username,
@@ -21,9 +21,17 @@ data class SignedInUser private constructor(
         val pictureUrl: Url?
 ) {
 
+    fun simplify(): SimpleRetrievedUser {
+        return SimpleRetrievedUser.of(
+                id,
+                displayName,
+                pictureUrl
+        )
+    }
+
     companion object {
         fun of(id: UserId,
-               registrationDate: Long,
+               timestamp: Long,
                email: Email,
                displayName: DisplayName,
                username: Username,
@@ -32,7 +40,7 @@ data class SignedInUser private constructor(
         ): SignedInUser {
             return SignedInUser(
                     id,
-                    registrationDate,
+                    timestamp,
                     email,
                     displayName,
                     username,

@@ -13,15 +13,12 @@ import dev.ahmedmourad.sherlock.auth.manager.AuthManagerImpl
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.remote.repository.FirebaseFirestoreRemoteRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
+import dev.ahmedmourad.sherlock.domain.data.FindSimpleUsers
+import dev.ahmedmourad.sherlock.domain.data.ObserveUserAuthState
 
-@Module(includes = [
-    FirebaseFirestoreModule::class,
-    FirebaseAuthModule::class,
-    FirebaseStorageModule::class
-])
+@Module
 internal interface AuthBindingsModule {
 
     @Binds
@@ -37,12 +34,6 @@ internal interface AuthBindingsModule {
 
     @Binds
     @InternalApi
-    fun bindUserAuthStateObservable(
-            @InternalApi impl: Authenticator
-    ): UserAuthStateObservable
-
-    @Binds
-    @InternalApi
     fun bindRemoteRepository(
             impl: FirebaseFirestoreRemoteRepository
     ): RemoteRepository
@@ -54,30 +45,38 @@ internal interface AuthBindingsModule {
     ): ImageRepository
 }
 
-
 @Module
-internal object FirebaseFirestoreModule {
+internal object AuthProvidedModules {
+
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): FirebaseFirestore = FirebaseFirestore.getInstance()
-}
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
-@Module
-internal object FirebaseStorageModule {
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): FirebaseStorage = FirebaseStorage.getInstance()
-}
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 
-@Module
-internal object FirebaseAuthModule {
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Reusable
+    @JvmStatic
+    fun provideObserveUserAuthState(
+            authManager: AuthManager
+    ): ObserveUserAuthState = authManager::observeUserAuthState
+
+    @Provides
+    @Reusable
+    @JvmStatic
+    fun provideFindSimpleUsersByIds(
+            authManager: AuthManager
+    ): FindSimpleUsers = authManager::findSimpleUsers
 }

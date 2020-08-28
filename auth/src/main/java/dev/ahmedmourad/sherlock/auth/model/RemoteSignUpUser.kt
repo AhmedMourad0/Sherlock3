@@ -16,10 +16,10 @@ internal data class RemoteSignUpUser(
         val phoneNumber: PhoneNumber,
         val pictureUrl: Url?
 ) {
-    fun toSignedInUser(registrationDate: Long): SignedInUser {
+    fun toSignedInUser(timestamp: Long): SignedInUser {
         return SignedInUser.of(
                 id,
-                registrationDate,
+                timestamp,
                 email,
                 displayName,
                 username,

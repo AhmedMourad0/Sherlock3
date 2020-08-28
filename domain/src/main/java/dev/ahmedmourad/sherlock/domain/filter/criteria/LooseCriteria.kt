@@ -53,7 +53,8 @@ internal class LooseCriteria(
             return MAX_DISTANCE.value / 2
         }
 
-        return locationManager.get().distanceBetween(query.location.coordinates.latitude,
+        return locationManager.get().distanceBetween(
+                query.location.coordinates.latitude,
                 query.location.coordinates.longitude,
                 child.location.coordinates.latitude,
                 child.location.coordinates.longitude

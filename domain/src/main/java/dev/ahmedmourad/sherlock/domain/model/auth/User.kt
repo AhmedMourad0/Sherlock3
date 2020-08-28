@@ -13,8 +13,8 @@ import kotlinx.serialization.Serializable
 @NoCopy
 data class User private constructor(
         val id: UserId,
-        val registrationDate: Long,
-        val lastLoginDate: Long,
+        val timestamp: Long,
+        val lastLoginTimestamp: Long,
         val email: Email,
         val displayName: DisplayName,
         val username: Username,
@@ -24,8 +24,8 @@ data class User private constructor(
 
     companion object {
         fun of(id: UserId,
-               registrationDate: Long,
-               lastLoginDate: Long,
+               timestamp: Long,
+               lastLoginTimestamp: Long,
                email: Email,
                displayName: DisplayName,
                username: Username,
@@ -34,8 +34,8 @@ data class User private constructor(
         ): User {
             return User(
                     id,
-                    registrationDate,
-                    lastLoginDate,
+                    timestamp,
+                    lastLoginTimestamp,
                     email,
                     displayName,
                     username,

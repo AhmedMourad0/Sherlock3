@@ -1,6 +1,9 @@
 package dev.ahmedmourad.sherlock.children.repository
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.children.di.InternalApi
@@ -13,7 +16,7 @@ import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
 import dev.ahmedmourad.sherlock.domain.filter.Filter
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
@@ -34,10 +37,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
         private val bus: Lazy<Bus>
 ) : ChildrenRepository {
 
-    private val tester by lazy { SherlockTester(remoteRepository, localRepository) }
-
     override fun publish(
-            child: PublishedChild
+            child: ChildToPublish
     ): Single<Either<ChildrenRepository.PublishException, RetrievedChild>> {
 
         fun ImageRepository.StoreChildPictureException.map() = when (this) {
@@ -139,9 +140,11 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
-        fun LocalRepository.UpdateIfExistsException.map() = when (this) {
-            is LocalRepository.UpdateIfExistsException.InternalException ->
+        fun LocalRepository.UpdateRetainingWeightException.map() = when (this) {
+            is LocalRepository.UpdateRetainingWeightException.InternalException ->
                 ChildrenRepository.FindException.InternalException(this.origin)
+            is LocalRepository.UpdateRetainingWeightException.UnknownException ->
+                ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
         return remoteRepository.get()
@@ -156,13 +159,12 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                             Flowable.just(null.right())
                         } else {
                             localRepository.get()
-                                    .updateIfExists(child)
+                                    .updateRetainingWeight(child)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
                                     .map { either ->
-                                        either.mapLeft(LocalRepository.UpdateIfExistsException::map)
-                                    }.toSingle((child toT null).right<Tuple2<RetrievedChild, Weight?>>())
-                                    .toFlowable()
+                                        either.mapLeft(LocalRepository.UpdateRetainingWeightException::map)
+                                    }
                         }
                     })
                 }.onErrorReturn {
@@ -185,7 +187,15 @@ internal class ChildrenRepositoryImpl @Inject constructor(
             RemoteRepository.FindAllException.NoSignedInUserException ->
                 ChildrenRepository.FindAllException.NoSignedInUserException
 
+            is RemoteRepository.FindAllException.InternalException ->
+                ChildrenRepository.FindAllException.InternalException(this.origin)
+
             is RemoteRepository.FindAllException.UnknownException ->
+                ChildrenRepository.FindAllException.UnknownException(this.origin)
+        }
+
+        fun LocalRepository.ReplaceAllException.map() = when (this) {
+            is LocalRepository.ReplaceAllException.UnknownException ->
                 ChildrenRepository.FindAllException.UnknownException(this.origin)
         }
 
@@ -201,10 +211,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                 .replaceAll(results)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(Schedulers.io())
-                                .map {
-                                    results.mapKeys { (child, _) -> child.simplify() }
-                                            .right()
-                                }.toFlowable()
+                                .map { it.mapLeft(LocalRepository.ReplaceAllException::map) }
+                                .toFlowable()
                     })
                 }.onErrorReturn {
                     ChildrenRepository.FindAllException.UnknownException(it).left()
@@ -216,52 +224,19 @@ internal class ChildrenRepositoryImpl @Inject constructor(
     override fun findLastSearchResults():
             Flowable<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
 
+        fun LocalRepository.FindAllSimpleWhereWeightExistsException.map() = when (this) {
+            is LocalRepository.FindAllSimpleWhereWeightExistsException.UnknownException ->
+                ChildrenRepository.FindLastSearchResultsException.UnknownException(this.origin)
+        }
+
         return localRepository.get()
-                .findAllWithWeight()
+                .findAllSimpleWhereWeightExists()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .map<Either<ChildrenRepository.FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>> {
-                    it.right()
+                    it.mapLeft(LocalRepository.FindAllSimpleWhereWeightExistsException::map)
                 }.onErrorReturn {
                     ChildrenRepository.FindLastSearchResultsException.UnknownException(it).left()
                 }
-    }
-
-    override fun test(): ChildrenRepository.Tester {
-        return tester
-    }
-
-    class SherlockTester(
-            private val remoteRepository: Lazy<RemoteRepository>,
-            private val localRepository: Lazy<LocalRepository>
-    ) : ChildrenRepository.Tester {
-        override fun clear(): Single<Either<ChildrenRepository.Tester.ClearException, Unit>> {
-
-            fun RemoteRepository.ClearException.map() = when (this) {
-
-                RemoteRepository.ClearException.NoInternetConnectionException ->
-                    ChildrenRepository.Tester.ClearException.NoInternetConnectionException
-
-                RemoteRepository.ClearException.NoSignedInUserException ->
-                    ChildrenRepository.Tester.ClearException.NoSignedInUserException
-
-                is RemoteRepository.ClearException.UnknownException ->
-                    ChildrenRepository.Tester.ClearException.UnknownException(this.origin)
-            }
-
-            return remoteRepository.get()
-                    .clear()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .flatMap { either ->
-                        either.fold(ifLeft = {
-                            Single.just(it.map().left())
-                        }, ifRight = {
-                            localRepository.get().clear().toSingleDefault(Unit.right())
-                        })
-                    }.onErrorReturn {
-                        ChildrenRepository.Tester.ClearException.UnknownException(it).left()
-                    }
-        }
     }
 }

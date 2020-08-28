@@ -18,6 +18,7 @@ interface FindChildrenInteractor :
     sealed class Exception {
         object NoInternetConnectionException : Exception()
         object NoSignedInUserException : Exception()
+        data class InternalException(val origin: Throwable) : Exception()
         data class UnknownException(val origin: Throwable) : Exception()
     }
 }
@@ -29,6 +30,9 @@ private fun ChildrenRepository.FindAllException.map() = when (this) {
 
     ChildrenRepository.FindAllException.NoSignedInUserException ->
         FindChildrenInteractor.Exception.NoSignedInUserException
+
+    is ChildrenRepository.FindAllException.InternalException ->
+        FindChildrenInteractor.Exception.InternalException(this.origin)
 
     is ChildrenRepository.FindAllException.UnknownException ->
         FindChildrenInteractor.Exception.UnknownException(this.origin)

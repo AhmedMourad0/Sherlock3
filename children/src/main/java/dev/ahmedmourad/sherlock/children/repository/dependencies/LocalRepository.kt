@@ -5,26 +5,32 @@ import arrow.core.Tuple2
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
-import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 
 internal interface LocalRepository {
 
-    fun updateIfExists(
-            child: RetrievedChild
-    ): Maybe<Either<UpdateIfExistsException, Tuple2<RetrievedChild, Weight?>>>
+    fun updateRetainingWeight(
+            item: RetrievedChild
+    ): Flowable<Either<UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>>
 
-    fun findAllWithWeight(): Flowable<Map<SimpleRetrievedChild, Weight>>
+    fun findAllSimpleWhereWeightExists():
+            Flowable<Either<FindAllSimpleWhereWeightExistsException, Map<SimpleRetrievedChild, Weight>>>
 
     fun replaceAll(
-            results: Map<RetrievedChild, Weight>
-    ): Single<Map<SimpleRetrievedChild, Weight>>
+            items: Map<SimpleRetrievedChild, Weight>
+    ): Single<Either<ReplaceAllException, Map<SimpleRetrievedChild, Weight>>>
 
-    fun clear(): Completable
+    sealed class UpdateRetainingWeightException {
+        data class InternalException(val origin: Throwable) : UpdateRetainingWeightException()
+        data class UnknownException(val origin: Throwable) : UpdateRetainingWeightException()
+    }
 
-    sealed class UpdateIfExistsException {
-        data class InternalException(val origin: Throwable) : UpdateIfExistsException()
+    sealed class FindAllSimpleWhereWeightExistsException {
+        data class UnknownException(val origin: Throwable) : FindAllSimpleWhereWeightExistsException()
+    }
+
+    sealed class ReplaceAllException {
+        data class UnknownException(val origin: Throwable) : ReplaceAllException()
     }
 }

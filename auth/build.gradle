@@ -55,6 +55,12 @@ android {
             }
         }
     }
+    configurations {
+        implementation.exclude module:'proto-google-common-protos'
+        implementation.exclude module:'protolite-well-known-types'
+        implementation.exclude module:'protobuf-lite'
+        implementation.exclude module:'protobuf-javalite'
+    }
 }
 
 dependencies {

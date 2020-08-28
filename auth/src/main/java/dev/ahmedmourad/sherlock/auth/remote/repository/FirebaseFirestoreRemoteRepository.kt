@@ -4,22 +4,22 @@ import androidx.annotation.VisibleForTesting
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.left
+import arrow.core.orNull
 import arrow.core.right
 import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.*
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.RemoteRepository
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser
 import dev.ahmedmourad.sherlock.auth.remote.contract.Contract
 import dev.ahmedmourad.sherlock.auth.remote.utils.toMap
+import dev.ahmedmourad.sherlock.domain.data.AuthManager
+import dev.ahmedmourad.sherlock.domain.data.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.PhoneNumber
@@ -38,7 +38,7 @@ import javax.inject.Inject
 internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         @InternalApi private val db: Lazy<FirebaseFirestore>,
         private val connectivityManager: Lazy<ConnectivityManager>,
-        @InternalApi private val userAuthStateObservable: UserAuthStateObservable
+        private val authStateObservable: ObserveUserAuthState
 ) : RemoteRepository {
 
     init {
@@ -59,6 +59,11 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 RemoteRepository.StoreSignUpUserException.UnknownException(this.origin)
         }
 
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.StoreSignUpUserException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
@@ -68,8 +73,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         Single.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            userAuthStateObservable.observeUserAuthState()
-                                    .map(Boolean::right)
+                            authStateObservable.invoke()
+                                    .map { it.mapLeft(AuthManager.ObserveUserAuthStateException::map) }
                                     .firstOrError()
                         } else {
                             Single.just(
@@ -98,9 +103,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
         return Single.create<Either<RemoteRepository.StoreSignUpUserException, SignedInUser>> { emitter ->
 
-            val registrationDate = System.currentTimeMillis()
+            val timestamp = System.currentTimeMillis()
             val successListener = { _: Void? ->
-                emitter.onSuccess(user.toSignedInUser(registrationDate).right())
+                emitter.onSuccess(user.toSignedInUser(timestamp).right())
             }
 
             val failureListener = { throwable: Throwable ->
@@ -127,6 +132,11 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 RemoteRepository.FindSignedInUserException.UnknownException(this.origin)
         }
 
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.FindSignedInUserException.UnknownException(this.origin)
+        }
+
         return connectivityManager.get()
                 .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
@@ -136,7 +146,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         Flowable.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            userAuthStateObservable.observeUserAuthState().map(Boolean::right)
+                            authStateObservable.invoke()
+                                    .map { it.mapLeft(AuthManager.ObserveUserAuthStateException::map) }
                         } else {
                             Flowable.just(
                                     RemoteRepository.FindSignedInUserException.NoInternetConnectionException.left()
@@ -193,12 +204,94 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
+    override fun findSimpleUsers(
+            ids: Collection<UserId>
+    ): Flowable<Either<RemoteRepository.FindSimpleUsersException, List<SimpleRetrievedUser>>> {
+
+        fun ConnectivityManager.ObserveInternetConnectivityException.map() = when (this) {
+            is ConnectivityManager.ObserveInternetConnectivityException.UnknownException ->
+                RemoteRepository.FindSimpleUsersException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
+                RemoteRepository.FindSimpleUsersException.UnknownException(this.origin)
+        }
+
+        return connectivityManager.get()
+                .observeInternetConnectivity()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .switchMap { isInternetConnectedEither ->
+                    isInternetConnectedEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isInternetConnected ->
+                        if (isInternetConnected) {
+                            authStateObservable.invoke()
+                                    .map { it.mapLeft(AuthManager.ObserveUserAuthStateException::map) }
+                        } else {
+                            Flowable.just(
+                                    RemoteRepository.FindSimpleUsersException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
+                }.switchMap { isUserSignedInEither ->
+                    isUserSignedInEither.fold<Flowable<Either<RemoteRepository.FindSimpleUsersException, List<SimpleRetrievedUser>>>>(ifLeft = {
+                        Flowable.just(it.left())
+                    }, ifRight = { isUserSignedIn ->
+                        if (isUserSignedIn) {
+                            createFindSimpleUsers(ids)
+                        } else {
+                            Flowable.just(
+                                    RemoteRepository.FindSimpleUsersException.NoSignedInUserException.left()
+                            )
+                        }
+                    })
+                }
+    }
+
+    private fun createFindSimpleUsers(
+            ids: Collection<UserId>
+    ): Flowable<Either<RemoteRepository.FindSimpleUsersException, List<SimpleRetrievedUser>>> {
+
+        return Flowable.create<Either<RemoteRepository.FindSimpleUsersException, List<SimpleRetrievedUser>>>({ emitter ->
+
+            val snapshotListener = { snapshot: QuerySnapshot?, exception: FirebaseFirestoreException? ->
+
+                if (exception != null) {
+                    emitter.onNext(
+                            RemoteRepository.FindSimpleUsersException.UnknownException(exception).left()
+                    )
+                } else if (snapshot != null) {
+                    emitter.onNext(snapshot.documents
+                            .filter(DocumentSnapshot::exists)
+                            .mapNotNull {
+                                extractSimpleUser(it).orNull()
+                            }.right()
+                    )
+                }
+            }
+
+            val registration = db.get().collection(Contract.Database.Users.PATH)
+                    .whereIn(FieldPath.documentId(), ids.map(UserId::value))
+                    .addSnapshotListener(snapshotListener)
+
+            emitter.setCancellable { registration.remove() }
+
+        }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+    }
+
     override fun updateUserLastLoginDate(
             id: UserId
     ): Single<Either<RemoteRepository.UpdateUserLastLoginDateException, Unit>> {
 
         fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
             is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                RemoteRepository.UpdateUserLastLoginDateException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.UpdateUserLastLoginDateException.UnknownException(this.origin)
         }
 
@@ -211,8 +304,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         Single.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            userAuthStateObservable.observeUserAuthState()
-                                    .map(Boolean::right)
+                            authStateObservable.invoke()
+                                    .map { it.mapLeft(AuthManager.ObserveUserAuthStateException::map) }
                                     .firstOrError()
                         } else {
                             Single.just(
@@ -257,7 +350,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
             db.get().collection(Contract.Database.Users.PATH)
                     .document(id.value)
-                    .update(Contract.Database.Users.LAST_LOGIN_DATE, System.currentTimeMillis())
+                    .update(Contract.Database.Users.LAST_LOGIN_TIMESTAMP, System.currentTimeMillis())
                     .addOnSuccessListener(successListener)
                     .addOnFailureListener(failureListener)
 
@@ -272,7 +365,7 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
 
     return Either.fx {
 
-        val registrationDate = snapshot.getTimestamp(Contract.Database.Users.REGISTRATION_DATE)
+        val timestamp = snapshot.getTimestamp(Contract.Database.Users.TIMESTAMP)
                 ?.toDate()
                 ?.time ?: return@fx null
 
@@ -301,11 +394,34 @@ internal fun extractSignedInUser(snapshot: DocumentSnapshot): Either<Throwable, 
 
         SignedInUser.of(
                 id,
-                registrationDate,
+                timestamp,
                 email,
                 displayName,
                 username,
                 phoneNumber,
+                pictureUrl
+        ).right().bind()
+    }
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun extractSimpleUser(snapshot: DocumentSnapshot): Either<Throwable, SimpleRetrievedUser?> {
+
+    val id = UserId(snapshot.id)
+
+    return Either.fx {
+
+        val displayName = snapshot.getString(Contract.Database.Users.DISPLAY_NAME)
+                ?.let(DisplayName.Companion::of)
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind() ?: return@fx null
+
+        val pictureUrl = snapshot.getString(Contract.Database.Users.PICTURE_URL)
+                ?.let(Url.Companion::of)
+                ?.mapLeft { ModelCreationException(it.toString()) }?.bind()
+
+        SimpleRetrievedUser.of(
+                id,
+                displayName,
                 pictureUrl
         ).right().bind()
     }

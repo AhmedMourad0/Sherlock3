@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import dev.ahmedmourad.sherlock.domain.filter.Filter
 import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
@@ -14,7 +14,7 @@ import io.reactivex.Single
 
 interface ChildrenRepository {
 
-    fun publish(child: PublishedChild): Single<Either<PublishException, RetrievedChild>>
+    fun publish(child: ChildToPublish): Single<Either<PublishException, RetrievedChild>>
 
     fun find(
             childId: ChildId
@@ -26,19 +26,6 @@ interface ChildrenRepository {
     ): Flowable<Either<FindAllException, Map<SimpleRetrievedChild, Weight>>>
 
     fun findLastSearchResults(): Flowable<Either<FindLastSearchResultsException, Map<SimpleRetrievedChild, Weight>>>
-
-    fun test(): Tester
-
-    interface Tester {
-
-        fun clear(): Single<Either<ClearException, Unit>>
-
-        sealed class ClearException {
-            object NoInternetConnectionException : ClearException()
-            object NoSignedInUserException : ClearException()
-            data class UnknownException(val origin: Throwable) : ClearException()
-        }
-    }
 
     sealed class PublishException {
         object NoInternetConnectionException : PublishException()
@@ -57,6 +44,7 @@ interface ChildrenRepository {
     sealed class FindAllException {
         object NoInternetConnectionException : FindAllException()
         object NoSignedInUserException : FindAllException()
+        data class InternalException(val origin: Throwable) : FindAllException()
         data class UnknownException(val origin: Throwable) : FindAllException()
     }
 

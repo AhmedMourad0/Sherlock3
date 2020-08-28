@@ -7,6 +7,7 @@ import arrow.core.right
 import dev.ahmedmourad.nocopy.annotations.NoCopy
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelConversionException
 import dev.ahmedmourad.sherlock.domain.model.EitherSerializer
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.ApproximateAppearance
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Location
@@ -19,10 +20,10 @@ import timber.log.error
 
 //TODO: make the rules a little stricter
 //TODO: add finding date
-//TODO: add user id
 @Serializable
 @NoCopy
-data class PublishedChild private constructor(
+data class ChildToPublish private constructor(
+        val user: SimpleRetrievedUser,
         val name: @Serializable(with = EitherSerializer::class) Either<Name, FullName>?,
         val notes: String?,
         val location: Location?,
@@ -30,10 +31,15 @@ data class PublishedChild private constructor(
         val picture: ByteArray?
 ) {
 
-    fun toRetrievedChild(id: ChildId, publicationDate: Long, pictureUrl: Url?): RetrievedChild {
+    fun toRetrievedChild(
+            id: ChildId,
+            timestamp: Long,
+            pictureUrl: Url?
+    ): RetrievedChild {
         return RetrievedChild.of(
                 id,
-                publicationDate,
+                user,
+                timestamp,
                 name,
                 notes,
                 location,
@@ -45,20 +51,51 @@ data class PublishedChild private constructor(
         }!!
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ChildToPublish
+
+        if (user != other.user) return false
+        if (name != other.name) return false
+        if (notes != other.notes) return false
+        if (location != other.location) return false
+        if (appearance != other.appearance) return false
+        if (picture != null) {
+            if (other.picture == null) return false
+            if (!picture.contentEquals(other.picture)) return false
+        } else if (other.picture != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = user.hashCode()
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (notes?.hashCode() ?: 0)
+        result = 31 * result + (location?.hashCode() ?: 0)
+        result = 31 * result + appearance.hashCode()
+        result = 31 * result + (picture?.contentHashCode() ?: 0)
+        return result
+    }
+
     companion object {
 
-        fun of(name: Either<Name, FullName>?,
+        fun of(user: SimpleRetrievedUser,
+               name: Either<Name, FullName>?,
                notes: String?,
                location: Location?,
                appearance: ApproximateAppearance,
                picture: ByteArray?
-        ): Either<Exception, PublishedChild> {
-            return validate(name, notes, location, appearance, picture)?.left()
-                    ?: PublishedChild(name, notes, location, appearance, picture).right()
+        ): Either<Exception, ChildToPublish> {
+            return validate(user, name, notes, location, appearance, picture)?.left()
+                    ?: ChildToPublish(user, name, notes, location, appearance, picture).right()
         }
 
         @Suppress("UNUSED_PARAMETER")
-        fun validate(name: Either<Name, FullName>?,
+        fun validate(user: SimpleRetrievedUser,
+                     name: Either<Name, FullName>?,
                      notes: String?,
                      location: Location?,
                      appearance: ApproximateAppearance,

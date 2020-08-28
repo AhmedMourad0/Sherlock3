@@ -12,7 +12,8 @@ import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.images.contract.Contract
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
-import dev.ahmedmourad.sherlock.auth.manager.dependencies.UserAuthStateObservable
+import dev.ahmedmourad.sherlock.domain.data.AuthManager
+import dev.ahmedmourad.sherlock.domain.data.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @Reusable
 internal class FirebaseStorageImageRepository @Inject constructor(
         private val connectivityManager: Lazy<ConnectivityManager>,
-        @InternalApi private val userAuthStateObservable: UserAuthStateObservable,
+        private val authStateObservable: ObserveUserAuthState,
         @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
@@ -35,6 +36,11 @@ internal class FirebaseStorageImageRepository @Inject constructor(
 
         fun ConnectivityManager.IsInternetConnectedException.map() = when (this) {
             is ConnectivityManager.IsInternetConnectedException.UnknownException ->
+                ImageRepository.StoreUserPictureException.UnknownException(this.origin)
+        }
+
+        fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 ImageRepository.StoreUserPictureException.UnknownException(this.origin)
         }
 
@@ -51,8 +57,8 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                         Single.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            userAuthStateObservable.observeUserAuthState()
-                                    .map(Boolean::right)
+                            authStateObservable.invoke()
+                                    .map { it.mapLeft(AuthManager.ObserveUserAuthStateException::map) }
                                     .firstOrError()
                         } else {
                             Single.just(

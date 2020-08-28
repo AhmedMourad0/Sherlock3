@@ -2,25 +2,29 @@ package dev.ahmedmourad.sherlock.children.di
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.sqldelight.db.SqlDriver
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.children.images.repository.FirebaseStorageImageRepository
-import dev.ahmedmourad.sherlock.children.local.database.ChildrenRoomDatabase
-import dev.ahmedmourad.sherlock.children.local.repository.RoomLocalRepository
+import dev.ahmedmourad.sherlock.children.local.ChildrenDatabase
+import dev.ahmedmourad.sherlock.children.local.ChildrenQueries
+import dev.ahmedmourad.sherlock.children.local.UsersQueries
+import dev.ahmedmourad.sherlock.children.local.daos.ChildrenDao
+import dev.ahmedmourad.sherlock.children.local.daos.ChildrenDaoImpl
+import dev.ahmedmourad.sherlock.children.local.database.childrenDatabase
+import dev.ahmedmourad.sherlock.children.local.database.sqliteDriver
+import dev.ahmedmourad.sherlock.children.local.repository.LocalRepositoryImpl
 import dev.ahmedmourad.sherlock.children.remote.repositories.FirebaseFirestoreRemoteRepository
 import dev.ahmedmourad.sherlock.children.repository.ChildrenRepositoryImpl
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
+import javax.inject.Singleton
 
-@Module(includes = [
-    ChildrenRoomDatabaseModule::class,
-    FirebaseFirestoreModule::class,
-    FirebaseStorageModule::class
-])
+@Module
 internal interface ChildrenBindingsModule {
 
     @Binds
@@ -43,33 +47,60 @@ internal interface ChildrenBindingsModule {
     @Binds
     @InternalApi
     fun bindLocalRepository(
-            impl: RoomLocalRepository
+            impl: LocalRepositoryImpl
     ): LocalRepository
+
+    @Binds
+    @InternalApi
+    fun bindChildrenDao(
+            impl: ChildrenDaoImpl
+    ): ChildrenDao
 }
 
 @Module
-internal object ChildrenRoomDatabaseModule {
+internal object ChildrenProvidedModule {
+
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): ChildrenRoomDatabase = ChildrenRoomDatabase.getInstance()
-}
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
-@Module
-internal object FirebaseFirestoreModule {
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): FirebaseFirestore = FirebaseFirestore.getInstance()
-}
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 
-@Module
-internal object FirebaseStorageModule {
+    @Provides
+    @Singleton
+    @InternalApi
+    @JvmStatic
+    fun provideSqliteDriver(): SqlDriver {
+        return sqliteDriver()
+    }
+
+    @Provides
+    @Singleton
+    @InternalApi
+    @JvmStatic
+    fun provideDeltaDatabase(@InternalApi driver: SqlDriver): ChildrenDatabase {
+        return childrenDatabase(driver)
+    }
+
     @Provides
     @Reusable
     @InternalApi
     @JvmStatic
-    fun provide(): FirebaseStorage = FirebaseStorage.getInstance()
+    fun provideChildrenQueries(@InternalApi db: ChildrenDatabase): ChildrenQueries {
+        return db.childrenQueries
+    }
+
+    @Provides
+    @Reusable
+    @InternalApi
+    @JvmStatic
+    fun provideUsersQueries(@InternalApi db: ChildrenDatabase): UsersQueries {
+        return db.usersQueries
+    }
 }

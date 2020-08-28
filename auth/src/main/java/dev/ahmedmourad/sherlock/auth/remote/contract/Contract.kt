@@ -6,16 +6,16 @@ internal object Contract {
 
         object Users {
 
-            const val PATH = "u"
+            const val PATH = "users"
 
-            const val REGISTRATION_DATE = "rd"
-            const val LAST_LOGIN_DATE = "ll"
-            const val EMAIL = "e"
-            const val DISPLAY_NAME = "dn"
-            const val USER_NAME = "un"
-            const val COUNTRY_CODE = "cc"
-            const val PHONE_NUMBER = "pn"
-            const val PICTURE_URL = "pu"
+            const val TIMESTAMP = "timestamp"
+            const val LAST_LOGIN_TIMESTAMP = "last_login_timestamp"
+            const val EMAIL = "email"
+            const val DISPLAY_NAME = "display_name"
+            const val USER_NAME = "username"
+            const val COUNTRY_CODE = "country_code"
+            const val PHONE_NUMBER = "phone_number"
+            const val PICTURE_URL = "picture_url"
         }
     }
 }

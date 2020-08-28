@@ -22,7 +22,7 @@
 		android:paddingBottom="16dp">
 		
 		<ImageView
-			android:id="@+id/picture_image_view"
+			android:id="@+id/child_picture"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:contentDescription="@string/child"
@@ -37,7 +37,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			app:barrierDirection="end"
-			app:constraint_referenced_ids="circleImageView"
+			app:constraint_referenced_ids="user_profile_picture"
 			tools:layout_editor_absoluteX="395dp"
 			tools:layout_editor_absoluteY="16dp" />
 		
@@ -46,7 +46,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			app:barrierDirection="bottom"
-			app:constraint_referenced_ids="materialTextView6,circleImageView,date_text_view"
+			app:constraint_referenced_ids="user_display_name,user_profile_picture,timestamp"
 			tools:layout_editor_absoluteY="283dp" />
 		
 		<androidx.constraintlayout.widget.Guideline
@@ -64,7 +64,7 @@
 			app:layout_constraintGuide_end="8dp" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/notes_text_view"
+			android:id="@+id/notes"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="12dp"
@@ -76,11 +76,11 @@
 			android:textSize="@dimen/resultNotesTextSize"
 			app:layout_constraintEnd_toStartOf="@+id/guideline9"
 			app:layout_constraintStart_toStartOf="@+id/guideline7"
-			app:layout_constraintTop_toBottomOf="@+id/picture_image_view"
+			app:layout_constraintTop_toBottomOf="@+id/child_picture"
 			tools:text="Don't you think it's ridiculous that Firebase Realtime Database has so poor querying capabilities?\nI mean It's Google for god's sake!" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/date_text_view"
+			android:id="@+id/timestamp"
 			android:layout_width="0dp"
 			android:layout_height="0dp"
 			android:layout_marginBottom="8dp"
@@ -89,15 +89,15 @@
 			android:maxLines="1"
 			android:scrollHorizontally="true"
 			android:textSize="@dimen/resultDateTextSize"
-			app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
+			app:layout_constraintBottom_toBottomOf="@+id/user_profile_picture"
 			app:layout_constraintEnd_toStartOf="@+id/guideline9"
 			app:layout_constraintHorizontal_bias="0.5"
 			app:layout_constraintStart_toEndOf="@+id/barrier"
-			app:layout_constraintTop_toBottomOf="@+id/materialTextView6"
+			app:layout_constraintTop_toBottomOf="@+id/user_display_name"
 			tools:text="@string/date" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/materialTextView6"
+			android:id="@+id/user_display_name"
 			android:layout_width="0dp"
 			android:layout_height="0dp"
 			android:ellipsize="end"
@@ -108,11 +108,11 @@
 			android:textColor="@android:color/black"
 			android:textSize="@dimen/resultUserNameTextSize"
 			android:textStyle="bold"
-			app:layout_constraintBottom_toTopOf="@+id/date_text_view"
+			app:layout_constraintBottom_toTopOf="@+id/timestamp"
 			app:layout_constraintEnd_toStartOf="@+id/guideline9"
 			app:layout_constraintHorizontal_bias="0.5"
 			app:layout_constraintStart_toEndOf="@+id/barrier"
-			app:layout_constraintTop_toTopOf="@+id/circleImageView"
+			app:layout_constraintTop_toTopOf="@+id/user_profile_picture"
 			app:layout_constraintVertical_chainStyle="spread" />
 		
 		<com.google.android.material.textview.MaterialTextView
@@ -124,10 +124,10 @@
 			android:textColor="@android:color/black"
 			android:textSize="@dimen/resultLocationTextSize"
 			app:layout_constraintStart_toStartOf="@+id/guideline7"
-			app:layout_constraintTop_toBottomOf="@+id/notes_text_view" />
+			app:layout_constraintTop_toBottomOf="@+id/notes" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/location_text_view"
+			android:id="@+id/location"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="4dp"
@@ -144,7 +144,7 @@
 			tools:text="Yasmeena Plaza, Tanta, Egypt" />
 		
 		<de.hdodenhof.circleimageview.CircleImageView
-			android:id="@+id/circleImageView"
+			android:id="@+id/user_profile_picture"
 			android:layout_width="@dimen/resultMetaUserPictureWidth"
 			android:layout_height="@dimen/resultMetaUserPictureHeight"
 			android:layout_gravity="center_vertical"

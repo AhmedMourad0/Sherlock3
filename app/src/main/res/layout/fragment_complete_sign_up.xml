@@ -42,7 +42,7 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintHorizontal_bias="0.5"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/picture_image_view" />
+			app:layout_constraintTop_toBottomOf="@+id/child_picture" />
 		
 		<com.google.android.material.textfield.TextInputLayout
 			android:id="@+id/textInputLayout4"
@@ -129,10 +129,10 @@
 			android:paddingEnd="0dp"
 			android:text="@string/change_profile_picture"
 			android:textColor="@color/colorAccent"
-			app:layout_constraintBottom_toBottomOf="@+id/picture_image_view"
+			app:layout_constraintBottom_toBottomOf="@+id/child_picture"
 			app:layout_constraintEnd_toStartOf="@+id/guideline2"
-			app:layout_constraintStart_toEndOf="@+id/picture_image_view"
-			app:layout_constraintTop_toTopOf="@+id/picture_image_view" />
+			app:layout_constraintStart_toEndOf="@+id/child_picture"
+			app:layout_constraintTop_toTopOf="@+id/child_picture" />
 		
 		<com.hbb20.CountryCodePicker
 			android:id="@+id/country_code_picker"
@@ -150,7 +150,7 @@
 			app:layout_constraintTop_toTopOf="@+id/textInputLayout5" />
 		
 		<de.hdodenhof.circleimageview.CircleImageView
-			android:id="@+id/picture_image_view"
+			android:id="@+id/profile_picture"
 			android:layout_width="80dp"
 			android:layout_height="80dp"
 			android:layout_marginTop="20dp"

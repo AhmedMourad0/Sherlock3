@@ -3,15 +3,24 @@ package dev.ahmedmourad.sherlock.auth.manager.dependencies
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Flowable
 import io.reactivex.Single
 
 internal interface RemoteRepository {
 
-    fun storeSignUpUser(user: RemoteSignUpUser): Single<Either<StoreSignUpUserException, SignedInUser>>
+    fun storeSignUpUser(
+            user: RemoteSignUpUser
+    ): Single<Either<StoreSignUpUserException, SignedInUser>>
 
-    fun findSignedInUser(id: UserId): Flowable<Either<FindSignedInUserException, SignedInUser?>>
+    fun findSignedInUser(
+            id: UserId
+    ): Flowable<Either<FindSignedInUserException, SignedInUser?>>
+
+    fun findSimpleUsers(
+            ids: Collection<UserId>
+    ): Flowable<Either<FindSimpleUsersException, List<SimpleRetrievedUser>>>
 
     fun updateUserLastLoginDate(id: UserId): Single<Either<UpdateUserLastLoginDateException, Unit>>
 
@@ -26,6 +35,13 @@ internal interface RemoteRepository {
         object NoSignedInUserException : FindSignedInUserException()
         data class InternalException(val origin: Throwable) : FindSignedInUserException()
         data class UnknownException(val origin: Throwable) : FindSignedInUserException()
+    }
+
+    sealed class FindSimpleUsersException {
+        object NoInternetConnectionException : FindSimpleUsersException()
+        object NoSignedInUserException : FindSimpleUsersException()
+        data class InternalException(val origin: Throwable) : FindSimpleUsersException()
+        data class UnknownException(val origin: Throwable) : FindSimpleUsersException()
     }
 
     sealed class UpdateUserLastLoginDateException {

@@ -1,14 +1,19 @@
 package dev.ahmedmourad.sherlock.domain.data
 
 import arrow.core.Either
-import dev.ahmedmourad.sherlock.domain.model.auth.CompletedUser
-import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
+import dev.ahmedmourad.sherlock.domain.model.auth.*
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
+import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Flowable
 import io.reactivex.Single
+
+typealias ObserveUserAuthState =
+        () -> @JvmSuppressWildcards Flowable<Either<AuthManager.ObserveUserAuthStateException, Boolean>>
+
+typealias FindSimpleUsers =
+        (@JvmSuppressWildcards Collection<UserId>) ->
+        @JvmSuppressWildcards Flowable<Either<AuthManager.FindSimpleUsersException, List<SimpleRetrievedUser>>>
 
 interface AuthManager {
 
@@ -16,6 +21,10 @@ interface AuthManager {
 
     fun observeSignedInUser():
             Flowable<Either<ObserveCurrentUserException, Either<IncompleteUser, SignedInUser>?>>
+
+    fun findSimpleUsers(
+            ids: Collection<UserId>
+    ): Flowable<Either<FindSimpleUsersException, List<SimpleRetrievedUser>>>
 
     fun signIn(
             credentials: UserCredentials
@@ -45,6 +54,13 @@ interface AuthManager {
         object NoInternetConnectionException : ObserveCurrentUserException()
         data class InternalException(val origin: Throwable) : ObserveCurrentUserException()
         data class UnknownException(val origin: Throwable) : ObserveCurrentUserException()
+    }
+
+    sealed class FindSimpleUsersException {
+        object NoInternetConnectionException : FindSimpleUsersException()
+        object NoSignedInUserException : FindSimpleUsersException()
+        data class InternalException(val origin: Throwable) : FindSimpleUsersException()
+        data class UnknownException(val origin: Throwable) : FindSimpleUsersException()
     }
 
     sealed class SignInException {

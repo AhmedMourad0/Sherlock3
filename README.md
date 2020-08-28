@@ -37,24 +37,28 @@ lost/kidnapped children.
 
 ## Whiteboard:
 
-- unsafeOf
 - LiveQuery (allowing users to register their search parameters for live
   updates and sending them notifications when a child with high
-- Firebase Cloud Functions.
   likelihood for a match is found).
+- Firebase Cloud Functions.
+- The id should never be exposed to the ui layer
+- Encrypt everything
+- Refactor all views and viewmodels, remove all logic from the former to the latter
+- Firebase Crashlytics?
+  
+- unsafeOf
+- RxBinding
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
   data modules.
 - Replace RxJava with Kotlin Coroutines and Flow.
 - Improve UI, maybe wait for Compose? It's a mess. We also need many
   spinners.
 - Testing.
-- Firebase Crashlytics.
 - Package per feature?
 - Use AndroidX's App Startup
 - Anonymous authentication as a firestore fallback strategy when the
   user is signed in but not with Firebase.
 - Timeline (shows a live feed of newly missing or found children near
   you)
-- Go Multiplatform (hopefully Dagger2 will be ported by then, I need
-  compile-time dependency graph validation).
-- Redux? MVI?
+- Go Multiplatform (kotlin-inject, sqldelight, gitlive firebase,...).
+- Redux? MVI? No?

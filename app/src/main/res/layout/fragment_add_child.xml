@@ -55,7 +55,7 @@
 			app:layout_constraintGuide_begin="12dp" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/location_text_view"
+			android:id="@+id/location"
 			android:layout_width="0dp"
 			android:layout_height="0dp"
 			android:gravity="center_vertical"
@@ -86,7 +86,7 @@
 			android:layout_weight="1"
 			app:layout_constraintEnd_toStartOf="@+id/guideline5"
 			app:layout_constraintStart_toEndOf="@id/barrier2"
-			app:layout_constraintTop_toBottomOf="@+id/location_text_view"
+			app:layout_constraintTop_toBottomOf="@+id/location"
 			app:rsb_indicator_height="@dimen/addChildSeekBarIndicatorHeight"
 			app:rsb_indicator_padding_left="@dimen/addChildSeekBarIndicatorPaddingLeft"
 			app:rsb_indicator_padding_right="@dimen/addChildSeekBarIndicatorPaddingRight"
@@ -168,7 +168,7 @@
 			app:layout_constraintTop_toBottomOf="@+id/skin" />
 		
 		<de.hdodenhof.circleimageview.CircleImageView
-			android:id="@+id/picture_image_view"
+			android:id="@+id/profile_picture"
 			android:layout_width="@dimen/addChildPictureWidth"
 			android:layout_height="@dimen/addChildPictureHeight"
 			android:layout_marginTop="20dp"
@@ -186,10 +186,10 @@
 			android:text="@string/choose_a_picture"
 			android:textColor="@color/colorAccent"
 			android:textSize="@dimen/addChildPictureTextSize"
-			app:layout_constraintBottom_toBottomOf="@+id/picture_image_view"
+			app:layout_constraintBottom_toBottomOf="@+id/child_picture"
 			app:layout_constraintEnd_toStartOf="@+id/guideline5"
-			app:layout_constraintStart_toEndOf="@+id/picture_image_view"
-			app:layout_constraintTop_toTopOf="@+id/picture_image_view" />
+			app:layout_constraintStart_toEndOf="@+id/child_picture"
+			app:layout_constraintTop_toTopOf="@+id/child_picture" />
 		
 		<com.google.android.material.textfield.TextInputLayout
 			android:id="@+id/textInputLayout2"
@@ -199,7 +199,7 @@
 			app:hintTextColor="@color/colorAccent"
 			app:layout_constraintEnd_toStartOf="@+id/guideline5"
 			app:layout_constraintStart_toStartOf="@+id/guideline3"
-			app:layout_constraintTop_toBottomOf="@+id/picture_image_view">
+			app:layout_constraintTop_toBottomOf="@+id/child_picture">
 			
 			<com.google.android.material.textfield.TextInputEditText
 				android:id="@+id/notes_edit_text"

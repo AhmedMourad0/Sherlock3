@@ -13,6 +13,7 @@ import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.images.contract.Contract
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
+import dev.ahmedmourad.sherlock.domain.data.ObserveUserAuthState
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @Reusable
 internal class FirebaseStorageImageRepository @Inject constructor(
         private val connectivityManager: Lazy<ConnectivityManager>,
-        private val authManager: Lazy<AuthManager>,
+        private val authStateObservable: Lazy<ObserveUserAuthState>,
         @InternalApi private val storage: Lazy<FirebaseStorage>
 ) : ImageRepository {
 
@@ -56,7 +57,7 @@ internal class FirebaseStorageImageRepository @Inject constructor(
                         Single.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            authManager.get().observeUserAuthState().map { either ->
+                            authStateObservable.get().invoke().map { either ->
                                 either.mapLeft(AuthManager.ObserveUserAuthStateException::map)
                             }.firstOrError()
                         } else {

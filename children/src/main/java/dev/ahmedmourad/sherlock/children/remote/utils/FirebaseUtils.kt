@@ -3,13 +3,15 @@ package dev.ahmedmourad.sherlock.children.remote.utils
 import arrow.core.Either
 import com.google.firebase.firestore.FieldValue
 import dev.ahmedmourad.sherlock.children.remote.contract.Contract
-import dev.ahmedmourad.sherlock.domain.model.children.PublishedChild
+import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
+import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.FullName
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 
-fun PublishedChild.toMap(pictureUrl: Url?): Map<String, Any?> = hashMapOf(
-        Contract.Database.Children.PUBLICATION_DATE to FieldValue.serverTimestamp(),
+fun ChildToPublish.toMap(pictureUrl: Url?): Map<String, Any?> = hashMapOf(
+        Contract.Database.Children.USER_ID to user.id.value,
+        Contract.Database.Children.TIMESTAMP to FieldValue.serverTimestamp(),
         Contract.Database.Children.LOCATION_ID to location?.id,
         Contract.Database.Children.LOCATION_NAME to location?.name,
         Contract.Database.Children.LOCATION_ADDRESS to location?.address,
@@ -47,3 +49,17 @@ private fun createNameHashMap(name: Either<Name, FullName>?): Map<String, Any?> 
         )
     })
 }
+
+fun ChildQuery.toMap(page: Int): Map<String, Any?> = hashMapOf(
+        Contract.Database.Queries.PAGE to page,
+        Contract.Database.Queries.USER_ID to this.user.id.value,
+        Contract.Database.Queries.FIRST_NAME to this.fullName.first.value,
+        Contract.Database.Queries.LAST_NAME to this.fullName.last.value,
+        Contract.Database.Queries.LATITUDE to this.location.coordinates.latitude,
+        Contract.Database.Queries.LONGITUDE to this.location.coordinates.longitude,
+        Contract.Database.Queries.GENDER to this.appearance.gender.value,
+        Contract.Database.Queries.SKIN to this.appearance.skin.value,
+        Contract.Database.Queries.HAIR to this.appearance.hair.value,
+        Contract.Database.Queries.AGE to this.appearance.age.value,
+        Contract.Database.Queries.HEIGHT to this.appearance.height.value
+)

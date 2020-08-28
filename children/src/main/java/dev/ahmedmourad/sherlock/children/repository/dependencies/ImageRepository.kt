@@ -6,7 +6,11 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Single
 
 internal interface ImageRepository {
-    fun storeChildPicture(id: ChildId, picture: ByteArray?): Single<Either<StoreChildPictureException, Url?>>
+
+    fun storeChildPicture(
+            id: ChildId,
+            picture: ByteArray?
+    ): Single<Either<StoreChildPictureException, Url?>>
 
     sealed class StoreChildPictureException {
         object NoInternetConnectionException : StoreChildPictureException()
