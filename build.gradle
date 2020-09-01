@@ -1,5 +1,5 @@
 buildscript {
-    ext{
+    ext {
         kotlin_version = "1.4.0"
         nav_version = '2.3.0'
     }
@@ -27,6 +27,7 @@ allprojects {
         mavenCentral()
         maven { url "https://jitpack.io" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url "https://kotlin.bintray.com/kotlinx/" }
         jcenter()
     }
     ext {

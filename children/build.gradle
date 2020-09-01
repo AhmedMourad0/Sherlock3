@@ -58,6 +58,9 @@ dependencies {
     api "com.google.firebase:firebase-storage:19.1.1"
     api "com.google.firebase:firebase-firestore-ktx:21.5.0"
 
+    api 'com.google.firebase:firebase-messaging:20.2.4'
+    api 'com.google.firebase:firebase-analytics:17.5.0'
+
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
@@ -93,6 +96,7 @@ configurations.all {
         }
     }
 }
+
 sqldelight {
     ChildrenDatabase {
         packageName = "dev.ahmedmourad.sherlock.children.local"
@@ -101,4 +105,3 @@ sqldelight {
         dialect = "sqlite:3.24"
     }
 }
-
