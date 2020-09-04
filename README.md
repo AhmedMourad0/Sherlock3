@@ -8,6 +8,8 @@ best possible design choices for a modern application.*
 Sherlock is a mobile app that aims to help families find their
 lost/kidnapped children.
 
+## Key Features
+
 ## Key Concepts
 
 - Clean Architecture.
@@ -20,10 +22,11 @@ lost/kidnapped children.
 - Dagger2.
 - AAC (Room, Navigation, ViewModel, SavedState, LiveData).
 - AndroidX Fragments.
-- Firebase (Firestore, Storage, Authentication).
+- Firebase (Firestore, Authentication, Functions, Messaging, Storage).
 - Authentication with (Email, Google, Facebook and Twitter).
 - RxJava.
 - KotlinX Serialization.
+- SQLDelight.
 - Glide.
 - Fragment navigation pattern (Single Activity, multiple fragments).
 - Reactive Event Bus.
@@ -32,33 +35,25 @@ lost/kidnapped children.
 - Backdrop.
 - Timber.
 - Home screen widgets.
-- ADT driven error handling.
+- ADT-driven error handling.
 - Bundlizer and NoCopy.
 
 ## Whiteboard:
 
-- LiveQuery (allowing users to register their search parameters for live
-  updates and sending them notifications when a child with high
-  likelihood for a match is found).
-- Firebase Cloud Functions.
-- The id should never be exposed to the ui layer
-- Encrypt everything
-- Refactor all views and viewmodels, remove all logic from the former to the latter
+- Compose
+- Testing.
+- Fix all ViewModels
+- Hide the id from the ui layer
+- Encryption, Redacted
 - Firebase Crashlytics?
-  
-- unsafeOf
-- RxBinding
 - Use Monads to abstract over data types (RxJava, Coroutines,...) in
   data modules.
 - Replace RxJava with Kotlin Coroutines and Flow.
-- Improve UI, maybe wait for Compose? It's a mess. We also need many
-  spinners.
-- Testing.
 - Package per feature?
 - Use AndroidX's App Startup
 - Anonymous authentication as a firestore fallback strategy when the
   user is signed in but not with Firebase.
 - Timeline (shows a live feed of newly missing or found children near
   you)
-- Go Multiplatform (kotlin-inject, sqldelight, gitlive firebase,...).
+- Go Multiplatform (kotlin-inject, gitlive firebase,...).
 - Redux? MVI? No?
