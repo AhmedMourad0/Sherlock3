@@ -16,10 +16,12 @@ import dev.ahmedmourad.sherlock.children.local.daos.ChildrenDaoImpl
 import dev.ahmedmourad.sherlock.children.local.database.childrenDatabase
 import dev.ahmedmourad.sherlock.children.local.database.sqliteDriver
 import dev.ahmedmourad.sherlock.children.local.repository.LocalRepositoryImpl
+import dev.ahmedmourad.sherlock.children.preferences.PreferencesManagerImpl
 import dev.ahmedmourad.sherlock.children.remote.repositories.FirebaseFirestoreRemoteRepository
 import dev.ahmedmourad.sherlock.children.repository.ChildrenRepositoryImpl
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
+import dev.ahmedmourad.sherlock.children.repository.dependencies.PreferencesManager
 import dev.ahmedmourad.sherlock.children.repository.dependencies.RemoteRepository
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
 import javax.inject.Singleton
@@ -55,6 +57,12 @@ internal interface ChildrenBindingsModule {
     fun bindChildrenDao(
             impl: ChildrenDaoImpl
     ): ChildrenDao
+
+    @Binds
+    @InternalApi
+    fun bindPreferencesManager(
+            impl: PreferencesManagerImpl
+    ): PreferencesManager
 }
 
 @Module
