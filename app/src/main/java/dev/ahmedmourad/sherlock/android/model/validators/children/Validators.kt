@@ -11,8 +11,8 @@ import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
-import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
 import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
+import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
@@ -156,8 +156,8 @@ internal fun validateCoordinates(latitude: Double?, longitude: Double?): Either<
     return Coordinates.of(latitude, longitude).mapLeft(Coordinates.Exception::localizedMessage)
 }
 
-internal fun validateLocation(location: Location?): Either<String, Location> {
-    return location?.right() ?: appCtx.getString(R.string.invalid_last_known_location).left()
+internal fun validateCoordinates(coordinates: Coordinates?): Either<String, Coordinates> {
+    return coordinates?.right() ?: appCtx.getString(R.string.invalid_last_known_location).left()
 }
 
 internal fun validateLocation(
@@ -229,13 +229,15 @@ internal fun validateAppPublishedChild(
 internal fun validateChildQuery(
         user: SimpleRetrievedUser,
         fullName: FullName,
-        location: Location,
-        appearance: ExactAppearance
-): Either<String, ChildQuery> {
-    return ChildQuery.of(
+        coordinates: Coordinates,
+        appearance: ExactAppearance,
+        page: Int
+): Either<String, ChildrenQuery> {
+    return ChildrenQuery.of(
             user,
             fullName,
-            location,
-            appearance
-    ).right()
+            coordinates,
+            appearance,
+            page
+    ).mapLeft(ChildrenQuery.Exception::localizedMessage)
 }
