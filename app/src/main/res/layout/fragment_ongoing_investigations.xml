@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent">
+	
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/recycler"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/colorRecyclerBackground"
+		android:clipToPadding="false"
+		android:paddingTop="@dimen/searchResultsRecyclerPaddingTop"
+		android:paddingBottom="@dimen/searchResultsRecyclerPaddingBottom"
+		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+		android:visibility="gone" />
+	
+	<include
+		android:id="@+id/error"
+		layout="@layout/content_error"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone" />
+	
+	<include
+		android:id="@+id/loading"
+		layout="@layout/content_loading"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
+</FrameLayout>

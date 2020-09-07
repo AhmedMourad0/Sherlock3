@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_marginStart="@dimen/resultMarginStart"
+	android:layout_marginTop="@dimen/resultMarginTop"
+	android:layout_marginEnd="@dimen/resultMarginEnd"
+	android:layout_marginBottom="@dimen/resultMarginBottom"
+	android:clickable="true"
+	android:focusable="true"
+	android:foreground="?selectableItemBackground"
+	app:backgroundTint="@android:color/white"
+	app:cardCornerRadius="@dimen/resultCardCornerRadius"
+	app:cardElevation="@dimen/resultCardElevation">
+	
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingBottom="16dp"
+		android:paddingTop="16dp">
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/child_name"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="8dp"
+			android:ellipsize="end"
+			android:gravity="center_vertical"
+			android:maxLines="1"
+			android:paddingStart="@dimen/resultLocationSpacing"
+			android:paddingEnd="@dimen/resultLocationPaddingEnd"
+			android:scrollHorizontally="true"
+			android:textSize="@dimen/resultLocationTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/materialTextView6"
+			app:layout_constraintEnd_toStartOf="@+id/guideline9"
+			app:layout_constraintStart_toEndOf="@id/barrier5"
+			app:layout_constraintTop_toTopOf="@+id/materialTextView6"
+			tools:text="Ahmed Mourad" />
+		
+		<ImageView
+			android:id="@+id/icon"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:contentDescription="@string/child"
+			android:scaleType="centerCrop"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="@+id/guideline7"
+			app:layout_constraintTop_toTopOf="parent"
+			app:srcCompat="@drawable/ic_detective" />
+		
+		<androidx.constraintlayout.widget.Barrier
+			android:id="@+id/barrier4"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:barrierDirection="end"
+			app:constraint_referenced_ids="icon"
+			tools:layout_editor_absoluteX="395dp"
+			tools:layout_editor_absoluteY="16dp" />
+		
+		<androidx.constraintlayout.widget.Barrier
+			android:id="@+id/barrier5"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:barrierDirection="end"
+			app:constraint_referenced_ids="materialTextView7,materialTextView6"
+			tools:layout_editor_absoluteX="395dp"
+			tools:layout_editor_absoluteY="16dp" />
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline7"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_begin="8dp" />
+		
+		<androidx.constraintlayout.widget.Guideline
+			android:id="@+id/guideline9"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			app:layout_constraintGuide_end="8dp" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView7"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="8dp"
+			android:text="@string/started_on"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/resultLocationTextSize"
+			app:layout_constraintStart_toStartOf="@+id/materialTextView6"
+			app:layout_constraintTop_toBottomOf="@+id/materialTextView6" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/timestamp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:ellipsize="end"
+			android:gravity="center_vertical"
+			android:maxLines="1"
+			android:paddingStart="@dimen/resultLocationSpacing"
+			android:paddingEnd="@dimen/resultLocationPaddingEnd"
+			android:scrollHorizontally="true"
+			android:textSize="@dimen/resultLocationTextSize"
+			app:layout_constraintBottom_toBottomOf="@+id/materialTextView7"
+			app:layout_constraintEnd_toStartOf="@+id/guideline9"
+			app:layout_constraintStart_toStartOf="@+id/child_name"
+			app:layout_constraintTop_toTopOf="@+id/materialTextView7"
+			tools:text="@string/date" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/materialTextView6"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="8dp"
+			android:text="@string/looking_for"
+			android:textColor="@android:color/black"
+			android:textSize="@dimen/resultLocationTextSize"
+			app:layout_constraintStart_toEndOf="@+id/icon"
+			app:layout_constraintTop_toTopOf="parent" />
+	
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
