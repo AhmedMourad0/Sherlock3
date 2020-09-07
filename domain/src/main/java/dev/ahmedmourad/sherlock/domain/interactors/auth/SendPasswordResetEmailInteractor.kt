@@ -8,7 +8,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SendPasswordResetEmailInteractor :
+fun interface SendPasswordResetEmailInteractor :
         (Email) -> Single<Either<SendPasswordResetEmailInteractor.Exception, Unit>> {
     sealed class Exception {
         data class NonExistentEmailException(val email: Email) : Exception()

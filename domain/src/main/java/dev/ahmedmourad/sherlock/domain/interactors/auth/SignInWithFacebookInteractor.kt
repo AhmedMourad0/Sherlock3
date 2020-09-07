@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SignInWithFacebookInteractor :
+fun interface SignInWithFacebookInteractor :
         () -> Single<Either<SignInWithFacebookInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
     sealed class Exception {
         object AccountHasBeenDisabledException : Exception()

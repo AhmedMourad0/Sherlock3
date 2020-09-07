@@ -7,7 +7,7 @@ import dev.ahmedmourad.sherlock.domain.platform.ConnectivityManager
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-interface ObserveInternetConnectivityInteractor :
+fun interface ObserveInternetConnectivityInteractor :
         () -> Flowable<Either<ObserveInternetConnectivityInteractor.Exception, Boolean>> {
     sealed class Exception {
         data class UnknownException(val origin: Throwable) : Exception()

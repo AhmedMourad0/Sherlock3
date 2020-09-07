@@ -11,7 +11,7 @@ import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-interface FindChildInteractor :
+fun interface FindChildInteractor :
         (ChildId) -> Flowable<Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?>> {
     sealed class Exception {
         object NoInternetConnectionException : Exception()

@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface AddChildInteractor :
+fun interface AddChildInteractor :
         (ChildToPublish) -> Single<Either<AddChildInteractor.Exception, RetrievedChild>> {
     sealed class Exception {
         object NoInternetConnectionException : Exception()

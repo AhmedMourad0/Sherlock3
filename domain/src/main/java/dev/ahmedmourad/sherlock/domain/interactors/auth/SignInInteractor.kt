@@ -10,7 +10,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SignInInteractor :
+fun interface SignInInteractor :
         (UserCredentials) -> Single<Either<SignInInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
     sealed class Exception {
         object AccountDoesNotExistOrHasBeenDisabledException : Exception()

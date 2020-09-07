@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-interface FindLastSearchResultsInteractor :
+fun interface FindLastSearchResultsInteractor :
         () -> Flowable<Either<FindLastSearchResultsInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
     sealed class Exception {
         data class InternalException(val origin: Throwable) : Exception()

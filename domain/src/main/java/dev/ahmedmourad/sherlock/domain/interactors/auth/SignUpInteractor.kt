@@ -10,7 +10,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SignUpInteractor :
+fun interface SignUpInteractor :
         (SignUpUser) -> Single<Either<SignUpInteractor.Exception, SignedInUser>> {
     sealed class Exception {
         object WeakPasswordException : Exception()

@@ -7,7 +7,7 @@ import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-interface ObserveUserAuthStateInteractor :
+fun interface ObserveUserAuthStateInteractor :
         () -> Flowable<Either<ObserveUserAuthStateInteractor.Exception, Boolean>> {
     sealed class Exception {
         data class UnknownException(val origin: Throwable) : Exception()

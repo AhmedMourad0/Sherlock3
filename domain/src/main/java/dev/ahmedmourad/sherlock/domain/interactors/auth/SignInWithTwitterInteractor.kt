@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SignInWithTwitterInteractor :
+fun interface SignInWithTwitterInteractor :
         () -> Single<Either<SignInWithTwitterInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
     sealed class Exception {
         object AccountHasBeenDisabledException : Exception()

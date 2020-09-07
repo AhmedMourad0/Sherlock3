@@ -9,7 +9,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface CompleteSignUpInteractor : (CompletedUser) -> Single<Either<CompleteSignUpInteractor.Exception, SignedInUser>> {
+fun interface CompleteSignUpInteractor : (CompletedUser) -> Single<Either<CompleteSignUpInteractor.Exception, SignedInUser>> {
     sealed class Exception {
         object NoInternetConnectionException : Exception()
         object NoSignedInUserException : Exception()

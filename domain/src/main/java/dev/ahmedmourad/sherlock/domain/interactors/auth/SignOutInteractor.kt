@@ -7,7 +7,7 @@ import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import io.reactivex.Single
 import javax.inject.Inject
 
-interface SignOutInteractor : () -> Single<Either<SignOutInteractor.Exception, Unit>> {
+fun interface SignOutInteractor : () -> Single<Either<SignOutInteractor.Exception, Unit>> {
     sealed class Exception {
         object NoInternetConnectionException : Exception()
         data class InternalException(val origin: Throwable) : Exception()
