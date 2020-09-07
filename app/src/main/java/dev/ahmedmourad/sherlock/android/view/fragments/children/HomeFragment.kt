@@ -78,7 +78,11 @@ internal class HomeFragment : Fragment(R.layout.fragment_home) {
                 R.drawable.search_child,
                 HomeFragmentDirections.Companion::actionHomeFragmentToFindChildrenFragment
         ))
-        add(AppSection(appCtx.getString(R.string.coming_soon), R.drawable.coming_soon, null))
+        add(AppSection(
+                getString(R.string.investigations),
+                R.drawable.investigation,
+                HomeFragmentDirections.Companion::actionHomeFragmentToOngoingInvestigationsFragment
+        ))
         add(AppSection(appCtx.getString(R.string.coming_soon), R.drawable.coming_soon, null))
     }
 
