@@ -14,13 +14,10 @@ import dev.ahmedmourad.sherlock.domain.bus.Bus
 import dev.ahmedmourad.sherlock.domain.constants.BackgroundState
 import dev.ahmedmourad.sherlock.domain.constants.PublishingState
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
-import dev.ahmedmourad.sherlock.domain.filter.Filter
-import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
-import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
-import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
+import dev.ahmedmourad.sherlock.domain.model.children.*
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -175,8 +172,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
     }
 
     override fun findAll(
-            query: ChildQuery,
-            filter: Filter<RetrievedChild>
+            query: ChildrenQuery
     ): Flowable<Either<ChildrenRepository.FindAllException, Map<SimpleRetrievedChild, Weight>>> {
 
         fun RemoteRepository.FindAllException.map() = when (this) {
@@ -200,7 +196,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
         }
 
         return remoteRepository.get()
-                .findAll(query, filter)
+                .findAll(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .switchMap { resultsEither ->
@@ -237,6 +233,69 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     it.mapLeft(LocalRepository.FindAllSimpleWhereWeightExistsException::map)
                 }.onErrorReturn {
                     ChildrenRepository.FindLastSearchResultsException.UnknownException(it).left()
+                }
+    }
+
+    override fun invalidateAllQueries(): Completable {
+        return remoteRepository.get()
+                .invalidateAllQueries()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+    }
+
+    override fun addInvestigation(
+            investigation: Investigation
+    ): Single<Either<ChildrenRepository.AddInvestigationException, Investigation>> {
+
+        fun RemoteRepository.AddInvestigationException.map() = when (this) {
+
+            RemoteRepository.AddInvestigationException.NoInternetConnectionException ->
+                ChildrenRepository.AddInvestigationException.NoInternetConnectionException
+
+            RemoteRepository.AddInvestigationException.NoSignedInUserException ->
+                ChildrenRepository.AddInvestigationException.NoSignedInUserException
+
+            is RemoteRepository.AddInvestigationException.UnknownException ->
+                ChildrenRepository.AddInvestigationException.UnknownException(this.origin)
+        }
+
+        return remoteRepository.get()
+                .addInvestigation(investigation)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .map {
+                    it.mapLeft(RemoteRepository.AddInvestigationException::map)
+                }.onErrorReturn {
+                    ChildrenRepository.AddInvestigationException.UnknownException(it).left()
+                }
+    }
+
+    override fun findAllInvestigations():
+            Flowable<Either<ChildrenRepository.FindAllInvestigationsException, List<Investigation>>> {
+
+        fun RemoteRepository.FindAllInvestigationsException.map() = when (this) {
+
+            RemoteRepository.FindAllInvestigationsException.NoInternetConnectionException ->
+                ChildrenRepository.FindAllInvestigationsException.NoInternetConnectionException
+
+            RemoteRepository.FindAllInvestigationsException.NoSignedInUserException ->
+                ChildrenRepository.FindAllInvestigationsException.NoSignedInUserException
+
+            is RemoteRepository.FindAllInvestigationsException.InternalException ->
+                ChildrenRepository.FindAllInvestigationsException.InternalException(this.origin)
+
+            is RemoteRepository.FindAllInvestigationsException.UnknownException ->
+                ChildrenRepository.FindAllInvestigationsException.UnknownException(this.origin)
+        }
+
+        return remoteRepository.get()
+                .findAllInvestigations()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .map {
+                    it.mapLeft(RemoteRepository.FindAllInvestigationsException::map)
+                }.onErrorReturn {
+                    ChildrenRepository.FindAllInvestigationsException.UnknownException(it).left()
                 }
     }
 }
