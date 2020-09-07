@@ -20,6 +20,7 @@ import dev.ahmedmourad.sherlock.domain.model.children.*
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.common.Url
+import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import timber.log.Timber
 import timber.log.error
 
