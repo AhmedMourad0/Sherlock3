@@ -4,6 +4,7 @@ import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
+import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import splitties.init.appCtx
@@ -73,6 +74,13 @@ internal fun ChildToPublish.Exception.localizedMessage(): String {
     return when (this) {
         ChildToPublish.Exception.NotEnoughDetailsException ->
             appCtx.getString(R.string.child_not_enough_details)
+    }
+}
+
+internal fun ChildrenQuery.Exception.localizedMessage(): String {
+    return when (this) {
+        ChildrenQuery.Exception.InvalidPageNumberException ->
+            appCtx.getString(R.string.something_went_wrong)
     }
 }
 

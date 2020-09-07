@@ -3,10 +3,7 @@ package dev.ahmedmourad.sherlock.android.interpreters.interactors
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
 import dev.ahmedmourad.sherlock.domain.interactors.auth.*
-import dev.ahmedmourad.sherlock.domain.interactors.children.AddChildInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildrenInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.children.FindLastSearchResultsInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.children.*
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import splitties.init.appCtx
 
@@ -23,13 +20,13 @@ internal fun CompleteSignUpInteractor.Exception.localizedMessage(): String {
     }
 }
 
-internal fun ObserveCurrentUserInteractor.Exception.localizedMessage(): String {
+internal fun ObserveSignedInUserInteractor.Exception.localizedMessage(): String {
     return when (this) {
-        ObserveCurrentUserInteractor.Exception.NoInternetConnectionException ->
+        ObserveSignedInUserInteractor.Exception.NoInternetConnectionException ->
             appCtx.getString(R.string.internet_connection_needed)
-        is ObserveCurrentUserInteractor.Exception.InternalException ->
+        is ObserveSignedInUserInteractor.Exception.InternalException ->
             somethingWentWrong(this.origin)
-        is ObserveCurrentUserInteractor.Exception.UnknownException ->
+        is ObserveSignedInUserInteractor.Exception.UnknownException ->
             somethingWentWrong(this.origin)
     }
 }
@@ -187,6 +184,30 @@ internal fun FindChildrenInteractor.Exception.localizedMessage(): String {
         is FindChildrenInteractor.Exception.InternalException ->
             somethingWentWrong(this.origin)
         is FindChildrenInteractor.Exception.UnknownException ->
+            somethingWentWrong(this.origin)
+    }
+}
+
+internal fun AddInvestigationInteractor.Exception.localizedMessage(): String {
+    return when (this) {
+        AddInvestigationInteractor.Exception.NoInternetConnectionException ->
+            appCtx.getString(R.string.internet_connection_needed)
+        AddInvestigationInteractor.Exception.NoSignedInUserException ->
+            appCtx.getString(R.string.authentication_needed)
+        is AddInvestigationInteractor.Exception.UnknownException ->
+            somethingWentWrong(this.origin)
+    }
+}
+
+internal fun FindAllInvestigationsInteractor.Exception.localizedMessage(): String {
+    return when (this) {
+        FindAllInvestigationsInteractor.Exception.NoInternetConnectionException ->
+            appCtx.getString(R.string.internet_connection_needed)
+        FindAllInvestigationsInteractor.Exception.NoSignedInUserException ->
+            appCtx.getString(R.string.authentication_needed)
+        is FindAllInvestigationsInteractor.Exception.InternalException ->
+            somethingWentWrong(this.origin)
+        is FindAllInvestigationsInteractor.Exception.UnknownException ->
             somethingWentWrong(this.origin)
     }
 }
