@@ -15,6 +15,9 @@
 		<action
 			android:id="@+id/action_homeFragment_to_findChildrenFragment"
 			app:destination="@id/findChildrenFragment" />
+		<action
+			android:id="@+id/action_homeFragment_to_ongoingInvestigationsFragment"
+			app:destination="@id/ongoingInvestigationsFragment" />
 	</fragment>
 	<fragment
 		android:id="@+id/addChildFragment"
@@ -58,4 +61,9 @@
 			android:name="childId"
 			app:argType="android.os.Bundle" />
 	</fragment>
+	<fragment
+		android:id="@+id/ongoingInvestigationsFragment"
+		android:name="dev.ahmedmourad.sherlock.android.view.fragments.children.OngoingInvestigationsFragment"
+		android:label="OngoingInvestigationsFragment"
+		tools:layout="@layout/fragment_ongoing_investigations" />
 </navigation>
