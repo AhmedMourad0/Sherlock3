@@ -9,6 +9,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -96,24 +97,26 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity) { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
+        observe(globalViewModel.internetConnectivity, Observer { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
             when (either) {
                 is Either.Left -> {
-                    Timber.error(RuntimeException(either.a.toString()), either.a::toString)
+                    Timber.error(message = either.a::toString)
                     setInternetDependantViewsEnabled(false)
                 }
                 is Either.Right -> {
                     handlePublishingStateValue(viewModel.publishingState.value)
                 }
             }.exhaust()
-        }
+        })
 
-        observe(viewModel.publishingState, this::handlePublishingStateValue)
+        observe(viewModel.publishingState, Observer {
+            this.handlePublishingStateValue(it)
+        })
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
                     b.location,
-                    b.profilePicture,
+                    b.childPicture,
                     b.publishButton,
                     b.skin.skinWhite,
                     b.skin.skinWheat,
@@ -141,26 +144,25 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 viewModel.heightError,
                 viewModel.appearanceError,
                 viewModel.picturePathError,
-                viewModel.childError
-        ) { msg ->
+                viewModel.childError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onFirstNameErrorDismissed()
-                viewModel.onLastNameErrorDismissed()
-                viewModel.onNameErrorDismissed()
-                viewModel.onMinAgeErrorDismissed()
-                viewModel.onMaxAgeErrorDismissed()
-                viewModel.onLocationErrorDismissed()
-                viewModel.onAgeErrorDismissed()
-                viewModel.onMinHeightErrorDismissed()
-                viewModel.onMaxHeightErrorDismissed()
-                viewModel.onHeightErrorDismissed()
-                viewModel.onAppearanceErrorDismissed()
-                viewModel.onPicturePathErrorDismissed()
-                viewModel.onChildErrorDismissed()
+                viewModel.onFirstNameErrorHandled()
+                viewModel.onLastNameErrorHandled()
+                viewModel.onNameErrorHandled()
+                viewModel.onMinAgeErrorHandled()
+                viewModel.onMaxAgeErrorHandled()
+                viewModel.onLocationErrorHandled()
+                viewModel.onAgeErrorHandled()
+                viewModel.onMinHeightErrorHandled()
+                viewModel.onMaxHeightErrorHandled()
+                viewModel.onHeightErrorHandled()
+                viewModel.onAppearanceErrorHandled()
+                viewModel.onPicturePathErrorHandled()
+                viewModel.onChildErrorHandled()
                 setUserInteractionsEnabled(true)
             }
-        }
+        })
     }
 
     private fun publish() {
@@ -217,7 +219,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     b.heightSeekBar,
                     b.location,
                     b.locationImageView,
-                    b.profilePicture,
+                    b.childPicture,
                     b.pictureTextView,
                     b.notesEditText,
                     b.publishButton
@@ -328,26 +330,26 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) { picturePath ->
+        observe(viewModel.picturePath, Observer { picturePath ->
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.profilePicture,
+                        b.childPicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
             }
-        }
+        })
     }
 
     private fun initializeLocationTextView() {
-        observe(viewModel.location) { location: PlacePicker.Location? ->
+        observe(viewModel.location, Observer { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.location?.text = location.name
             } else {
                 binding?.location?.setText(R.string.no_location_specified)
             }
-        }
+        })
     }
 
     private fun startImagePicker() {
@@ -369,7 +371,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.profilePicture.isEnabled = enabled
+            b.childPicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }

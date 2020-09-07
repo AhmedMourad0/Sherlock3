@@ -89,35 +89,35 @@ internal class SignUpViewModel(
         savedStateHandle.set(KEY_PICTURE_PATH, newValue)
     }
 
-    fun onPasswordErrorDismissed() {
+    fun onPasswordErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PASSWORD, null)
     }
 
-    fun onPasswordConfirmationErrorDismissed() {
+    fun onPasswordConfirmationErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PASSWORD_CONFIRMATION, null)
     }
 
-    fun onEmailErrorDismissed() {
+    fun onEmailErrorHandled() {
         savedStateHandle.set(KEY_ERROR_EMAIL, null)
     }
 
-    fun onCredentialsErrorDismissed() {
+    fun onCredentialsErrorHandled() {
         savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
     }
 
-    fun onDisplayNameErrorDismissed() {
+    fun onDisplayNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, null)
     }
 
-    fun onPhoneNumberErrorDismissed() {
+    fun onPhoneNumberErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, null)
     }
 
-    fun onPicturePathErrorDismissed() {
+    fun onPicturePathErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
     }
 
-    fun onUserErrorDismissed() {
+    fun onUserErrorHandled() {
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 

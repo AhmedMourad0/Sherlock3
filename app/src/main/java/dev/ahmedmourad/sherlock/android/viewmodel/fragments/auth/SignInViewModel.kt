@@ -53,15 +53,15 @@ internal class SignInViewModel(
         savedStateHandle.set(KEY_PASSWORD, newValue)
     }
 
-    fun onEmailErrorDismissed() {
+    fun onEmailErrorHandled() {
         savedStateHandle.set(KEY_ERROR_EMAIL, null)
     }
 
-    fun onPasswordErrorDismissed() {
+    fun onPasswordErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PASSWORD, null)
     }
 
-    fun onCredentialsErrorDismissed() {
+    fun onCredentialsErrorHandled() {
         savedStateHandle.set(KEY_ERROR_CREDENTIALS, null)
     }
 

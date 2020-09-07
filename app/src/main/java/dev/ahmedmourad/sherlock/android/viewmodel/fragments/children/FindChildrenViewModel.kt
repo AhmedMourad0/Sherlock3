@@ -13,7 +13,7 @@ import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
+import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import javax.inject.Inject
 
 internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -92,57 +92,57 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
         savedStateHandle.set(KEY_HEIGHT, newValue)
     }
 
-    fun onUserErrorDismissed() {
+    fun onUserErrorHandled() {
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onFirstNameErrorDismissed() {
+    fun onFirstNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_FIRST_NAME, null)
     }
 
-    fun onLastNameErrorDismissed() {
+    fun onLastNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_LAST_NAME, null)
     }
 
-    fun onNameErrorDismissed() {
+    fun onNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_NAME, null)
     }
 
-    fun onLocationErrorDismissed() {
+    fun onLocationErrorHandled() {
         savedStateHandle.set(KEY_ERROR_LOCATION, null)
     }
 
-    fun onAgeErrorDismissed() {
+    fun onAgeErrorHandled() {
         savedStateHandle.set(KEY_ERROR_AGE, null)
     }
 
-    fun onHeightErrorDismissed() {
+    fun onHeightErrorHandled() {
         savedStateHandle.set(KEY_ERROR_HEIGHT, null)
     }
 
-    fun onGenderErrorDismissed() {
+    fun onGenderErrorHandled() {
         savedStateHandle.set(KEY_ERROR_GENDER, null)
     }
 
-    fun onSkinErrorDismissed() {
+    fun onSkinErrorHandled() {
         savedStateHandle.set(KEY_ERROR_SKIN, null)
     }
 
-    fun onHairErrorDismissed() {
+    fun onHairErrorHandled() {
         savedStateHandle.set(KEY_ERROR_HAIR, null)
     }
 
-    fun onAppearanceErrorDismissed() {
+    fun onAppearanceErrorHandled() {
         savedStateHandle.set(KEY_ERROR_APPEARANCE, null)
     }
 
-    fun onQueryErrorDismissed() {
+    fun onQueryErrorHandled() {
         savedStateHandle.set(KEY_ERROR_QUERY, null)
     }
 
 
-    fun toChildQuery(user: SignedInUser?): ChildQuery? {
-        return Either.fx<Unit, ChildQuery> {
+    fun toChildQuery(user: SignedInUser?): ChildrenQuery? {
+        return Either.fx<Unit, ChildrenQuery> {
 
             val u = !user.toOption().toEither {
                 savedStateHandle.set(KEY_ERROR_USER, "This action requires authentication")
@@ -190,32 +190,22 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
                 savedStateHandle.set(KEY_ERROR_APPEARANCE, it)
             }
 
-            val coordinates = location.value?.let { l ->
+            val coordinatesNullable = location.value?.let { l ->
                 validateCoordinates(l.latitude, l.longitude).mapLeft {
                     savedStateHandle.set(KEY_ERROR_LOCATION, it)
                 }.bind()
             }
 
-            val tempLocation = location.value?.let { l ->
-                validateLocation(
-                        l.id,
-                        l.name,
-                        l.address,
-                        coordinates
-                ).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                }.bind()
-            }
-
-            val location = !validateLocation(tempLocation).mapLeft {
+            val coordinates = !validateCoordinates(coordinatesNullable).mapLeft {
                 savedStateHandle.set(KEY_ERROR_LOCATION, it)
             }
 
             validateChildQuery(
                     u.simplify(),
                     fullName,
-                    location,
-                    appearance
+                    coordinates,
+                    appearance,
+                    0 //TODO: pagination
             ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_QUERY, it)
             }.bind()

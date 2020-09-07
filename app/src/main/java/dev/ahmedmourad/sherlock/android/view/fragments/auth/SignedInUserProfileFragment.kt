@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import arrow.core.Either
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
@@ -19,7 +20,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFacto
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -61,17 +62,17 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignedInUserProfileBinding.bind(view)
-        observe(globalViewModel.signedInUser) { resultEither ->
+        observe(globalViewModel.signedInUser, Observer { resultEither ->
             resultEither.fold(ifLeft = { e ->
                 when (e) {
 
-                    ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> Unit
+                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> Unit
 
-                    is ObserveCurrentUserInteractor.Exception.InternalException -> {
+                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
                         Timber.error(e.origin, e::toString)
                     }
 
-                    is ObserveCurrentUserInteractor.Exception.UnknownException -> {
+                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
                         Timber.error(e.origin, e::toString)
                     }
 
@@ -82,7 +83,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
                     populateUi(userEither.b)
                 }
             })
-        }
+        })
     }
 
     private fun populateUi(user: SignedInUser) {

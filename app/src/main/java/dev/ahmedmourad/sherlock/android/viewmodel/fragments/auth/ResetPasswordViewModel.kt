@@ -31,7 +31,7 @@ internal class ResetPasswordViewModel(
         savedStateHandle.set(KEY_EMAIL, newValue)
     }
 
-    fun onEmailErrorDismissed() {
+    fun onEmailErrorHandled() {
         savedStateHandle.set(KEY_ERROR_EMAIL, null)
     }
 

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import dagger.Lazy
@@ -68,7 +69,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         initializePictureImageView()
         addErrorObservers()
         binding?.let { b ->
-            arrayOf(b.profilePicture,
+            arrayOf(b.childPicture,
                     b.pictureTextView,
                     b.signUpButton,
                     b.orSignInTextView,
@@ -88,20 +89,19 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                 viewModel.displayNameError,
                 viewModel.phoneNumberError,
                 viewModel.picturePathError,
-                viewModel.userError
-        ) { msg ->
+                viewModel.userError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onPasswordErrorDismissed()
-                viewModel.onPasswordConfirmationErrorDismissed()
-                viewModel.onEmailErrorDismissed()
-                viewModel.onCredentialsErrorDismissed()
-                viewModel.onDisplayNameErrorDismissed()
-                viewModel.onPhoneNumberErrorDismissed()
-                viewModel.onPicturePathErrorDismissed()
-                viewModel.onUserErrorDismissed()
+                viewModel.onPasswordErrorHandled()
+                viewModel.onPasswordConfirmationErrorHandled()
+                viewModel.onEmailErrorHandled()
+                viewModel.onCredentialsErrorHandled()
+                viewModel.onDisplayNameErrorHandled()
+                viewModel.onPhoneNumberErrorHandled()
+                viewModel.onPicturePathErrorHandled()
+                viewModel.onUserErrorHandled()
             }
-        }
+        })
     }
 
     private fun initializeEditTexts() {
@@ -145,17 +145,17 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picturePath) { picturePath ->
+        observe(viewModel.picturePath, Observer { picturePath ->
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.profilePicture,
+                        b.childPicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
 
                 )
             }
-        }
+        })
     }
 
     private fun signUp() {
@@ -275,7 +275,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.profilePicture.isEnabled = enabled
+            b.childPicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }

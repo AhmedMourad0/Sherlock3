@@ -9,7 +9,7 @@ import arrow.core.toT
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.R
-import dev.ahmedmourad.sherlock.android.databinding.ItemResultBinding
+import dev.ahmedmourad.sherlock.android.databinding.ItemChildResultBinding
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
@@ -27,49 +27,49 @@ internal class ChildrenRecyclerAdapter(
         private val onChildSelectedListener: OnChildSelectedListener
 ) : DynamicRecyclerAdapter<Map<SimpleRetrievedChild, Weight>, ChildrenRecyclerAdapter.ViewHolder>() {
 
-    private val resultsList = ArrayList<Tuple2<SimpleRetrievedChild, Weight>>()
+    private val items = ArrayList<Tuple2<SimpleRetrievedChild, Weight>>()
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(container.context).inflate(R.layout.item_result, container, false))
+        return ViewHolder(LayoutInflater.from(container.context).inflate(R.layout.item_child_result, container, false))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(resultsList[position])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(items[position])
 
-    override fun getItemCount() = resultsList.size
+    override fun getItemCount() = items.size
 
     override fun update(items: Map<SimpleRetrievedChild, Weight>) {
-        resultsList.clear()
-        resultsList.addAll(items.entries.sortedByDescending { it.value.value }.map { it.key toT it.value })
+        this.items.clear()
+        this.items.addAll(items.entries.sortedByDescending { it.value.value }.map { it.key toT it.value })
         notifyDataSetChanged()
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        private val binding: ItemResultBinding = ItemResultBinding.bind(view)
+        private val binding: ItemChildResultBinding = ItemChildResultBinding.bind(view)
 
-        internal fun bind(result: Tuple2<SimpleRetrievedChild, Weight>) {
+        internal fun bind(item: Tuple2<SimpleRetrievedChild, Weight>) {
 
             imageLoader.get().load(
-                    result.a.pictureUrl?.value,
+                    item.a.pictureUrl?.value,
                     binding.childPicture,
                     R.drawable.placeholder,
                     R.drawable.placeholder
             )
 
             imageLoader.get().load(
-                    result.a.user.pictureUrl?.value,
+                    item.a.user.pictureUrl?.value,
                     binding.userProfilePicture,
                     R.drawable.placeholder,
                     R.drawable.placeholder
             )
 
-            binding.userDisplayName.text = textFormatter.get().formatDisplayName(result.a.user.displayName)
+            binding.userDisplayName.text = textFormatter.get().formatDisplayName(item.a.user.displayName)
             //TODO: this needs to change with time
-            binding.timestamp.text = dateManager.get().getRelativeDateTimeString(result.a.timestamp)
-            binding.notes.text = textFormatter.get().formatNotes(result.a.notes)
-            binding.location.text = textFormatter.get().formatLocation(result.a.locationName, result.a.locationAddress)
+            binding.timestamp.text = dateManager.get().getRelativeDateTimeString(item.a.timestamp)
+            binding.notes.text = textFormatter.get().formatNotes(item.a.notes)
+            binding.location.text = textFormatter.get().formatLocation(item.a.locationName, item.a.locationAddress)
 
-            itemView.setOnClickListener { onChildSelectedListener(result) }
+            itemView.setOnClickListener { onChildSelectedListener(item) }
         }
     }
 }

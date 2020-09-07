@@ -14,7 +14,7 @@ import javax.inject.Inject
 internal typealias OnSectionSelectedListener = (NavDirections?) -> Unit
 
 internal class AppSectionsRecyclerAdapter(
-        private val sectionsList: List<AppSection>,
+        private val items: List<AppSection>,
         private val onSectionSelectedListener: OnSectionSelectedListener
 ) : RecyclerView.Adapter<AppSectionsRecyclerAdapter.ViewHolder>() {
 
@@ -22,18 +22,18 @@ internal class AppSectionsRecyclerAdapter(
         return ViewHolder(LayoutInflater.from(container.context).inflate(R.layout.item_section, container, false))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(sectionsList[position])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(items[position])
 
-    override fun getItemCount() = sectionsList.size
+    override fun getItemCount() = items.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val binding: ItemSectionBinding = ItemSectionBinding.bind(view)
 
-        internal fun bind(section: AppSection) {
-            binding.nameTextView.text = section.name
-            binding.imageView.setImageResource(section.imageDrawable)
-            itemView.setOnClickListener { onSectionSelectedListener(section.navDirectionFactory?.invoke()) }
+        internal fun bind(item: AppSection) {
+            binding.nameTextView.text = item.name
+            binding.imageView.setImageResource(item.imageDrawable)
+            itemView.setOnClickListener { onSectionSelectedListener(item.navDirectionFactory?.invoke()) }
         }
     }
 }

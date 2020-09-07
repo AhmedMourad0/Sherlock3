@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.Observer
 import arrow.core.Either
 import arrow.core.getOrElse
 import dagger.Lazy
@@ -31,7 +32,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import timber.log.Timber
@@ -86,27 +87,27 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setupBackdrop()
         setupNavigation()
 
-        observe(globalViewModel.userAuthState) { either ->
+        observe(globalViewModel.userAuthState, Observer { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
-                Timber.error(RuntimeException(it.toString()), it::toString)
+                Timber.error(message = it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
             })
-        }
+        })
 
-        observe(globalViewModel.signedInUser) { either ->
+        observe(globalViewModel.signedInUser, Observer { either ->
             either.fold(ifLeft = {
                 invalidateOptionsMenu()
-                Timber.error(RuntimeException(it.toString()), it::toString)
+                Timber.error(message = it::toString)
             }, ifRight = {
                 invalidateOptionsMenu()
                 updateBackdropDestination()
             })
-        }
+        })
 
-        observe(viewModel.isInPrimaryContentMode) { newValue ->
+        observe(viewModel.isInPrimaryContentMode, Observer { newValue ->
             invalidateOptionsMenu()
             binding.primaryContentOverlay.visibility = View.VISIBLE
             binding.dummyView.requestFocusFromTouch()
@@ -115,7 +116,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 else -> foregroundAnimator.start()
             }
             refreshPrimaryNavigationFragment()
-        }
+        })
     }
 
     private fun setupBackdrop() {
@@ -319,22 +320,22 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
                 when (it) {
 
-                    ObserveCurrentUserInteractor.Exception.NoInternetConnectionException -> {
+                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> {
                         item.isEnabled = false
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_no_internet)
                         setInPrimaryContentMode(true)
                     }
 
-                    is ObserveCurrentUserInteractor.Exception.InternalException -> {
+                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
                         item.isEnabled = false
-                        Timber.error(RuntimeException(it.toString()), it::toString)
+                        Timber.error(message = it::toString)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
                         setInPrimaryContentMode(true)
                     }
 
-                    is ObserveCurrentUserInteractor.Exception.UnknownException -> {
+                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
                         item.isEnabled = false
-                        Timber.error(RuntimeException(it.toString()), it::toString)
+                        Timber.error(message = it::toString)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
                         setInPrimaryContentMode(true)
                     }
@@ -419,7 +420,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
     private fun signOut() {
         signOutDisposable = viewModel.signOutSingle.subscribe({ resultEither ->
             if (resultEither is Either.Left) {
-                Timber.error(RuntimeException(resultEither.toString()), resultEither::toString)
+                Timber.error(message = resultEither::toString)
             }
         }, {
             Timber.error(it, it::toString)

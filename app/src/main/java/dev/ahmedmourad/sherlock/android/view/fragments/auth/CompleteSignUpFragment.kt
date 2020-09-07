@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
 import arrow.core.identity
@@ -75,7 +76,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
         addErrorObservers()
 
         binding?.let { b ->
-            arrayOf(b.profilePicture,
+            arrayOf(b.childPicture,
                     b.pictureTextView,
                     b.completeButton
             ).forEach { it.setOnClickListener(this) }
@@ -88,17 +89,16 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                 viewModel.displayNameError,
                 viewModel.phoneNumberError,
                 viewModel.pictureError,
-                viewModel.userError
-        ) { msg ->
+                viewModel.userError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onEmailErrorDismissed()
-                viewModel.onDisplayNameErrorDismissed()
-                viewModel.onPhoneNumberErrorDismissed()
-                viewModel.onPicturePathErrorDismissed()
-                viewModel.onUserErrorDismissed()
+                viewModel.onEmailErrorHandled()
+                viewModel.onDisplayNameErrorHandled()
+                viewModel.onPhoneNumberErrorHandled()
+                viewModel.onPicturePathErrorHandled()
+                viewModel.onUserErrorHandled()
             }
-        }
+        })
     }
 
     private fun initializeEditTexts() {
@@ -136,7 +136,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
             if (viewModel.picture.value != null) {
                 imageLoader.get().load(
                         viewModel.picture.value?.value,
-                        b.profilePicture,
+                        b.childPicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
@@ -145,16 +145,16 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     }
 
     private fun initializePictureImageView() {
-        observe(viewModel.picture) { picturePath ->
+        observe(viewModel.picture, Observer { picturePath ->
             binding?.let { b ->
                 imageLoader.get().load(
                         picturePath?.value,
-                        b.profilePicture,
+                        b.childPicture,
                         R.drawable.placeholder,
                         R.drawable.placeholder
                 )
             }
-        }
+        })
     }
 
     private fun completeSignUp() {
@@ -173,7 +173,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                 CompleteSignUpInteractor.Exception.NoInternetConnectionException -> Unit
 
                 CompleteSignUpInteractor.Exception.NoSignedInUserException -> {
-                    Timber.error(RuntimeException(it.toString()), it::toString)
+                    Timber.error(message = it::toString)
                 }
 
                 is CompleteSignUpInteractor.Exception.InternalException -> {
@@ -199,7 +199,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
     private fun setPictureEnabled(enabled: Boolean) {
         binding?.let { b ->
-            b.profilePicture.isEnabled = enabled
+            b.childPicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
         }
     }

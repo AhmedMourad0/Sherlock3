@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -67,9 +68,9 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
 
         //TODO: show loading, hide when date is received
         //TODO: notify the user when the data is updated or deleted
-        observe(viewModel.result) { resultEither: Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?> ->
+        observe(viewModel.result, Observer { resultEither: Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?> ->
             resultEither.fold(ifLeft = { e ->
-                    //TODO: show error image with retry option
+                //TODO: show error image with retry option
                 when (e) {
 
                     FindChildInteractor.Exception.NoInternetConnectionException -> Unit
@@ -89,7 +90,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
                 }.exhaust()
                 Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
             }, ifRight = this::populateUi)
-        }
+        })
     }
 
     private fun populateUi(result: Tuple2<RetrievedChild, Weight?>?) {

@@ -10,7 +10,7 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveCurrentUserInteractor
+import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveUserAuthStateInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -22,7 +22,7 @@ internal class GlobalViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         observeInternetConnectivityInteractor: Lazy<ObserveInternetConnectivityInteractor>,
         observeUserAuthStateInteractor: Lazy<ObserveUserAuthStateInteractor>,
-        observeCurrentUserInteractor: Lazy<ObserveCurrentUserInteractor>
+        observeSignedInUserInteractor: Lazy<ObserveSignedInUserInteractor>
 ) : ViewModel() {
 
     val internetConnectivity by lazy {
@@ -41,7 +41,7 @@ internal class GlobalViewModel(
     }
 
     val signedInUser by lazy {
-        observeCurrentUserInteractor.get()
+        observeSignedInUserInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
@@ -55,14 +55,14 @@ internal class GlobalViewModel(
     class Factory @Inject constructor(
             private val observeInternetConnectivityInteractor: Provider<Lazy<ObserveInternetConnectivityInteractor>>,
             private val observeUserAuthStateInteractor: Provider<Lazy<ObserveUserAuthStateInteractor>>,
-            private val observeCurrentUserInteractor: Provider<Lazy<ObserveCurrentUserInteractor>>
+            private val observeSignedInUserInteractor: Provider<Lazy<ObserveSignedInUserInteractor>>
     ) : AssistedViewModelFactory<GlobalViewModel> {
         override fun invoke(handle: SavedStateHandle): GlobalViewModel {
             return GlobalViewModel(
                     handle,
                     observeInternetConnectivityInteractor.get(),
                     observeUserAuthStateInteractor.get(),
-                    observeCurrentUserInteractor.get()
+                    observeSignedInUserInteractor.get()
             )
         }
     }

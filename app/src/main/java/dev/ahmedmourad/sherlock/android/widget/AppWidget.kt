@@ -63,7 +63,7 @@ internal class AppWidget : AppWidgetProvider() {
 
                     when (either) {
                         is Either.Left -> {
-                            Timber.error(RuntimeException(either.a.toString()), either.a::toString)
+                            Timber.error(message = either.a::toString)
                             Toast.makeText(
                                     context,
                                     either.a.localizedMessage(),

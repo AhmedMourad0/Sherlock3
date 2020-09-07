@@ -9,6 +9,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import dagger.Lazy
@@ -32,7 +33,7 @@ import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.constants.findEnum
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
-import dev.ahmedmourad.sherlock.domain.model.children.ChildQuery
+import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import splitties.init.appCtx
 import timber.log.Timber
@@ -79,17 +80,17 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity) { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
+        observe(globalViewModel.internetConnectivity, Observer { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
             when (either) {
                 is Either.Left -> {
                     setInternetDependantViewsEnabled(false)
-                    Timber.error(RuntimeException(either.a.toString()), either.a::toString)
+                    Timber.error(message = either.a::toString)
                 }
                 is Either.Right -> {
                     setInternetDependantViewsEnabled(either.b)
                 }
             }.exhaust()
-        }
+        })
 
         binding?.let { b ->
             arrayOf(b.locationImageView,
@@ -116,23 +117,22 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 viewModel.skinError,
                 viewModel.hairError,
                 viewModel.appearanceError,
-                viewModel.queryError
-        ) { msg ->
+                viewModel.queryError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onFirstNameErrorDismissed()
-                viewModel.onLastNameErrorDismissed()
-                viewModel.onNameErrorDismissed()
-                viewModel.onLocationErrorDismissed()
-                viewModel.onAgeErrorDismissed()
-                viewModel.onHeightErrorDismissed()
-                viewModel.onGenderErrorDismissed()
-                viewModel.onSkinErrorDismissed()
-                viewModel.onHairErrorDismissed()
-                viewModel.onAppearanceErrorDismissed()
-                viewModel.onQueryErrorDismissed()
+                viewModel.onFirstNameErrorHandled()
+                viewModel.onLastNameErrorHandled()
+                viewModel.onNameErrorHandled()
+                viewModel.onLocationErrorHandled()
+                viewModel.onAgeErrorHandled()
+                viewModel.onHeightErrorHandled()
+                viewModel.onGenderErrorHandled()
+                viewModel.onSkinErrorHandled()
+                viewModel.onHairErrorHandled()
+                viewModel.onAppearanceErrorHandled()
+                viewModel.onQueryErrorHandled()
             }
-        }
+        })
     }
 
     private fun setInternetDependantViewsEnabled(enabled: Boolean) {
@@ -219,13 +219,13 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     }
 
     private fun initializeLocationTextView() {
-        observe(viewModel.location) { location: PlacePicker.Location? ->
+        observe(viewModel.location, Observer { location: PlacePicker.Location? ->
             if (location?.name?.isNotBlank() == true) {
                 binding?.location?.text = location.name
             } else {
                 binding?.location?.setText(R.string.no_location_specified)
             }
-        }
+        })
     }
 
     private fun search() {
@@ -241,7 +241,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                         findNavController().navigate(
                                 FindChildrenFragmentDirections
                                         .actionFindChildrenFragmentToChildrenSearchResultsFragment(
-                                                it.bundle(ChildQuery.serializer())
+                                                it.bundle(ChildrenQuery.serializer())
                                         )
                         )
                     }

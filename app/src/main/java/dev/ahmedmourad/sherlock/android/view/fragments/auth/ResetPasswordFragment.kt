@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import arrow.core.Either
@@ -62,12 +63,12 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
     //This's temporary and is here for debugging purposes
     private fun addErrorObservers() {
-        observe(viewModel.emailError) { msg ->
+        observe(viewModel.emailError, Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onEmailErrorDismissed()
+                viewModel.onEmailErrorHandled()
             }
-        }
+        })
     }
 
     private fun initializeEditTexts() {

@@ -77,23 +77,23 @@ internal class CompleteSignUpViewModel(
         savedStateHandle.set(KEY_PICTURE, newValue)
     }
 
-    fun onEmailErrorDismissed() {
+    fun onEmailErrorHandled() {
         savedStateHandle.set(KEY_ERROR_EMAIL, null)
     }
 
-    fun onDisplayNameErrorDismissed() {
+    fun onDisplayNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_DISPLAY_NAME, null)
     }
 
-    fun onPhoneNumberErrorDismissed() {
+    fun onPhoneNumberErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, null)
     }
 
-    fun onPicturePathErrorDismissed() {
+    fun onPicturePathErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PICTURE, null)
     }
 
-    fun onUserErrorDismissed() {
+    fun onUserErrorHandled() {
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 

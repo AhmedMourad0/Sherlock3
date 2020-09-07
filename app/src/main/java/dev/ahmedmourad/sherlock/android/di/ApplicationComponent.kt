@@ -22,32 +22,19 @@ import javax.inject.Singleton
 ])
 @Singleton
 internal interface ApplicationComponent {
-
     fun inject(target: MainActivity)
-
     fun inject(target: HomeFragment)
-
     fun inject(target: AddChildFragment)
-
     fun inject(target: ChildDetailsFragment)
-
     fun inject(target: FindChildrenFragment)
-
     fun inject(target: ChildrenSearchResultsFragment)
-
+    fun inject(target: OngoingInvestigationsFragment)
     fun inject(target: SignInFragment)
-
     fun inject(target: SignUpFragment)
-
     fun inject(target: CompleteSignUpFragment)
-
     fun inject(target: ResetPasswordFragment)
-
     fun inject(target: SignedInUserProfileFragment)
-
     fun inject(target: SherlockService)
-
     fun inject(target: ChildrenRemoteViewsService)
-
     fun inject(target: AppWidget)
 }

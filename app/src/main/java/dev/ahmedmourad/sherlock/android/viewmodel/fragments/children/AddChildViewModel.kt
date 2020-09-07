@@ -142,59 +142,59 @@ internal class AddChildViewModel(
         savedStateHandle.set(KEY_PICTURE_PATH, newValue)
     }
 
-    fun onUserErrorDismissed() {
+    fun onUserErrorHandled() {
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onFirstNameErrorDismissed() {
+    fun onFirstNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_FIRST_NAME, null)
     }
 
-    fun onLastNameErrorDismissed() {
+    fun onLastNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_LAST_NAME, null)
     }
 
-    fun onNameErrorDismissed() {
+    fun onNameErrorHandled() {
         savedStateHandle.set(KEY_ERROR_NAME, null)
     }
 
-    fun onMinAgeErrorDismissed() {
+    fun onMinAgeErrorHandled() {
         savedStateHandle.set(KEY_ERROR_MIN_AGE, null)
     }
 
-    fun onMaxAgeErrorDismissed() {
+    fun onMaxAgeErrorHandled() {
         savedStateHandle.set(KEY_ERROR_MAX_AGE, null)
     }
 
-    fun onLocationErrorDismissed() {
+    fun onLocationErrorHandled() {
         savedStateHandle.set(KEY_ERROR_LOCATION, null)
     }
 
-    fun onAgeErrorDismissed() {
+    fun onAgeErrorHandled() {
         savedStateHandle.set(KEY_ERROR_AGE, null)
     }
 
-    fun onMinHeightErrorDismissed() {
+    fun onMinHeightErrorHandled() {
         savedStateHandle.set(KEY_ERROR_MIN_HEIGHT, null)
     }
 
-    fun onMaxHeightErrorDismissed() {
+    fun onMaxHeightErrorHandled() {
         savedStateHandle.set(KEY_ERROR_MAX_HEIGHT, null)
     }
 
-    fun onHeightErrorDismissed() {
+    fun onHeightErrorHandled() {
         savedStateHandle.set(KEY_ERROR_HEIGHT, null)
     }
 
-    fun onAppearanceErrorDismissed() {
+    fun onAppearanceErrorHandled() {
         savedStateHandle.set(KEY_ERROR_APPEARANCE, null)
     }
 
-    fun onPicturePathErrorDismissed() {
+    fun onPicturePathErrorHandled() {
         savedStateHandle.set(KEY_ERROR_PICTURE_PATH, null)
     }
 
-    fun onChildErrorDismissed() {
+    fun onChildErrorHandled() {
         savedStateHandle.set(KEY_ERROR_CHILD, null)
     }
 

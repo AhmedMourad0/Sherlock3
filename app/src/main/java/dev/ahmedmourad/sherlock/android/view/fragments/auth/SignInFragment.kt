@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
@@ -72,15 +73,14 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
     private fun addErrorObservers() {
         observeAll(viewModel.emailError,
                 viewModel.passwordError,
-                viewModel.credentialsError
-        ) { msg ->
+                viewModel.credentialsError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                viewModel.onEmailErrorDismissed()
-                viewModel.onPasswordErrorDismissed()
-                viewModel.onCredentialsErrorDismissed()
+                viewModel.onEmailErrorHandled()
+                viewModel.onPasswordErrorHandled()
+                viewModel.onCredentialsErrorHandled()
             }
-        }
+        })
     }
 
     private fun initializeEditTexts() {
