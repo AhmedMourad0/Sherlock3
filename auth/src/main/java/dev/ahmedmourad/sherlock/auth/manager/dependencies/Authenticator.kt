@@ -13,7 +13,7 @@ internal interface Authenticator {
 
     fun observeUserAuthState(): Flowable<Boolean>
 
-    fun observeCurrentUser(): Flowable<Option<IncompleteUser>>
+    fun observeSignedInUser(): Flowable<Option<IncompleteUser>>
 
     fun signIn(credentials: UserCredentials): Single<Either<SignInException, IncompleteUser>>
 
