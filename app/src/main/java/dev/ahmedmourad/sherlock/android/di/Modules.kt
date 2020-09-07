@@ -2,10 +2,7 @@ package dev.ahmedmourad.sherlock.android.di
 
 import dagger.Binds
 import dagger.Module
-import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFactory
-import dev.ahmedmourad.sherlock.android.adapters.AppSectionsRecyclerAdapterFactoryImpl
-import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactory
-import dev.ahmedmourad.sherlock.android.adapters.ChildrenRecyclerAdapterFactoryImpl
+import dev.ahmedmourad.sherlock.android.adapters.*
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatterImpl
 import dev.ahmedmourad.sherlock.android.loader.GlideImageLoader
@@ -33,6 +30,11 @@ internal interface AppBindingsModule {
     fun bindChildrenRecyclerAdapterFactory(
             impl: ChildrenRecyclerAdapterFactoryImpl
     ): ChildrenRecyclerAdapterFactory
+
+    @Binds
+    fun bindInvestigationsRecyclerAdapterFactory(
+            impl: InvestigationsRecyclerAdapterFactoryImpl
+    ): InvestigationsRecyclerAdapterFactory
 
     @Binds
     fun bindAppSectionsRecyclerAdapterFactory(
@@ -133,4 +135,9 @@ internal interface AppBindingsModule {
     fun bindChildDetailsViewModel(
             impl: ChildDetailsViewModel.Factory
     ): AssistedViewModelFactory<ChildDetailsViewModel>
+
+    @Binds
+    fun bindOngoingInvestigationsViewModel(
+            impl: OngoingInvestigationsViewModel.Factory
+    ): AssistedViewModelFactory<OngoingInvestigationsViewModel>
 }
