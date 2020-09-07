@@ -1,7 +1,6 @@
 package dev.ahmedmourad.sherlock.children.repository.dependencies
 
 import arrow.core.Either
-import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.children.*
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.common.Url
@@ -26,9 +25,7 @@ internal interface RemoteRepository {
             investigation: Investigation
     ): Single<Either<AddInvestigationException, Investigation>>
 
-    fun findAllInvestigations(
-            user: SimpleRetrievedUser
-    ): Flowable<Either<FindAllInvestigationsException, List<Investigation>>>
+    fun findAllInvestigations(): Flowable<Either<FindAllInvestigationsException, List<Investigation>>>
 
     fun findAll(
             query: ChildrenQuery
