@@ -1,6 +1,7 @@
 package dev.ahmedmourad.sherlock.domain.data
 
 import arrow.core.Either
+import arrow.core.Option
 import dev.ahmedmourad.sherlock.domain.model.auth.*
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
@@ -11,6 +12,10 @@ import io.reactivex.Single
 typealias ObserveUserAuthState =
         () -> @JvmSuppressWildcards Flowable<Either<AuthManager.ObserveUserAuthStateException, Boolean>>
 
+
+typealias ObserveSimpleSignedInUser =
+        () -> @JvmSuppressWildcards Flowable<Option<SimpleRetrievedUser>>
+
 typealias FindSimpleUsers =
         (@JvmSuppressWildcards Collection<UserId>) ->
         @JvmSuppressWildcards Flowable<Either<AuthManager.FindSimpleUsersException, List<SimpleRetrievedUser>>>
@@ -20,7 +25,7 @@ interface AuthManager {
     fun observeUserAuthState(): Flowable<Either<ObserveUserAuthStateException, Boolean>>
 
     fun observeSignedInUser():
-            Flowable<Either<ObserveCurrentUserException, Either<IncompleteUser, SignedInUser>?>>
+            Flowable<Either<ObserveSignedInUserException, Either<IncompleteUser, SignedInUser>?>>
 
     fun findSimpleUsers(
             ids: Collection<UserId>
@@ -36,11 +41,14 @@ interface AuthManager {
             completedUser: CompletedUser
     ): Single<Either<CompleteSignUpException, SignedInUser>>
 
-    fun signInWithGoogle(): Single<Either<SignInWithGoogleException, Either<IncompleteUser, SignedInUser>>>
+    fun signInWithGoogle():
+            Single<Either<SignInWithGoogleException, Either<IncompleteUser, SignedInUser>>>
 
-    fun signInWithFacebook(): Single<Either<SignInWithFacebookException, Either<IncompleteUser, SignedInUser>>>
+    fun signInWithFacebook():
+            Single<Either<SignInWithFacebookException, Either<IncompleteUser, SignedInUser>>>
 
-    fun signInWithTwitter(): Single<Either<SignInWithTwitterException, Either<IncompleteUser, SignedInUser>>>
+    fun signInWithTwitter():
+            Single<Either<SignInWithTwitterException, Either<IncompleteUser, SignedInUser>>>
 
     fun sendPasswordResetEmail(email: Email): Single<Either<SendPasswordResetEmailException, Unit>>
 
@@ -50,10 +58,10 @@ interface AuthManager {
         data class UnknownException(val origin: Throwable) : ObserveUserAuthStateException()
     }
 
-    sealed class ObserveCurrentUserException {
-        object NoInternetConnectionException : ObserveCurrentUserException()
-        data class InternalException(val origin: Throwable) : ObserveCurrentUserException()
-        data class UnknownException(val origin: Throwable) : ObserveCurrentUserException()
+    sealed class ObserveSignedInUserException {
+        object NoInternetConnectionException : ObserveSignedInUserException()
+        data class InternalException(val origin: Throwable) : ObserveSignedInUserException()
+        data class UnknownException(val origin: Throwable) : ObserveSignedInUserException()
     }
 
     sealed class FindSimpleUsersException {
