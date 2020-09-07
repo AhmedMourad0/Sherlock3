@@ -42,7 +42,7 @@ lost/kidnapped children.
 
 - Compose
 - Testing.
-- Fix all ViewModels
+- Fix the rest of the ViewModels
 - Hide the id from the ui layer
 - Encryption, Redacted
 - Firebase Crashlytics?
