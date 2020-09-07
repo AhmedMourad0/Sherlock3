@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+	
+	<ImageView
+		android:id="@+id/error_icon"
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_marginStart="80dp"
+		android:layout_marginEnd="80dp"
+		android:layout_marginBottom="60dp"
+		android:contentDescription="@string/error_image"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintDimensionRatio="1:1"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+	
+	<com.google.android.material.textview.MaterialTextView
+		android:id="@+id/error_message"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="20dp"
+		android:textColor="#000000"
+		android:textSize="18sp"
+		android:inputType="textMultiLine"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/error_icon"
+		tools:text="No Internet Connection" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
