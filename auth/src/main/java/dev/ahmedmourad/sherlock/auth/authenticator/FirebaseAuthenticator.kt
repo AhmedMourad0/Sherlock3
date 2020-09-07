@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.twitter.sdk.android.core.*
 import dagger.Lazy
 import dagger.Reusable
@@ -41,6 +42,7 @@ private class AuthUserCollisionException(
 @Reusable
 internal class FirebaseAuthenticator @Inject constructor(
         @InternalApi private val auth: Lazy<FirebaseAuth>,
+        @InternalApi private val messaging: Lazy<FirebaseMessaging>,
         private val connectivityManager: Lazy<ConnectivityManager>
 ) : Authenticator {
 
@@ -76,7 +78,7 @@ internal class FirebaseAuthenticator @Inject constructor(
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun observeCurrentUser(): Flowable<Option<IncompleteUser>> {
+    override fun observeSignedInUser(): Flowable<Option<IncompleteUser>> {
         return observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -112,6 +114,15 @@ internal class FirebaseAuthenticator @Inject constructor(
                             Single.just(
                                     Authenticator.SignInException.NoInternetConnectionException.left()
                             )
+                        }
+                    })
+                }.flatMap { userEither ->
+                    userEither.fold(ifLeft = {
+                        Single.just(it.left())
+                    }, ifRight = { user ->
+                        subscribeToPushNotifications(user.id).map { idEither ->
+                            idEither.mapLeft { Authenticator.SignInException.UnknownException(it) }
+                                    .flatMap { userEither }
                         }
                     })
                 }
@@ -174,7 +185,15 @@ internal class FirebaseAuthenticator @Inject constructor(
                             )
                         }
                     })
-
+                }.flatMap { userEither ->
+                    userEither.fold(ifLeft = {
+                        Single.just(it.left())
+                    }, ifRight = { user ->
+                        subscribeToPushNotifications(user.id).map { idEither ->
+                            idEither.mapLeft { Authenticator.SignUpException.UnknownException(it) }
+                                    .flatMap { userEither }
+                        }
+                    })
                 }
     }
 
@@ -458,7 +477,7 @@ internal class FirebaseAuthenticator @Inject constructor(
             credentialEither: Either<AuthActivityFactory.Exception, AuthCredential>
     ): Single<Either<SignInWithCredentialException, IncompleteUser>> {
 
-        return Single.create<Either<SignInWithCredentialException, IncompleteUser>> { emitter ->
+        return Single.create<Either<SignInWithCredentialException, Pair<IncompleteUser, AuthCredential>>> { emitter ->
 
             credentialEither.fold(ifLeft = { e ->
 
@@ -472,7 +491,7 @@ internal class FirebaseAuthenticator @Inject constructor(
             }, ifRight = { credential ->
 
                 val successListener = { result: AuthResult ->
-                    emitter.onSuccess(result.user!!.toIncompleteUser().right())
+                    emitter.onSuccess((result.user!!.toIncompleteUser() to credential).right())
                 }
 
                 val failureListener = failureListener@{ throwable: Throwable ->
@@ -498,7 +517,18 @@ internal class FirebaseAuthenticator @Inject constructor(
                         .addOnFailureListener(failureListener)
             })
 
-        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+        }.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap { userEither ->
+                    userEither.fold(ifLeft = {
+                        Single.just(it.left())
+                    }, ifRight = { (user, credential) ->
+                        subscribeToPushNotifications(user.id).map { idEither ->
+                            idEither.mapLeft { SignInWithCredentialException.UnknownException(it, credential.signInMethod) }
+                                    .flatMap { userEither.map { it.first } }
+                        }
+                    })
+                }
     }
 
     private fun recoverFromUserCollisionIfNecessary(
@@ -537,6 +567,46 @@ internal class FirebaseAuthenticator @Inject constructor(
 
             //TODO: convert to ? after you make sure it works
             auth.get().currentUser!!.linkWithCredential(credential)
+                    .addOnSuccessListener(successListener)
+                    .addOnFailureListener(failureListener)
+
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+    }
+
+    private fun subscribeToPushNotifications(
+            userId: UserId
+    ): Single<Either<Throwable, UserId>> {
+        return Single.create<Either<Throwable, UserId>> { emitter ->
+
+            val successListener = { _: Void ->
+                emitter.onSuccess(userId.right())
+            }
+
+            val failureListener = { e: Exception ->
+                emitter.onSuccess(e.left())
+            }
+
+            messaging.get().subscribeToTopic(userId.value)
+                    .addOnSuccessListener(successListener)
+                    .addOnFailureListener(failureListener)
+
+        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+    }
+
+    private fun unsubscribeFromPushNotifications(
+            userId: UserId
+    ): Single<Either<Throwable, UserId>> {
+        return Single.create<Either<Throwable, UserId>> { emitter ->
+
+            val successListener = { _: Void ->
+                emitter.onSuccess(userId.right())
+            }
+
+            val failureListener = { e: Exception ->
+                emitter.onSuccess(e.left())
+            }
+
+            messaging.get().unsubscribeFromTopic(userId.value)
                     .addOnSuccessListener(successListener)
                     .addOnFailureListener(failureListener)
 
@@ -607,6 +677,8 @@ internal class FirebaseAuthenticator @Inject constructor(
                 Authenticator.SignOutException.UnknownException(this.origin)
         }
 
+        val userId = auth.get().currentUser?.uid?.let(::UserId)
+
         return connectivityManager.get()
                 .isInternetConnected()
                 .subscribeOn(Schedulers.io())
@@ -616,8 +688,13 @@ internal class FirebaseAuthenticator @Inject constructor(
                         Single.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
                         if (isInternetConnected) {
-                            signOutFromFirebaseAuth()
-                                    .andThen(signOutFromGoogle())
+                            if (userId != null) {
+                                unsubscribeFromPushNotifications(userId).map { idEither ->
+                                    idEither.mapLeft { Authenticator.SignOutException.UnknownException(it) }
+                                }
+                            } else {
+                                Single.just(userId.right())
+                            }
                         } else {
                             Single.just(
                                     Authenticator.SignOutException.NoInternetConnectionException.left()
@@ -628,9 +705,15 @@ internal class FirebaseAuthenticator @Inject constructor(
                     either.fold(ifLeft = {
                         Single.just(it.left())
                     }, ifRight = {
-                        signOutFromFacebook()
-                                .andThen(signOutFromTwitter())
-                                .andThen(Single.just(auth.get().currentUser?.uid?.let(::UserId).right()))
+                        signOutFromFirebaseAuth()
+                                .andThen(signOutFromGoogle())
+                    })
+                }.flatMap { either ->
+                    either.fold(ifLeft = {
+                        Single.just(it.left())
+                    }, ifRight = {
+                        signOutFromFacebook().andThen(signOutFromTwitter())
+                                .andThen(Single.just(userId.right()))
                     })
                 }
     }
