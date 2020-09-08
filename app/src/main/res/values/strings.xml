@@ -129,7 +129,7 @@
 	<string name="gender_missing">Child\'s gender must be specified</string>
 	<string name="skin_color_missing">Child\'s skin color must be specified</string>
 	<string name="hair_color_missing">Child\'s hair color must be specified</string>
-	<string name="malformed_email">Please enter a valid email</string>
+	<string name="malformed_email">Please enter a valid email address</string>
 	<string name="email_empty_or_blank">An email cannot be empty or whitespaces</string>
 	<string name="email_contains_whitespaces">An email cannot contain whitespaces</string>
 	<string name="invalid_user">Please provide valid details</string>
@@ -163,15 +163,16 @@
 	<string name="something_went_wrong">Something went wrong!</string>
 	<string name="something_went_wrong_with_message">Something went wrong:\n%1$s</string>
 	<string name="authentication_needed">Authentication is required to perform this action!</string>
+	<string name="authentication_completion_needed">You need to complete your authentication to perform this action!</string>
 	<string name="internet_connection_needed">You need to be connected to the internet to perform this action!</string>
-	<string name="email_non_existent">The email you entered does not correspond to any existing account!</string>
+	<string name="email_non_existent">The email you entered is not associated to any existing account!</string>
 	<string name="account_disabled_or_does_not_exist">This account has been disabled or does not exist!</string>
 	<string name="wrong_email_or_password">Incorrect email or password!</string>
 	<string name="account_has_been_disabled">This account has been disabled!</string>
 	<string name="session_has_expired">Your session has expired, please to sign in to continue!</string>
 	<string name="email_already_in_use">This email is already in use by an existing account!</string>
 	<string name="custom_auth_no_response">Authentication was cancelled or has expired!</string>
-	<string name="weak_password">Password is too weak, please enter a stronger one!</string>
+	<string name="weak_password">Password is too weak, please pick a stronger one!</string>
 	<string name="profile_picture">Profile Picture</string>
 	<string name="warning">Warning</string>
 	<string name="settings">Settings</string>
@@ -186,7 +187,9 @@
 	<string name="error_image">Error Image</string>
 	<string name="no_internet_connection">No Internet Connection!</string>
 	<string name="have_no_ongoing_investigations">You have no ongoing investigations!</string>
+	<string name="no_results">No results were found</string>
 	<string name="not_signed_in">You are not signed in!</string>
 	<string name="sign_in_needed_to_view">You need to be signed in to view this!</string>
+	<string name="starting_investigation">Starting investigation!</string>
 
 </resources>
