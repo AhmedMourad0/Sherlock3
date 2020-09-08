@@ -1,317 +1,338 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 	
-	<com.google.android.material.appbar.AppBarLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:theme="@style/AppTheme.AppBarOverlay">
-		
-		<com.google.android.material.appbar.CollapsingToolbarLayout
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:fitsSystemWindows="true"
-			app:contentScrim="?attr/colorPrimary"
-			app:layout_scrollFlags="exitUntilCollapsed|scroll">
-			
-			<FrameLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				app:layout_collapseMode="parallax">
-				
-				<ImageView
-					android:id="@+id/child_picture"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:adjustViewBounds="true"
-					android:contentDescription="@string/picture"
-					android:fitsSystemWindows="true"
-					android:scaleType="centerCrop"
-					android:src="@drawable/placeholder" />
-				
-				<View
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:alpha="0.4"
-					android:background="@drawable/backdrop_background"
-					android:layout_gravity="center_horizontal|bottom" />
-			
-			</FrameLayout>
-			
-			<com.google.android.material.appbar.MaterialToolbar
-				android:id="@+id/toolbar"
-				android:layout_width="match_parent"
-				android:layout_height="?actionBarSize"
-				app:layout_collapseMode="pin"
-				app:popupTheme="@style/AppTheme.PopupOverlay" />
-		
-		</com.google.android.material.appbar.CollapsingToolbarLayout>
-	
-	</com.google.android.material.appbar.AppBarLayout>
-	
-	<androidx.core.widget.NestedScrollView
+	<androidx.coordinatorlayout.widget.CoordinatorLayout
+		android:id="@+id/content_root"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:clipToPadding="false"
-		android:paddingTop="@dimen/displayChildPaddingTop"
-		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+		android:visibility="gone">
 		
-		<LinearLayout
+		<androidx.core.widget.NestedScrollView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:clipToPadding="false"
+			android:paddingTop="@dimen/displayChildPaddingTop"
+			app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+				
+				<com.google.android.material.card.MaterialCardView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="@dimen/displayChildCardMarginStart"
+					android:layout_marginEnd="@dimen/displayChildCardMarginEnd"
+					app:backgroundTint="@android:color/white"
+					app:cardCornerRadius="@dimen/displayChildCardCornerRadius"
+					app:cardElevation="@dimen/displayChildCardElevation">
+					
+					<LinearLayout
+						android:layout_width="wrap_content"
+						android:layout_height="match_parent"
+						android:orientation="vertical"
+						android:paddingTop="@dimen/displayChildCardPaddingTop"
+						android:paddingBottom="@dimen/displayChildCardPaddingBottom">
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_name"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_username"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_age"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_age"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_gender"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_gender"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_height"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_height"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_skin"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_skin"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_hair"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:drawableStart="@drawable/ic_hair"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+					
+					</LinearLayout>
+				
+				</com.google.android.material.card.MaterialCardView>
+				
+				<com.google.android.material.card.MaterialCardView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="@dimen/displayChildCardMarginStart"
+					android:layout_marginEnd="@dimen/displayChildCardMarginEnd"
+					android:layout_marginBottom="@dimen/displayChildMarginBottom"
+					app:backgroundTint="@android:color/white"
+					app:cardCornerRadius="@dimen/displayChildCardCornerRadius"
+					app:cardElevation="@dimen/displayChildCardElevation">
+					
+					<LinearLayout
+						android:layout_width="wrap_content"
+						android:layout_height="match_parent"
+						android:orientation="vertical"
+						android:paddingTop="@dimen/displayChildCardPaddingTop"
+						android:paddingBottom="@dimen/displayChildCardPaddingBottom">
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/child_location"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
+							android:drawableStart="@drawable/ic_location"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.1"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<com.google.android.material.textview.MaterialTextView
+							android:id="@+id/notes"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginTop="@dimen/displayChildDetailMarginTop"
+							android:drawableStart="@drawable/ic_notes"
+							android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
+							android:fontFamily="sans-serif"
+							android:gravity="center_vertical"
+							android:lineSpacingMultiplier="1.2"
+							android:paddingStart="@dimen/displayChildDetailPaddingStart"
+							android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
+							android:text="@string/not_available"
+							android:textSize="@dimen/displayChildDetailTextSize" />
+						
+						<include
+							layout="@layout/content_divider"
+							android:layout_width="match_parent"
+							android:layout_height="1dp"
+							android:layout_marginStart="@dimen/dividerMarginStart"
+							android:layout_marginTop="@dimen/dividerMarginTop"
+							android:layout_marginEnd="@dimen/dividerMarginEnd"
+							android:layout_marginBottom="@dimen/dividerMarginBottom" />
+					
+					</LinearLayout>
+				
+				</com.google.android.material.card.MaterialCardView>
+				
+				<com.google.android.material.textview.MaterialTextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="@dimen/displayChildHeaderMarginStart"
+					android:layout_marginTop="@dimen/displayChildDetailsLabelMarginTop"
+					android:layout_marginBottom="@dimen/displayChildHeaderMarginBottom"
+					android:fontFamily="sans-serif"
+					android:text="@string/details"
+					android:textColor="@color/colorFontSection" />
+				
+				<com.google.android.material.textview.MaterialTextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="@dimen/displayChildHeaderMarginStart"
+					android:layout_marginTop="@dimen/displayChildDescriptionLabelMarginTop"
+					android:layout_marginBottom="@dimen/displayChildHeaderMarginBottom"
+					android:fontFamily="sans-serif"
+					android:text="@string/description"
+					android:textColor="@color/colorFontSection" />
+			
+			</LinearLayout>
+		
+		</androidx.core.widget.NestedScrollView>
+		
+		<com.google.android.material.appbar.AppBarLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical">
+			android:theme="@style/AppTheme.AppBarOverlay">
 			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="@dimen/displayChildHeaderMarginBottom"
-				android:layout_marginStart="@dimen/displayChildHeaderMarginStart"
-				android:layout_marginTop="@dimen/displayChildDescriptionLabelMarginTop"
-				android:fontFamily="sans-serif"
-				android:text="@string/description"
-				android:textColor="@color/colorFontSection" />
-			
-			<com.google.android.material.card.MaterialCardView
+			<com.google.android.material.appbar.CollapsingToolbarLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginEnd="@dimen/displayChildCardMarginEnd"
-				android:layout_marginStart="@dimen/displayChildCardMarginStart"
-				app:backgroundTint="@android:color/white"
-				app:cardCornerRadius="@dimen/displayChildCardCornerRadius"
-				app:cardElevation="@dimen/displayChildCardElevation">
+				android:layout_height="match_parent"
+				android:fitsSystemWindows="true"
+				app:contentScrim="?attr/colorPrimary"
+				app:layout_scrollFlags="exitUntilCollapsed|scroll">
 				
-				<LinearLayout
-					android:layout_width="wrap_content"
-					android:layout_height="match_parent"
-					android:orientation="vertical"
-					android:paddingTop="@dimen/displayChildCardPaddingTop"
-					android:paddingBottom="@dimen/displayChildCardPaddingBottom">
+				<FrameLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					app:layout_collapseMode="parallax">
 					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_name"
+					<ImageView
+						android:id="@+id/child_picture"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_username"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
+						android:adjustViewBounds="true"
+						android:contentDescription="@string/picture"
+						android:fitsSystemWindows="true"
+						android:scaleType="centerCrop"
+						android:src="@drawable/placeholder" />
 					
-					<include
-						layout="@layout/content_divider"
+					<View
 						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_age"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_age"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-					
-					<include
-						layout="@layout/content_divider"
-						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_gender"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_gender"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-					
-					<include
-						layout="@layout/content_divider"
-						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_height"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_height"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-					
-					<include
-						layout="@layout/content_divider"
-						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_skin"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_skin"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-					
-					<include
-						layout="@layout/content_divider"
-						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_hair"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_hair"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
+						android:layout_height="match_parent"
+						android:layout_gravity="center_horizontal|bottom"
+						android:alpha="0.4"
+						android:background="@drawable/backdrop_background" />
 				
-				</LinearLayout>
-			
-			</com.google.android.material.card.MaterialCardView>
-			
-			<com.google.android.material.textview.MaterialTextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="@dimen/displayChildHeaderMarginBottom"
-				android:layout_marginStart="@dimen/displayChildHeaderMarginStart"
-				android:layout_marginTop="@dimen/displayChildDetailsLabelMarginTop"
-				android:fontFamily="sans-serif"
-				android:text="@string/details"
-				android:textColor="@color/colorFontSection" />
-			
-			<com.google.android.material.card.MaterialCardView
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="@dimen/displayChildMarginBottom"
-				android:layout_marginEnd="@dimen/displayChildCardMarginEnd"
-				android:layout_marginStart="@dimen/displayChildCardMarginStart"
-				app:backgroundTint="@android:color/white"
-				app:cardCornerRadius="@dimen/displayChildCardCornerRadius"
-				app:cardElevation="@dimen/displayChildCardElevation">
+				</FrameLayout>
 				
-				<LinearLayout
-					android:layout_width="wrap_content"
-					android:layout_height="match_parent"
-					android:orientation="vertical"
-					android:paddingTop="@dimen/displayChildCardPaddingTop"
-					android:paddingBottom="@dimen/displayChildCardPaddingBottom">
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/child_location"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginBottom="@dimen/displayChildDetailMarginBottom"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_location"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.1"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-					
-					<include
-						layout="@layout/content_divider"
-						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:layout_marginStart="@dimen/dividerMarginStart"
-						android:layout_marginTop="@dimen/dividerMarginTop"
-						android:layout_marginEnd="@dimen/dividerMarginEnd"
-						android:layout_marginBottom="@dimen/dividerMarginBottom" />
-					
-					<com.google.android.material.textview.MaterialTextView
-						android:id="@+id/notes"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginTop="@dimen/displayChildDetailMarginTop"
-						android:drawablePadding="@dimen/displayChildDetailDrawablePadding"
-						android:drawableStart="@drawable/ic_notes"
-						android:fontFamily="sans-serif"
-						android:gravity="center_vertical"
-						android:lineSpacingMultiplier="1.2"
-						android:paddingEnd="@dimen/displayChildDetailPaddingEnd"
-						android:paddingStart="@dimen/displayChildDetailPaddingStart"
-						android:text="@string/not_available"
-						android:textSize="@dimen/displayChildDetailTextSize" />
-				
-				</LinearLayout>
+				<com.google.android.material.appbar.MaterialToolbar
+					android:id="@+id/toolbar"
+					android:layout_width="match_parent"
+					android:layout_height="?actionBarSize"
+					app:layout_collapseMode="pin"
+					app:popupTheme="@style/AppTheme.PopupOverlay" />
 			
-			</com.google.android.material.card.MaterialCardView>
+			</com.google.android.material.appbar.CollapsingToolbarLayout>
 		
-		</LinearLayout>
+		</com.google.android.material.appbar.AppBarLayout>
 	
-	</androidx.core.widget.NestedScrollView>
+	</androidx.coordinatorlayout.widget.CoordinatorLayout>
+	
+	<include
+		android:id="@+id/error"
+		layout="@layout/content_error"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone" />
+	
+	<include
+		android:id="@+id/loading"
+		layout="@layout/content_loading"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

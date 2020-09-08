@@ -1,161 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:clipToPadding="false"
-	android:paddingTop="24dp"
-	android:paddingBottom="24dp"
-	app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+	android:layout_height="match_parent">
 	
-	<androidx.constraintlayout.widget.ConstraintLayout
+	<androidx.core.widget.NestedScrollView
+		android:id="@+id/content_root"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="match_parent"
+		android:clipToPadding="false"
+		android:paddingTop="24dp"
+		android:paddingBottom="24dp"
+		android:visibility="gone"
+		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 		
-		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/name"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:layout_marginTop="8dp"
-			android:ellipsize="end"
-			android:fontFamily="sans-serif"
-			android:gravity="center"
-			android:lineSpacingMultiplier="1.1"
-			android:maxLines="2"
-			android:paddingStart="80dp"
-			android:paddingEnd="80dp"
-			android:text="@string/not_available"
-			android:textColor="@android:color/black"
-			android:textSize="24sp"
-			android:textStyle="bold"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
-		
-		<de.hdodenhof.circleimageview.CircleImageView
-			android:id="@+id/profile_picture"
-			android:layout_width="0dp"
-			android:layout_height="0dp"
-			android:layout_marginStart="100dp"
-			android:layout_marginEnd="100dp"
-			android:contentDescription="@string/profile_picture"
-			android:scaleType="centerCrop"
-			android:src="@drawable/placeholder"
-			app:civ_border_color="@android:color/white"
-			app:civ_border_width="0dp"
-			app:layout_constraintDimensionRatio="1:1"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent" />
-		
-		<com.google.android.material.card.MaterialCardView
+		<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="8dp"
-			android:layout_marginTop="24dp"
-			android:layout_marginEnd="8dp"
-			android:layout_marginBottom="4dp"
-			app:cardCornerRadius="1dp"
-			app:cardElevation="2dp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/name">
+			android:layout_height="wrap_content">
 			
-			<LinearLayout
+			<com.google.android.material.card.MaterialCardView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:paddingStart="16dp"
-				android:paddingTop="20dp"
-				android:paddingEnd="16dp"
-				android:paddingBottom="20dp">
+				android:layout_marginStart="8dp"
+				android:layout_marginTop="24dp"
+				android:layout_marginEnd="8dp"
+				android:layout_marginBottom="4dp"
+				app:cardCornerRadius="1dp"
+				app:cardElevation="2dp"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/name">
 				
-				<com.google.android.material.textview.MaterialTextView
+				<LinearLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:layout_marginBottom="8dp"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:text="@string/email_address"
-					android:textSize="14sp" />
+					android:orientation="vertical"
+					android:paddingStart="16dp"
+					android:paddingTop="20dp"
+					android:paddingEnd="16dp"
+					android:paddingBottom="20dp">
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:layout_marginBottom="8dp"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:text="@string/email_address"
+						android:textSize="14sp" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/email"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:lineSpacingMultiplier="1.1"
+						android:text="@string/not_available"
+						android:textColor="@android:color/black"
+						android:textSize="18sp" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:layout_marginBottom="8dp"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:text="@string/phone_number"
+						android:textSize="14sp" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/phone_number"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:lineSpacingMultiplier="1.1"
+						android:text="@string/not_available"
+						android:textColor="@android:color/black"
+						android:textSize="18sp" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:layout_marginBottom="8dp"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:text="@string/joined_on"
+						android:textSize="14sp" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/timestamp"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:fontFamily="sans-serif"
+						android:gravity="center_vertical"
+						android:lineSpacingMultiplier="1.1"
+						android:text="@string/not_available"
+						android:textColor="@android:color/black"
+						android:textSize="18sp" />
+					
+					<include
+						layout="@layout/content_divider"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_marginTop="24dp"
+						android:layout_marginBottom="24dp" />
+					
+					<include
+						layout="@layout/content_divider"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_marginTop="24dp"
+						android:layout_marginBottom="24dp" />
 				
-				<com.google.android.material.textview.MaterialTextView
-					android:id="@+id/email"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:lineSpacingMultiplier="1.1"
-					android:text="@string/not_available"
-					android:textColor="@android:color/black"
-					android:textSize="18sp" />
-				
-				<include
-					layout="@layout/content_divider"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginTop="24dp"
-					android:layout_marginBottom="24dp" />
-				
-				<com.google.android.material.textview.MaterialTextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:layout_marginBottom="8dp"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:text="@string/phone_number"
-					android:textSize="14sp" />
-				
-				<com.google.android.material.textview.MaterialTextView
-					android:id="@+id/phone_number"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:lineSpacingMultiplier="1.1"
-					android:text="@string/not_available"
-					android:textColor="@android:color/black"
-					android:textSize="18sp" />
-				
-				<include
-					layout="@layout/content_divider"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginTop="24dp"
-					android:layout_marginBottom="24dp" />
-				
-				<com.google.android.material.textview.MaterialTextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:layout_marginBottom="8dp"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:text="@string/joined_on"
-					android:textSize="14sp" />
-				
-				<com.google.android.material.textview.MaterialTextView
-					android:id="@+id/timestamp"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:fontFamily="sans-serif"
-					android:gravity="center_vertical"
-					android:lineSpacingMultiplier="1.1"
-					android:text="@string/not_available"
-					android:textColor="@android:color/black"
-					android:textSize="18sp" />
+				</LinearLayout>
 			
-			</LinearLayout>
+			</com.google.android.material.card.MaterialCardView>
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:id="@+id/name"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:layout_marginTop="8dp"
+				android:ellipsize="end"
+				android:fontFamily="sans-serif"
+				android:gravity="center"
+				android:lineSpacingMultiplier="1.1"
+				android:maxLines="2"
+				android:paddingStart="80dp"
+				android:paddingEnd="80dp"
+				android:text="@string/not_available"
+				android:textColor="@android:color/black"
+				android:textSize="24sp"
+				android:textStyle="bold"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
+			
+			<de.hdodenhof.circleimageview.CircleImageView
+				android:id="@+id/profile_picture"
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:layout_marginStart="100dp"
+				android:layout_marginEnd="100dp"
+				android:contentDescription="@string/profile_picture"
+				android:scaleType="centerCrop"
+				android:src="@drawable/placeholder"
+				app:civ_border_color="@android:color/white"
+				app:civ_border_width="0dp"
+				app:layout_constraintDimensionRatio="1:1"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent" />
 		
-		</com.google.android.material.card.MaterialCardView>
+		</androidx.constraintlayout.widget.ConstraintLayout>
 	
-	</androidx.constraintlayout.widget.ConstraintLayout>
+	</androidx.core.widget.NestedScrollView>
+	
+	<include
+		android:id="@+id/error"
+		layout="@layout/content_error"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone" />
+	
+	<include
+		android:id="@+id/loading"
+		layout="@layout/content_loading"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 
-</androidx.core.widget.NestedScrollView>
+</FrameLayout>
