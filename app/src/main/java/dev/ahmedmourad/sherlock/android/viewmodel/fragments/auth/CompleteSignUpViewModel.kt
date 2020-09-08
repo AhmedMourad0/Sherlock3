@@ -3,6 +3,7 @@ package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
@@ -28,8 +29,12 @@ import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
-import io.reactivex.Single
+import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.serialization.Serializable
+import timber.log.Timber
+import timber.log.error
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -38,6 +43,8 @@ internal class CompleteSignUpViewModel(
         private val completeSignUpInteractor: Lazy<CompleteSignUpInteractor>,
         private val imageLoader: Lazy<ImageLoader>
 ) : ViewModel() {
+
+    private var disposable by disposable()
 
     private val id: UserId = savedStateHandle.get<Bundle>(KEY_ID)!!.unbundle(UserId.serializer())
 
@@ -60,6 +67,15 @@ internal class CompleteSignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE, null) }
     val userError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
+
+    val completeSignUpState: LiveData<CompleteSignUpState?> by lazy {
+        Transformations.map(savedStateHandle.getLiveData<Bundle?>(
+                KEY_COMPLETE_SIGN_UP_STATE,
+                null
+        )) {
+            it?.unbundle(CompleteSignUpState.serializer())
+        }
+    }
 
     fun onEmailChange(newValue: String?) {
         savedStateHandle.set(KEY_EMAIL, newValue)
@@ -97,11 +113,62 @@ internal class CompleteSignUpViewModel(
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onCompleteSignUp(): Single<Either<CompleteSignUpInteractor.Exception, SignedInUser>>? {
-        return toCompletedUser()?.let {
-            completeSignUpInteractor.get().invoke(
-                    it.toCompletedUser(imageLoader.get())
-            ).observeOn(AndroidSchedulers.mainThread())
+    fun onCompleteSignUpStateHandled() {
+        savedStateHandle.set(KEY_COMPLETE_SIGN_UP_STATE, null)
+    }
+
+    fun onCompleteSignUp() {
+        toCompletedUser()?.let { appUser ->
+            disposable = completeSignUpInteractor.get()
+                    .invoke(appUser.toCompletedUser(imageLoader.get()))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ either ->
+                        either.fold(ifLeft = { e ->
+                            when (e) {
+
+                                CompleteSignUpInteractor.Exception.NoInternetConnectionException -> {
+                                    savedStateHandle.set(
+                                            KEY_COMPLETE_SIGN_UP_STATE,
+                                            CompleteSignUpState.NoInternet.bundle(CompleteSignUpState.serializer())
+                                    )
+                                }
+
+                                CompleteSignUpInteractor.Exception.NoSignedInUserException -> {
+                                    savedStateHandle.set(
+                                            KEY_COMPLETE_SIGN_UP_STATE,
+                                            CompleteSignUpState.NoSignedInUser.bundle(CompleteSignUpState.serializer())
+                                    )
+                                }
+
+                                is CompleteSignUpInteractor.Exception.InternalException -> {
+                                    Timber.error(e.origin, e.origin::toString)
+                                    savedStateHandle.set(
+                                            KEY_COMPLETE_SIGN_UP_STATE,
+                                            CompleteSignUpState.Error.bundle(CompleteSignUpState.serializer())
+                                    )
+                                }
+
+                                is CompleteSignUpInteractor.Exception.UnknownException -> {
+                                    Timber.error(e.origin, e.origin::toString)
+                                    savedStateHandle.set(
+                                            KEY_COMPLETE_SIGN_UP_STATE,
+                                            CompleteSignUpState.Error.bundle(CompleteSignUpState.serializer())
+                                    )
+                                }
+                            }.exhaust()
+                        }, ifRight = {
+                            savedStateHandle.set(
+                                    KEY_COMPLETE_SIGN_UP_STATE,
+                                    CompleteSignUpState.Success(it).bundle(CompleteSignUpState.serializer())
+                            )
+                        })
+                    }, {
+                        Timber.error(it, it::toString)
+                        savedStateHandle.set(
+                                KEY_COMPLETE_SIGN_UP_STATE,
+                                CompleteSignUpState.Error.bundle(CompleteSignUpState.serializer())
+                        )
+                    })
         }
     }
 
@@ -143,6 +210,27 @@ internal class CompleteSignUpViewModel(
         }.orNull()
     }
 
+    override fun onCleared() {
+        disposable?.dispose()
+        super.onCleared()
+    }
+
+    @Serializable
+    sealed class CompleteSignUpState {
+
+        @Serializable
+        data class Success(val user: SignedInUser) : CompleteSignUpState()
+
+        @Serializable
+        object NoSignedInUser : CompleteSignUpState()
+
+        @Serializable
+        object NoInternet : CompleteSignUpState()
+
+        @Serializable
+        object Error : CompleteSignUpState()
+    }
+
     @Reusable
     class Factory @Inject constructor(
             private val completeSignUpInteractor: Provider<Lazy<CompleteSignUpInteractor>>,
@@ -181,6 +269,9 @@ internal class CompleteSignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PICTURE"
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
+
+        private const val KEY_COMPLETE_SIGN_UP_STATE =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.COMPLETE_SIGN_UP_STATE"
 
         fun defaultArgs(incompleteUser: IncompleteUser): Bundle? {
             return Bundle(6).apply {

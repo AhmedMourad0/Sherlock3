@@ -9,8 +9,6 @@ import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
-import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.children.AddInvestigationInteractor
@@ -20,12 +18,13 @@ import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.model.children.Investigation
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.Serializable
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -43,21 +42,17 @@ internal class ChildrenSearchResultsViewModel(
     private val query: ChildrenQuery =
             savedStateHandle.get<Bundle>(KEY_CHILD_QUERY)!!.unbundle(ChildrenQuery.serializer())
 
-    val startInvestigationError: LiveData<String?>
-            by lazy { savedStateHandle.getLiveData<String?>(KEY_START_INVESTIGATION_ERROR, null) }
-
-    val startInvestigationSuccess: LiveData<Investigation?> by lazy {
-        Transformations.map(savedStateHandle.getLiveData<Bundle?>(KEY_START_INVESTIGATION_SUCCESS, null)) {
-            it?.unbundle(Investigation.serializer().nullable)
+    val stateInvestigationState: LiveData<StartInvestigationState?> by lazy {
+        Transformations.map(savedStateHandle.getLiveData<Bundle?>(
+                KEY_START_INVESTIGATION_STATE,
+                null
+        )) {
+            it?.unbundle(StartInvestigationState.serializer())
         }
     }
 
-    fun onStartInvestigationErrorHandled() {
-        savedStateHandle.set(KEY_START_INVESTIGATION_ERROR, null)
-    }
-
-    fun onStartInvestigationSuccessHandled() {
-        savedStateHandle.set(KEY_START_INVESTIGATION_SUCCESS, null)
+    fun onStartInvestigationStateHandled() {
+        savedStateHandle.set(KEY_START_INVESTIGATION_STATE, null)
     }
 
     private val refreshSubject = PublishSubject.create<Unit>()
@@ -108,14 +103,43 @@ internal class ChildrenSearchResultsViewModel(
                 .invoke(query.toInvestigation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ either ->
-                    either.fold(ifLeft = {
-                        savedStateHandle.set(KEY_START_INVESTIGATION_ERROR, it.localizedMessage())
+                    either.fold(ifLeft = { e ->
+                        when (e) {
+
+                            AddInvestigationInteractor.Exception.NoInternetConnectionException -> {
+                                savedStateHandle.set(
+                                        KEY_START_INVESTIGATION_STATE,
+                                        StartInvestigationState.NoInternet.bundle(StartInvestigationState.serializer())
+                                )
+                            }
+
+                            AddInvestigationInteractor.Exception.NoSignedInUserException -> {
+                                savedStateHandle.set(
+                                        KEY_START_INVESTIGATION_STATE,
+                                        StartInvestigationState.NoSignedInUser.bundle(StartInvestigationState.serializer())
+                                )
+                            }
+
+                            is AddInvestigationInteractor.Exception.UnknownException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_START_INVESTIGATION_STATE,
+                                        StartInvestigationState.Error.bundle(StartInvestigationState.serializer())
+                                )
+                            }
+                        }.exhaust()
                     }, ifRight = {
-                        savedStateHandle.set(KEY_START_INVESTIGATION_SUCCESS, it.bundle(Investigation.serializer()))
+                        savedStateHandle.set(
+                                KEY_START_INVESTIGATION_STATE,
+                                StartInvestigationState.Success(it).bundle(StartInvestigationState.serializer())
+                        )
                     })
                 }, {
                     Timber.error(it, it::toString)
-                    savedStateHandle.set(KEY_START_INVESTIGATION_ERROR, somethingWentWrong(it))
+                    savedStateHandle.set(
+                            KEY_START_INVESTIGATION_STATE,
+                            StartInvestigationState.Error.bundle(StartInvestigationState.serializer())
+                    )
                 }))
     }
 
@@ -131,6 +155,25 @@ internal class ChildrenSearchResultsViewModel(
     override fun onCleared() {
         compositeDisposable.dispose()
         super.onCleared()
+    }
+
+    @Serializable
+    sealed class StartInvestigationState {
+
+        @Serializable
+        data class Success(val item: Investigation) : StartInvestigationState()
+
+        @Serializable
+        object Loading : StartInvestigationState()
+
+        @Serializable
+        object NoInternet : StartInvestigationState()
+
+        @Serializable
+        object NoSignedInUser : StartInvestigationState()
+
+        @Serializable
+        object Error : StartInvestigationState()
     }
 
     sealed class State {
@@ -163,10 +206,8 @@ internal class ChildrenSearchResultsViewModel(
         private const val KEY_CHILD_QUERY =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.key.CHILD_QUERY"
 
-        private const val KEY_START_INVESTIGATION_ERROR =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.key.ERROR_START_INVESTIGATION"
-        private const val KEY_START_INVESTIGATION_SUCCESS =
-                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.key.ERROR_START_INVESTIGATION"
+        private const val KEY_START_INVESTIGATION_STATE =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.key.START_INVESTIGATION_STATE"
 
         fun defaultArgs(query: ChildrenQuery): Bundle? {
             return Bundle(1).apply {

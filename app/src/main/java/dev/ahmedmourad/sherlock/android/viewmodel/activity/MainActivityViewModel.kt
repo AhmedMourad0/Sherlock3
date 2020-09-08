@@ -4,18 +4,25 @@ import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import arrow.core.Either
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignOutInteractor
+import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.android.schedulers.AndroidSchedulers
+import timber.log.Timber
+import timber.log.error
 import javax.inject.Inject
 import javax.inject.Provider
 
 internal class MainActivityViewModel(
         private val savedStateHandle: SavedStateHandle,
-        signOutInteractor: Lazy<SignOutInteractor>
+        private val signOutInteractor: Lazy<SignOutInteractor>
 ) : ViewModel() {
+
+    private var disposable by disposable()
 
     val isInPrimaryContentMode: LiveData<Boolean>
             by lazy { savedStateHandle.getLiveData<Boolean>(KEY_IS_IN_PRIMARY_MODE, null) }
@@ -26,8 +33,30 @@ internal class MainActivityViewModel(
         }
     }
 
-    val signOutSingle by lazy {
-        signOutInteractor.get().invoke().observeOn(AndroidSchedulers.mainThread())
+    fun onSignOut() {
+        disposable = signOutInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it is Either.Left) {
+                        when (val e = it.a) {
+                            SignOutInteractor.Exception.NoInternetConnectionException -> Unit
+                            is SignOutInteractor.Exception.InternalException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                            }
+                            is SignOutInteractor.Exception.UnknownException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                            }
+                        }.exhaust()
+                    }
+                }, {
+                    Timber.error(it, it::toString)
+                })
+    }
+
+    override fun onCleared() {
+        disposable?.dispose()
+        super.onCleared()
     }
 
     @Reusable

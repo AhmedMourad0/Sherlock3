@@ -3,12 +3,15 @@ package dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
 import arrow.core.orNull
 import dagger.Lazy
 import dagger.Reusable
+import dev.ahmedmourad.bundlizer.bundle
+import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.*
@@ -19,10 +22,12 @@ import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookIntera
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
-import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import io.reactivex.Single
+import dev.ahmedmourad.sherlock.domain.utils.disposable
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.serialization.Serializable
+import timber.log.Timber
+import timber.log.error
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -34,6 +39,8 @@ internal class SignUpViewModel(
         private val signUpWithTwitterInteractor: Lazy<SignInWithTwitterInteractor>,
         private val imageLoader: Lazy<ImageLoader>
 ) : ViewModel() {
+
+    private var disposable by disposable()
 
     val password: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_PASSWORD, null) }
@@ -64,6 +71,15 @@ internal class SignUpViewModel(
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_PICTURE_PATH, null) }
     val userError: LiveData<String?>
             by lazy { savedStateHandle.getLiveData<String?>(KEY_ERROR_USER, null) }
+
+    val signUpState: LiveData<SignUpState?> by lazy {
+        Transformations.map(savedStateHandle.getLiveData<Bundle?>(
+                KEY_SIGN_UP_STATE,
+                null
+        )) {
+            it?.unbundle(SignUpState.serializer())
+        }
+    }
 
     fun onPasswordChange(newValue: String?) {
         savedStateHandle.set(KEY_PASSWORD, newValue)
@@ -121,30 +137,298 @@ internal class SignUpViewModel(
         savedStateHandle.set(KEY_ERROR_USER, null)
     }
 
-    fun onSignUpWithGoogle():
-            Single<Either<SignInWithGoogleInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
-        return signUpWithGoogleInteractor.get()
-                .invoke()
-                .observeOn(AndroidSchedulers.mainThread())
+    fun onSignUpStateHandled() {
+        savedStateHandle.set(KEY_SIGN_UP_STATE, null)
     }
 
-    fun onSignUpWithFacebook():
-            Single<Either<SignInWithFacebookInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
-        return signUpWithFacebookInteractor.get()
+    fun onSignUpWithGoogle() {
+        disposable = signUpWithGoogleInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ either ->
+                    either.fold(ifLeft = { e ->
+                        when (e) {
+
+                            SignInWithGoogleInteractor.Exception.AccountHasBeenDisabledException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.AccountDisabled.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithGoogleInteractor.Exception.MalformedOrExpiredCredentialException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.MalformedOrExpiredCredential.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithGoogleInteractor.Exception.EmailAlreadyInUseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.EmailAlreadyInUse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithGoogleInteractor.Exception.NoResponseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoResponse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoInternet.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithGoogleInteractor.Exception.InternalException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithGoogleInteractor.Exception.UnknownException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+                        }.exhaust()
+                    }, ifRight = {
+                        savedStateHandle.set(
+                                KEY_SIGN_UP_STATE,
+                                SignUpState.Success.bundle(SignUpState.serializer())
+                        )
+                    })
+                }, {
+                    Timber.error(it, it::toString)
+                    savedStateHandle.set(
+                            KEY_SIGN_UP_STATE,
+                            SignUpState.Error.bundle(SignUpState.serializer())
+                    )
+                })
     }
 
-    fun onSignUpWithTwitter():
-            Single<Either<SignInWithTwitterInteractor.Exception, Either<IncompleteUser, SignedInUser>>> {
-        return signUpWithTwitterInteractor.get()
+    fun onSignUpWithFacebook() {
+        disposable = signUpWithFacebookInteractor.get()
                 .invoke()
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ either ->
+                    either.fold(ifLeft = { e ->
+                        when (e) {
+
+                            SignInWithFacebookInteractor.Exception.AccountHasBeenDisabledException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.AccountDisabled.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithFacebookInteractor.Exception.MalformedOrExpiredCredentialException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.MalformedOrExpiredCredential.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithFacebookInteractor.Exception.EmailAlreadyInUseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.EmailAlreadyInUse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithFacebookInteractor.Exception.NoResponseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoResponse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoInternet.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithFacebookInteractor.Exception.InternalException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithFacebookInteractor.Exception.UnknownException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+                        }.exhaust()
+                    }, ifRight = {
+                        savedStateHandle.set(
+                                KEY_SIGN_UP_STATE,
+                                SignUpState.Success.bundle(SignUpState.serializer())
+                        )
+                    })
+                }, {
+                    Timber.error(it, it::toString)
+                    savedStateHandle.set(
+                            KEY_SIGN_UP_STATE,
+                            SignUpState.Error.bundle(SignUpState.serializer())
+                    )
+                })
     }
 
-    fun onSignUp(): Single<Either<SignUpInteractor.Exception, SignedInUser>>? {
-        return toAppSignUpUser()?.toSignUpUser(imageLoader.get())?.let {
-            signUpInteractor.get().invoke(it).observeOn(AndroidSchedulers.mainThread())
+    fun onSignUpWithTwitter() {
+        disposable = signUpWithTwitterInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ either ->
+                    either.fold(ifLeft = { e ->
+                        when (e) {
+
+                            SignInWithTwitterInteractor.Exception.AccountHasBeenDisabledException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.AccountDisabled.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithTwitterInteractor.Exception.MalformedOrExpiredCredentialException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.MalformedOrExpiredCredential.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithTwitterInteractor.Exception.EmailAlreadyInUseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.EmailAlreadyInUse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithTwitterInteractor.Exception.NoResponseException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoResponse.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> {
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.NoInternet.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithTwitterInteractor.Exception.InternalException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+
+                            is SignInWithTwitterInteractor.Exception.UnknownException -> {
+                                Timber.error(e.origin, e.origin::toString)
+                                savedStateHandle.set(
+                                        KEY_SIGN_UP_STATE,
+                                        SignUpState.Error.bundle(SignUpState.serializer())
+                                )
+                            }
+                        }.exhaust()
+                    }, ifRight = {
+                        savedStateHandle.set(
+                                KEY_SIGN_UP_STATE,
+                                SignUpState.Success.bundle(SignUpState.serializer())
+                        )
+                    })
+                }, {
+                    Timber.error(it, it::toString)
+                    savedStateHandle.set(
+                            KEY_SIGN_UP_STATE,
+                            SignUpState.Error.bundle(SignUpState.serializer())
+                    )
+                })
+    }
+
+    fun onSignUp() {
+        disposable = toAppSignUpUser()?.toSignUpUser(imageLoader.get())?.let { user ->
+            signUpInteractor.get()
+                    .invoke(user)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ either ->
+                        either.fold(ifLeft = { e ->
+                            when (e) {
+
+                                SignUpInteractor.Exception.WeakPasswordException -> {
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.WeakPassword.bundle(SignUpState.serializer())
+                                    )
+                                }
+
+                                SignUpInteractor.Exception.MalformedEmailException -> {
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.MalformedEmail.bundle(SignUpState.serializer())
+                                    )
+                                }
+
+                                is SignUpInteractor.Exception.EmailAlreadyInUseException -> {
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.EmailAlreadyInUse.bundle(SignUpState.serializer())
+                                    )
+                                }
+
+                                SignUpInteractor.Exception.NoInternetConnectionException -> {
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.NoInternet.bundle(SignUpState.serializer())
+                                    )
+                                }
+
+                                is SignUpInteractor.Exception.InternalException -> {
+                                    Timber.error(e.origin, e.origin::toString)
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.Error.bundle(SignUpState.serializer())
+                                    )
+                                }
+
+                                is SignUpInteractor.Exception.UnknownException -> {
+                                    Timber.error(e.origin, e.origin::toString)
+                                    savedStateHandle.set(
+                                            KEY_SIGN_UP_STATE,
+                                            SignUpState.Error.bundle(SignUpState.serializer())
+                                    )
+                                }
+                            }.exhaust()
+                        }, ifRight = {
+                            savedStateHandle.set(
+                                    KEY_SIGN_UP_STATE,
+                                    SignUpState.Success.bundle(SignUpState.serializer())
+                            )
+                        })
+                    }, {
+                        Timber.error(it, it::toString)
+                        savedStateHandle.set(
+                                KEY_SIGN_UP_STATE,
+                                SignUpState.Error.bundle(SignUpState.serializer())
+                        )
+                    })
         }
     }
 
@@ -194,6 +478,42 @@ internal class SignUpViewModel(
             }.bind()
 
         }.orNull()
+    }
+
+    override fun onCleared() {
+        disposable?.dispose()
+        super.onCleared()
+    }
+
+    @Serializable
+    sealed class SignUpState {
+
+        @Serializable
+        object Success : SignUpState()
+
+        @Serializable
+        object AccountDisabled : SignUpState()
+
+        @Serializable
+        object MalformedOrExpiredCredential : SignUpState()
+
+        @Serializable
+        object EmailAlreadyInUse : SignUpState()
+
+        @Serializable
+        object NoResponse : SignUpState()
+
+        @Serializable
+        object NoInternet : SignUpState()
+
+        @Serializable
+        object WeakPassword : SignUpState()
+
+        @Serializable
+        object MalformedEmail : SignUpState()
+
+        @Serializable
+        object Error : SignUpState()
     }
 
     @Reusable
@@ -247,6 +567,9 @@ internal class SignUpViewModel(
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_PICTURE_PATH"
         private const val KEY_ERROR_USER =
                 "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.ERROR_USER"
+
+        private const val KEY_SIGN_UP_STATE =
+                "dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.key.SIGN_UP_STATE"
 
         fun defaultArgs(): Bundle? = null
     }

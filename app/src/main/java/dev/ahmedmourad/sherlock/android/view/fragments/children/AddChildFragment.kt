@@ -12,8 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import arrow.core.Either
-import arrow.core.orNull
 import com.jaygoo.widget.RangeSeekBar
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
@@ -35,7 +33,6 @@ import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewMo
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.constants.*
-import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -54,7 +51,6 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     @Inject
     internal lateinit var imagePicker: Lazy<ImagePicker>
-
 
     @Inject
     internal lateinit var imageLoader: Lazy<ImageLoader>
@@ -97,14 +93,15 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity, Observer { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
-            when (either) {
-                is Either.Left -> {
-                    Timber.error(message = either.a::toString)
-                    setInternetDependantViewsEnabled(false)
-                }
-                is Either.Right -> {
+        observe(globalViewModel.internetConnectivityState, Observer { state ->
+            when (state) {
+                GlobalViewModel.InternetConnectivityState.Connected,
+                GlobalViewModel.InternetConnectivityState.Disconnected -> {
                     handlePublishingStateValue(viewModel.publishingState.value)
+                }
+                GlobalViewModel.InternetConnectivityState.Loading -> Unit
+                GlobalViewModel.InternetConnectivityState.Error -> {
+                    setInternetDependantViewsEnabled(false)
                 }
             }.exhaust()
         })
@@ -180,14 +177,14 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
                 } else {
                     setInternetDependantViewsEnabled(
-                            globalViewModel.internetConnectivity.value?.orNull() ?: false
+                            globalViewModel.internetConnectivityState.value is GlobalViewModel.InternetConnectivityState.Connected
                     )
                 }
             }
             null -> {
                 setUserInteractionsEnabled(true)
                 setInternetDependantViewsEnabled(
-                        globalViewModel.internetConnectivity.value?.orNull() ?: false
+                        globalViewModel.internetConnectivityState.value is GlobalViewModel.InternetConnectivityState.Connected
                 )
             }
         }
@@ -203,9 +200,16 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     }
 
     private fun setUserInteractionsEnabled(enabled: Boolean) {
-
-        //TODO: start loading when false and stop when true
         binding?.let { b ->
+
+            if (enabled) {
+                b.contentRoot.visibility = View.VISIBLE
+                b.loading.root.visibility = View.GONE
+            } else {
+                b.contentRoot.visibility = View.GONE
+                b.loading.root.visibility = View.VISIBLE
+            }
+
             arrayOf(b.skin.skinWhite,
                     b.skin.skinWheat,
                     b.skin.skinDark,

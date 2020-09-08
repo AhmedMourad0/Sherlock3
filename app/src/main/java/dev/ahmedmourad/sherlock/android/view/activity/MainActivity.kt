@@ -14,8 +14,6 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Observer
-import arrow.core.Either
-import arrow.core.getOrElse
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
@@ -32,11 +30,8 @@ import dev.ahmedmourad.sherlock.android.viewmodel.activity.MainActivityViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
-import dev.ahmedmourad.sherlock.domain.utils.disposable
-import timber.log.Timber
-import timber.log.error
+import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -72,8 +67,6 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         )
     }
 
-    private var signOutDisposable by disposable()
-
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,24 +80,36 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setupBackdrop()
         setupNavigation()
 
-        observe(globalViewModel.userAuthState, Observer { either ->
-            either.fold(ifLeft = {
-                invalidateOptionsMenu()
-                Timber.error(message = it::toString)
-            }, ifRight = {
-                invalidateOptionsMenu()
-                updateBackdropDestination()
-            })
+        observe(globalViewModel.authState, Observer { state ->
+            when (state) {
+
+                GlobalViewModel.AuthState.Authenticated,
+                GlobalViewModel.AuthState.Unauthenticated,
+                GlobalViewModel.AuthState.Loading -> {
+                    invalidateOptionsMenu()
+                    updateBackdropDestination()
+                }
+
+                GlobalViewModel.AuthState.Error -> {
+                    invalidateOptionsMenu()
+                }
+            }.exhaust()
         })
 
-        observe(globalViewModel.signedInUser, Observer { either ->
-            either.fold(ifLeft = {
-                invalidateOptionsMenu()
-                Timber.error(message = it::toString)
-            }, ifRight = {
-                invalidateOptionsMenu()
-                updateBackdropDestination()
-            })
+        observe(globalViewModel.userState, Observer { state ->
+            when (state) {
+                is GlobalViewModel.UserState.Authenticated,
+                is GlobalViewModel.UserState.Incomplete,
+                GlobalViewModel.UserState.Unauthenticated,
+                GlobalViewModel.UserState.Loading -> {
+                    invalidateOptionsMenu()
+                    updateBackdropDestination()
+                }
+                GlobalViewModel.UserState.NoInternet,
+                GlobalViewModel.UserState.Error -> {
+                    invalidateOptionsMenu()
+                }
+            }.exhaust()
         })
 
         observe(viewModel.isInPrimaryContentMode, Observer { newValue ->
@@ -218,8 +223,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
     private fun updateBackdropDestination() {
 
-        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false } ?: return
-        val userEither = globalViewModel.signedInUser.value ?: return
+        val userState = globalViewModel.userState.value ?: return
 
         val authNavController = findNavController(R.id.auth_nav_host_fragment)
         val authNeutralDestinations = arrayOf(
@@ -228,10 +232,32 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 R.id.resetPasswordFragment
         )
 
-        if (isUserSignedIn) {
+        when (userState) {
 
-            userEither.fold(ifLeft = {
+            is GlobalViewModel.UserState.Authenticated -> {
+                if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
+                    authNavController.navigate(
+                            R.id.signedInUserProfileFragment,
+                            null,
+                            clearBackStack(authNavController)
+                    )
+                    setInPrimaryContentMode(true)
+                }
+                Unit
+            }
 
+            is GlobalViewModel.UserState.Incomplete -> {
+                if (authNavController.currentDestination?.id != R.id.completeSignUpFragment) {
+                    authNavController.navigate(
+                            R.id.completeSignUpFragment,
+                            CompleteSignUpFragmentArgs(userState.user.bundle(IncompleteUser.serializer())).toBundle(),
+                            clearBackStack(authNavController)
+                    )
+                }
+                Unit
+            }
+
+            GlobalViewModel.UserState.Unauthenticated -> {
                 if (authNavController.currentDestination?.id !in authNeutralDestinations) {
                     authNavController.navigate(
                             R.id.signInFragment,
@@ -239,48 +265,23 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                             clearBackStack(authNavController)
                     )
                 }
-
-            }, ifRight = { either ->
-
-                if (either != null) {
-                    either.fold(ifLeft = {
-                        if (authNavController.currentDestination?.id != R.id.completeSignUpFragment) {
-                            authNavController.navigate(
-                                    R.id.completeSignUpFragment,
-                                    CompleteSignUpFragmentArgs(it.bundle(IncompleteUser.serializer())).toBundle(),
-                                    clearBackStack(authNavController)
-                            )
-                        }
-                    }, ifRight = {
-                        if (authNavController.currentDestination?.id != R.id.signedInUserProfileFragment) {
-                            authNavController.navigate(
-                                    R.id.signedInUserProfileFragment,
-                                    null,
-                                    clearBackStack(authNavController)
-                            )
-                            setInPrimaryContentMode(true)
-                        }
-                    })
-                } else {
-                    if (authNavController.currentDestination?.id !in authNeutralDestinations) {
-                        authNavController.navigate(
-                                R.id.signInFragment,
-                                null,
-                                clearBackStack(authNavController)
-                        )
-                    }
-                }
-            })
-
-        } else {
-            if (authNavController.currentDestination?.id !in authNeutralDestinations) {
-                authNavController.navigate(
-                        R.id.signInFragment,
-                        null,
-                        clearBackStack(authNavController)
-                )
+                Unit
             }
-        }
+
+            GlobalViewModel.UserState.Loading,
+            GlobalViewModel.UserState.NoInternet -> Unit
+
+            GlobalViewModel.UserState.Error -> {
+                if (authNavController.currentDestination?.id !in authNeutralDestinations) {
+                    authNavController.navigate(
+                            R.id.signInFragment,
+                            null,
+                            clearBackStack(authNavController)
+                    )
+                }
+                Unit
+            }
+        }.exhaust()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -291,92 +292,66 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
         val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
-                ?: return super.onPrepareOptionsMenu(menu)
+                ?.apply { this.isEnabled = true } ?: return super.onPrepareOptionsMenu(menu)
 
-        item.isEnabled = true
-
-        val isUserSignedIn = globalViewModel.userAuthState.value?.getOrElse { false }
-
-        menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn ?: false
+        val isUserSignedIn = globalViewModel.authState.value is GlobalViewModel.AuthState.Authenticated
+        menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn
 
         if (!viewModel.isInPrimaryContentMode.value!!) {
             item.icon = ContextCompat.getDrawable(this, R.drawable.ic_cancel)
             return super.onPrepareOptionsMenu(menu)
         }
 
-        val userEither = globalViewModel.signedInUser.value
-        val isStateLoaded = isUserSignedIn != null && userEither != null
+        when (val userState = globalViewModel.userState.value) {
 
-        item.isEnabled = isStateLoaded
-        if (!isStateLoaded) {
-            item.setActionView(R.layout.content_indeterminate_progress_bar)
-            setInPrimaryContentMode(true)
-            return super.onPrepareOptionsMenu(menu)
-        }
-
-        if (isUserSignedIn == true) {
-
-            userEither!!.fold(ifLeft = {
-
-                when (it) {
-
-                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> {
-                        item.isEnabled = false
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_no_internet)
-                        setInPrimaryContentMode(true)
-                    }
-
-                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
-                        item.isEnabled = false
-                        Timber.error(message = it::toString)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
-                        setInPrimaryContentMode(true)
-                    }
-
-                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
-                        item.isEnabled = false
-                        Timber.error(message = it::toString)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
-                        setInPrimaryContentMode(true)
-                    }
+            is GlobalViewModel.UserState.Authenticated -> {
+                item.setActionView(R.layout.item_menu_profile_picture)
+                imageLoader.get().load(
+                        userState.user.pictureUrl?.value,
+                        item.actionView.findViewById(R.id.menu_profile_picture_image),
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+                )
+                item.actionView.setOnClickListener {
+                    onOptionsItemSelected(item)
                 }
+            }
 
-            }, ifRight = { either ->
-                if (either != null) {
-                    either.fold(ifLeft = {
-                        item.setActionView(R.layout.item_menu_profile_picture_with_warning)
-                        imageLoader.get().load(
-                                it.pictureUrl?.value,
-                                item.actionView.findViewById(R.id.menu_profile_picture_image),
-                                R.drawable.placeholder,
-                                R.drawable.placeholder
-                        )
-                        item.actionView.setOnClickListener {
-                            onOptionsItemSelected(item)
-                        }
-                    }, ifRight = {
-                        item.setActionView(R.layout.item_menu_profile_picture)
-                        imageLoader.get().load(
-                                it.pictureUrl?.value,
-                                item.actionView.findViewById(R.id.menu_profile_picture_image),
-                                R.drawable.placeholder,
-                                R.drawable.placeholder
-                        )
-                        item.actionView.setOnClickListener {
-                            onOptionsItemSelected(item)
-                        }
-                    })
-                } else {
-                    item.isEnabled = false
-                    item.setActionView(R.layout.content_indeterminate_progress_bar)
-                    setInPrimaryContentMode(true)
+            is GlobalViewModel.UserState.Incomplete -> {
+                item.setActionView(R.layout.item_menu_profile_picture_with_warning)
+                imageLoader.get().load(
+                        userState.user.pictureUrl?.value,
+                        item.actionView.findViewById(R.id.menu_profile_picture_image),
+                        R.drawable.placeholder,
+                        R.drawable.placeholder
+                )
+                item.actionView.setOnClickListener {
+                    onOptionsItemSelected(item)
                 }
-            })
+            }
 
-        } else {
-            item.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
-        }
+            GlobalViewModel.UserState.Unauthenticated -> {
+                item.icon = ContextCompat.getDrawable(this, R.drawable.ic_login)
+            }
 
+            null, GlobalViewModel.UserState.Loading -> {
+                item.isEnabled = false
+                item.setActionView(R.layout.content_indeterminate_progress_bar)
+                setInPrimaryContentMode(true)
+            }
+
+            GlobalViewModel.UserState.NoInternet -> {
+                item.isEnabled = false
+                item.icon = ContextCompat.getDrawable(this, R.drawable.ic_no_internet)
+                setInPrimaryContentMode(true)
+            }
+
+            GlobalViewModel.UserState.Error -> {
+                item.isEnabled = false
+                item.icon = ContextCompat.getDrawable(this, R.drawable.ic_error)
+                setInPrimaryContentMode(true)
+            }
+        }.exhaust()
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -387,7 +362,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                 true
             }
             R.id.main_menu_sign_out -> {
-                signOut()
+                viewModel.onSignOut()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -417,23 +392,12 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         }
     }
 
-    private fun signOut() {
-        signOutDisposable = viewModel.signOutSingle.subscribe({ resultEither ->
-            if (resultEither is Either.Left) {
-                Timber.error(message = resultEither::toString)
-            }
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
     override fun onStop() {
         if (foregroundAnimator.isStarted) {
             foregroundAnimator.end()
         }
         foregroundAnimator.removeAllUpdateListeners()
         foregroundAnimator.removeAllListeners()
-        signOutDisposable?.dispose()
         super.onStop()
     }
 

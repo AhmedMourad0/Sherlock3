@@ -2,25 +2,22 @@ package dev.ahmedmourad.sherlock.android.view.fragments.auth
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import arrow.core.Either
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignedInUserProfileBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignedInUserProfileViewModel
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.platform.DateManager
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -62,28 +59,75 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignedInUserProfileBinding.bind(view)
-        observe(globalViewModel.signedInUser, Observer { resultEither ->
-            resultEither.fold(ifLeft = { e ->
-                when (e) {
+        observe(globalViewModel.userState, Observer { state ->
+            when (state) {
 
-                    ObserveSignedInUserInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    is ObserveSignedInUserInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
+                is GlobalViewModel.UserState.Authenticated -> {
+                    populateUi(state.user)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.VISIBLE
+                        b.error.root.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
                     }
-
-                    is ObserveSignedInUserInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }, ifRight = { userEither ->
-                if (userEither is Either.Right) {
-                    populateUi(userEither.b)
                 }
-            })
+
+                is GlobalViewModel.UserState.Incomplete -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.something_went_wrong)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_research)
+                    }
+                    Timber.error { "Incomplete user in the SignedInProfileFragment: ${state.user}" }
+                }
+
+                GlobalViewModel.UserState.Unauthenticated -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.sign_in_needed_to_view)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_finger_print)
+                    }
+                }
+
+                GlobalViewModel.UserState.Loading -> {
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.error.root.visibility = View.GONE
+                        b.loading.root.visibility = View.VISIBLE
+                    }
+                }
+
+                GlobalViewModel.UserState.NoInternet -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.no_internet_connection)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_no_internet_colorful)
+                    }
+                }
+
+                GlobalViewModel.UserState.Error -> {
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.something_went_wrong)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_research)
+                    }
+                }
+            }.exhaust()
         })
+
+        binding?.error?.root?.setOnClickListener {
+            globalViewModel.onRefresh()
+        }
     }
 
     private fun populateUi(user: SignedInUser) {

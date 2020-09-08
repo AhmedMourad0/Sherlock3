@@ -7,30 +7,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import arrow.core.Either
-import arrow.core.Tuple2
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentChildDetailsBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.formatter.TextFormatter
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildDetailsViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.children.FindChildInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import timber.log.Timber
-import timber.log.error
+import splitties.init.appCtx
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -66,68 +60,108 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
         binding = FragmentChildDetailsBinding.bind(view)
         (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
 
-        //TODO: show loading, hide when date is received
-        //TODO: notify the user when the data is updated or deleted
-        observe(viewModel.result, Observer { resultEither: Either<FindChildInteractor.Exception, Tuple2<RetrievedChild, Weight?>?> ->
-            resultEither.fold(ifLeft = { e ->
-                //TODO: show error image with retry option
-                when (e) {
+        observe(viewModel.state, Observer { state ->
+            when (state) {
 
-                    FindChildInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    FindChildInteractor.Exception.NoSignedInUserException -> {
-                        (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                is ChildDetailsViewModel.State.Data -> {
+                    populateUi(state.item)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.VISIBLE
+                        b.error.root.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
                     }
+                }
 
-                    is FindChildInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
+                ChildDetailsViewModel.State.NoData -> {
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.child_data_missing)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_records)
                     }
+                }
 
-                    is FindChildInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
+                ChildDetailsViewModel.State.Loading -> {
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.error.root.visibility = View.GONE
+                        b.loading.root.visibility = View.VISIBLE
                     }
+                }
 
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }, ifRight = this::populateUi)
+                ChildDetailsViewModel.State.NoInternet -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.no_internet_connection)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_no_internet_colorful)
+                    }
+                }
+
+                ChildDetailsViewModel.State.NoSignedInUser -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.sign_in_needed_to_view)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_finger_print)
+                    }
+                    Toast.makeText(
+                            appCtx,
+                            R.string.authentication_needed,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                ChildDetailsViewModel.State.Error -> {
+                    binding?.let { b ->
+                        b.contentRoot.visibility = View.GONE
+                        b.loading.root.visibility = View.GONE
+                        b.error.root.visibility = View.VISIBLE
+                        b.error.errorMessage.setText(R.string.something_went_wrong)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_research)
+                    }
+                }
+            }.exhaust()
         })
+
+        binding?.error?.root?.setOnClickListener {
+            viewModel.onRefresh()
+        }
     }
 
-    private fun populateUi(result: Tuple2<RetrievedChild, Weight?>?) {
-
-        if (result == null) {
-            //TODO: display error message and image instead
-            Toast.makeText(context, R.string.child_data_missing, Toast.LENGTH_LONG).show()
-            findNavController().popBackStack()
-            return
-        }
+    private fun populateUi(result: Pair<RetrievedChild, Weight?>) {
 
         binding?.let { b ->
 
             imageLoader.get().load(
-                    result.a.pictureUrl?.value,
+                    result.first.pictureUrl?.value,
                     b.childPicture,
                     R.drawable.placeholder,
                     R.drawable.placeholder
             )
 
-            val name = textFormatter.get().formatName(result.a.name)
+            val name = textFormatter.get().formatName(result.first.name)
             b.toolbar.title = name
             b.childName.text = name
 
-            b.childAge.text = textFormatter.get().formatAge(result.a.appearance.ageRange)
+            b.childAge.text = textFormatter.get().formatAge(result.first.appearance.ageRange)
 
-            b.childGender.text = textFormatter.get().formatGender(result.a.appearance.gender)
+            b.childGender.text = textFormatter.get().formatGender(result.first.appearance.gender)
 
-            b.childHeight.text = textFormatter.get().formatHeight(result.a.appearance.heightRange)
+            b.childHeight.text = textFormatter.get().formatHeight(result.first.appearance.heightRange)
 
-            b.childSkin.text = textFormatter.get().formatSkin(result.a.appearance.skin)
+            b.childSkin.text = textFormatter.get().formatSkin(result.first.appearance.skin)
 
-            b.childHair.text = textFormatter.get().formatHair(result.a.appearance.hair)
+            b.childHair.text = textFormatter.get().formatHair(result.first.appearance.hair)
 
-            b.childLocation.text = textFormatter.get().formatLocation(result.a.location)
+            b.childLocation.text = textFormatter.get().formatLocation(result.first.location)
 
-            b.notes.text = textFormatter.get().formatNotes(result.a.notes)
+            b.notes.text = textFormatter.get().formatNotes(result.first.notes)
         }
     }
 

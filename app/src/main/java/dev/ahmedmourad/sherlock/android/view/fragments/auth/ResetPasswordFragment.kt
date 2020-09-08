@@ -9,21 +9,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import arrow.core.Either
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentResetPasswordBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.utils.observe
-import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.ResetPasswordViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.SendPasswordResetEmailInteractor
-import dev.ahmedmourad.sherlock.domain.utils.disposable
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
-import timber.log.Timber
-import timber.log.error
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -42,8 +36,6 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
     private val args: ResetPasswordFragmentArgs by navArgs()
 
-    private var sendEmailDisposable by disposable()
-
     private var binding: FragmentResetPasswordBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +48,31 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         binding = FragmentResetPasswordBinding.bind(view)
         initializeEditTexts()
         addErrorObservers()
+        observe(viewModel.passwordResetState, Observer { state ->
+            @Suppress("IMPLICIT_CAST_TO_ANY")
+            when (state) {
+
+                ResetPasswordViewModel.PasswordResetState.Success -> {
+                    findNavController().popBackStack()
+                }
+
+                ResetPasswordViewModel.PasswordResetState.NonExistentEmail -> {
+                    Toast.makeText(context, R.string.email_non_existent, Toast.LENGTH_LONG).show()
+                }
+
+                ResetPasswordViewModel.PasswordResetState.NoInternet -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                    Toast.makeText(context, R.string.internet_connection_needed, Toast.LENGTH_LONG).show()
+                }
+
+                ResetPasswordViewModel.PasswordResetState.Error -> {
+                    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                }
+
+                null -> Unit
+            }.exhaust()
+            viewModel.onResetPasswordStateHandled()
+        })
         binding?.let { b ->
             arrayOf(b.sendEmailButton).forEach { it.setOnClickListener(this) }
         }
@@ -80,35 +97,6 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         }
     }
 
-    private fun sendPasswordResetEmail() {
-        sendEmailDisposable = viewModel.onCompleteSignUp()?.subscribe(::onSendEmailSuccess) {
-            Timber.error(it, it::toString)
-            Toast.makeText(context, somethingWentWrong(it), Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun onSendEmailSuccess(
-            resultEither: Either<SendPasswordResetEmailInteractor.Exception, Unit>
-    ) {
-        resultEither.fold(ifLeft = { e ->
-            when (e) {
-                is SendPasswordResetEmailInteractor.Exception.NonExistentEmailException,
-                SendPasswordResetEmailInteractor.Exception.NoInternetConnectionException -> Unit
-                is SendPasswordResetEmailInteractor.Exception.UnknownException -> {
-                    Timber.error(e.origin, e::toString)
-                }
-            }.exhaust()
-            Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-        }, ifRight = {
-            findNavController().popBackStack()
-        })
-    }
-
-    override fun onStop() {
-        sendEmailDisposable?.dispose()
-        super.onStop()
-    }
-
     override fun onDestroyView() {
         binding = null
         super.onDestroyView()
@@ -116,7 +104,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.send_email_button -> sendPasswordResetEmail()
+            R.id.send_email_button -> viewModel.onSendResetEmail()
         }
     }
 }

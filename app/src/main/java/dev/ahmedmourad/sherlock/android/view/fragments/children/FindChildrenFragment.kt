@@ -11,13 +11,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import arrow.core.Either
 import dagger.Lazy
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentFindChildrenBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.pickers.colors.ColorSelector
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
@@ -32,7 +30,6 @@ import dev.ahmedmourad.sherlock.domain.constants.Gender
 import dev.ahmedmourad.sherlock.domain.constants.Hair
 import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.constants.findEnum
-import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import splitties.init.appCtx
@@ -80,14 +77,17 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeLocationTextView()
         addErrorObservers()
 
-        observe(globalViewModel.internetConnectivity, Observer { either: Either<ObserveInternetConnectivityInteractor.Exception, Boolean> ->
-            when (either) {
-                is Either.Left -> {
-                    setInternetDependantViewsEnabled(false)
-                    Timber.error(message = either.a::toString)
+        observe(globalViewModel.internetConnectivityState, Observer { state ->
+            when (state) {
+                GlobalViewModel.InternetConnectivityState.Connected -> {
+                    setInternetDependantViewsEnabled(true)
                 }
-                is Either.Right -> {
-                    setInternetDependantViewsEnabled(either.b)
+                GlobalViewModel.InternetConnectivityState.Disconnected -> {
+                    setInternetDependantViewsEnabled(false)
+                }
+                GlobalViewModel.InternetConnectivityState.Loading -> Unit
+                GlobalViewModel.InternetConnectivityState.Error -> {
+                    setInternetDependantViewsEnabled(false)
                 }
             }.exhaust()
         })
@@ -229,28 +229,48 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     }
 
     private fun search() {
-        val signedInUserEither = globalViewModel.signedInUser.value
-        if (signedInUserEither != null) {
-            signedInUserEither.fold(ifLeft = {
-                Toast.makeText(appCtx, it.localizedMessage(), Toast.LENGTH_LONG).show()
-            }, ifRight = { user ->
-                if (user == null) {
-                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
-                } else {
-                    viewModel.toChildQuery(globalViewModel.signedInUserSimplified.value)?.let {
-                        findNavController().navigate(
-                                FindChildrenFragmentDirections
-                                        .actionFindChildrenFragmentToChildrenSearchResultsFragment(
-                                                it.bundle(ChildrenQuery.serializer())
-                                        )
-                        )
-                    }
-                }
-            })
-        } else {
-            Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
-            (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
-        }
+        when (globalViewModel.userState.value) {
+
+            is GlobalViewModel.UserState.Authenticated -> {
+                viewModel.toChildQuery(globalViewModel.signedInUserSimplified.value)
+                        ?.bundle(ChildrenQuery.serializer())
+                        ?.let {
+                            findNavController().navigate(
+                                    FindChildrenFragmentDirections
+                                            .actionFindChildrenFragmentToChildrenSearchResultsFragment(it)
+                            )
+                        }
+            }
+
+            is GlobalViewModel.UserState.Incomplete -> {
+                Toast.makeText(appCtx, R.string.authentication_completion_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+            }
+
+            GlobalViewModel.UserState.Unauthenticated -> {
+                Toast.makeText(appCtx, R.string.authentication_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+            }
+
+            GlobalViewModel.UserState.Loading -> {
+                Toast.makeText(appCtx, R.string.authentication_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+            }
+
+            GlobalViewModel.UserState.NoInternet -> {
+                Toast.makeText(appCtx, R.string.internet_connection_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+            }
+
+            GlobalViewModel.UserState.Error -> {
+                Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+            }
+
+            null -> {
+                Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
+            }
+        }.exhaust()
     }
 
     private fun startPlacePicker() {

@@ -10,23 +10,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import arrow.core.Either
 import dagger.Lazy
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.databinding.FragmentSignUpBinding
 import dev.ahmedmourad.sherlock.android.di.injector
-import dev.ahmedmourad.sherlock.android.interpreters.interactors.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.auth.SignUpViewModel
-import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithGoogleInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithTwitterInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.auth.SignUpInteractor
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import timber.log.Timber
@@ -68,6 +63,65 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         initializeEditTexts()
         initializePictureImageView()
         addErrorObservers()
+
+
+        observe(viewModel.signUpState, Observer { state ->
+            @Suppress("IMPLICIT_CAST_TO_ANY")
+            when (state) {
+
+                SignUpViewModel.SignUpState.Success -> Unit
+
+                SignUpViewModel.SignUpState.AccountDisabled -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.account_has_been_disabled, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.MalformedOrExpiredCredential -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.session_has_expired, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.EmailAlreadyInUse -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.email_already_in_use, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.NoResponse -> {
+                    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.NoInternet -> {
+                    Toast.makeText(context, R.string.internet_connection_needed, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.MalformedEmail -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.malformed_email, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.WeakPassword -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.weak_password, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                SignUpViewModel.SignUpState.Error -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    setInteractionsEnabled(true)
+                }
+
+                null -> Unit
+            }.exhaust()
+            viewModel.onSignUpStateHandled()
+        })
+
         binding?.let { b ->
             arrayOf(b.childPicture,
                     b.pictureTextView,
@@ -158,113 +212,6 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         })
     }
 
-    private fun signUp() {
-        signUpDisposable = viewModel.onSignUp()?.subscribe({ either ->
-            if (either is Either.Left) {
-                val e = either.a
-                when (e) {
-
-                    SignUpInteractor.Exception.WeakPasswordException,
-                    SignUpInteractor.Exception.MalformedEmailException,
-                    is SignUpInteractor.Exception.EmailAlreadyInUseException,
-                    SignUpInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    is SignUpInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-
-                    is SignUpInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
-    private fun signUpWithGoogle() {
-        signUpDisposable = viewModel.onSignUpWithGoogle().subscribe({ either ->
-            if (either is Either.Left) {
-                val e = either.a
-                when (e) {
-
-                    SignInWithGoogleInteractor.Exception.AccountHasBeenDisabledException,
-                    SignInWithGoogleInteractor.Exception.MalformedOrExpiredCredentialException,
-                    SignInWithGoogleInteractor.Exception.EmailAlreadyInUseException,
-                    SignInWithGoogleInteractor.Exception.NoResponseException,
-                    SignInWithGoogleInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    is SignInWithGoogleInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-
-                    is SignInWithGoogleInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
-    private fun signUpWithFacebook() {
-        signUpDisposable = viewModel.onSignUpWithFacebook().subscribe({ either ->
-            if (either is Either.Left) {
-                val e = either.a
-                when (e) {
-
-                    SignInWithFacebookInteractor.Exception.AccountHasBeenDisabledException,
-                    SignInWithFacebookInteractor.Exception.MalformedOrExpiredCredentialException,
-                    SignInWithFacebookInteractor.Exception.EmailAlreadyInUseException,
-                    SignInWithFacebookInteractor.Exception.NoResponseException,
-                    SignInWithFacebookInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    is SignInWithFacebookInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-
-                    is SignInWithFacebookInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
-    private fun signUpWithTwitter() {
-        signUpDisposable = viewModel.onSignUpWithTwitter().subscribe({ either ->
-            if (either is Either.Left) {
-                val e = either.a
-                when (e) {
-
-                    SignInWithTwitterInteractor.Exception.AccountHasBeenDisabledException,
-                    SignInWithTwitterInteractor.Exception.MalformedOrExpiredCredentialException,
-                    SignInWithTwitterInteractor.Exception.EmailAlreadyInUseException,
-                    SignInWithTwitterInteractor.Exception.NoResponseException,
-                    SignInWithTwitterInteractor.Exception.NoInternetConnectionException -> Unit
-
-                    is SignInWithTwitterInteractor.Exception.InternalException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-
-                    is SignInWithTwitterInteractor.Exception.UnknownException -> {
-                        Timber.error(e.origin, e::toString)
-                    }
-                }.exhaust()
-                Toast.makeText(context, e.localizedMessage(), Toast.LENGTH_LONG).show()
-            }
-        }, {
-            Timber.error(it, it::toString)
-        })
-    }
-
     private fun startImagePicker() {
         setPictureEnabled(false)
         imagePicker.get().start(this) {
@@ -277,6 +224,24 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
         binding?.let { b ->
             b.childPicture.isEnabled = enabled
             b.pictureTextView.isEnabled = enabled
+        }
+    }
+
+    private fun setInteractionsEnabled(enabled: Boolean) {
+        binding?.let { b ->
+            b.signUpButton.isEnabled = enabled
+            b.signUpWithGoogleImageView.isEnabled = enabled
+            b.signUpWithFacebookImageView.isEnabled = enabled
+            b.signUpWithTwitterImageView.isEnabled = enabled
+            b.childPicture.isEnabled = enabled
+            b.pictureTextView.isEnabled = enabled
+            b.orSignInTextView.isEnabled = enabled
+            b.displayNameEditText.isEnabled = enabled
+            b.emailEditText.isEnabled = enabled
+            b.passwordEditText.isEnabled = enabled
+            b.confirmPasswordEditText.isEnabled = enabled
+            b.phoneNumberEditText.isEnabled = enabled
+            b.countryCodePicker.isEnabled = enabled
         }
     }
 
@@ -311,13 +276,25 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     override fun onClick(v: View) {
         when (v.id) {
 
-            R.id.sign_up_button -> signUp()
+            R.id.sign_up_button -> {
+                setInteractionsEnabled(false)
+                viewModel.onSignUp()
+            }
 
-            R.id.sign_up_with_google_image_view -> signUpWithGoogle()
+            R.id.sign_up_with_google_image_view -> {
+                setInteractionsEnabled(false)
+                viewModel.onSignUpWithGoogle()
+            }
 
-            R.id.sign_up_with_facebook_image_view -> signUpWithFacebook()
+            R.id.sign_up_with_facebook_image_view -> {
+                setInteractionsEnabled(false)
+                viewModel.onSignUpWithFacebook()
+            }
 
-            R.id.sign_up_with_twitter_image_view -> signUpWithTwitter()
+            R.id.sign_up_with_twitter_image_view -> {
+                setInteractionsEnabled(false)
+                viewModel.onSignUpWithTwitter()
+            }
 
             R.id.picture_text_view, R.id.child_picture -> startImagePicker()
 

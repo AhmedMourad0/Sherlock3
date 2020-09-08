@@ -83,8 +83,8 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
                         b.startInvestigation.hide()
                         b.loading.root.visibility = View.GONE
                         b.error.root.visibility = View.VISIBLE
-                        b.error.errorMessage.setText(R.string.have_no_ongoing_investigations)
-                        b.error.errorIcon.setImageResource(R.drawable.ic_detective_woman)
+                        b.error.errorMessage.setText(R.string.no_results)
+                        b.error.errorIcon.setImageResource(R.drawable.ic_records)
                     }
                 }
 
@@ -139,37 +139,69 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
             }.exhaust()
         })
 
-        observe(viewModel.startInvestigationSuccess, Observer {
-            binding?.startInvestigation?.hide()
-            Toast.makeText(
-                    appCtx,
-                    getString(R.string.start_investigation_success),
-                    Toast.LENGTH_LONG
-            ).show()
-            viewModel.onStartInvestigationSuccessHandled()
-        })
+        observe(viewModel.stateInvestigationState, Observer { state ->
+            when (state) {
 
-        observe(viewModel.startInvestigationError, Observer { msg ->
-            if (msg != null) {
-                Toast.makeText(
-                        appCtx,
-                        msg,
-                        Toast.LENGTH_LONG
-                ).show()
-            } else {
-                Toast.makeText(
-                        appCtx,
-                        R.string.something_went_wrong,
-                        Toast.LENGTH_LONG
-                ).show()
-            }
-            viewModel.onStartInvestigationErrorHandled()
-            binding?.startInvestigation?.isEnabled = true
+                is ChildrenSearchResultsViewModel.StartInvestigationState.Success -> {
+                    binding?.startInvestigation?.hide()
+                    binding?.startInvestigation?.isEnabled = false
+                    Toast.makeText(
+                            appCtx,
+                            R.string.start_investigation_success,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                ChildrenSearchResultsViewModel.StartInvestigationState.Loading -> {
+                    binding?.startInvestigation?.hide()
+                    binding?.startInvestigation?.isEnabled = false
+                    Toast.makeText(
+                            appCtx,
+                            R.string.starting_investigation,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                ChildrenSearchResultsViewModel.StartInvestigationState.NoInternet -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                    binding?.startInvestigation?.show()
+                    binding?.startInvestigation?.isEnabled = true
+                    Toast.makeText(
+                            appCtx,
+                            R.string.internet_connection_needed,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                ChildrenSearchResultsViewModel.StartInvestigationState.NoSignedInUser -> {
+                    (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                    binding?.startInvestigation?.show()
+                    binding?.startInvestigation?.isEnabled = true
+                    Toast.makeText(
+                            appCtx,
+                            R.string.authentication_needed,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                ChildrenSearchResultsViewModel.StartInvestigationState.Error -> {
+                    binding?.startInvestigation?.show()
+                    binding?.startInvestigation?.isEnabled = true
+                    Toast.makeText(
+                            appCtx,
+                            R.string.something_went_wrong,
+                            Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                null -> Unit
+            }.exhaust()
+            viewModel.onStartInvestigationStateHandled()
         })
 
         binding?.startInvestigation?.setOnClickListener {
-            viewModel.onStartInvestigation()
             binding?.startInvestigation?.isEnabled = false
+            viewModel.onStartInvestigation()
         }
 
         binding?.error?.root?.setOnClickListener {
