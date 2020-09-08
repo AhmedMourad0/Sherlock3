@@ -8,8 +8,6 @@ best possible design choices for a modern application.*
 Sherlock is a mobile app that aims to help families find their
 lost/kidnapped children.
 
-## Key Features
-
 ## Key Concepts
 
 - Clean Architecture.
@@ -38,7 +36,7 @@ lost/kidnapped children.
 - ADT-driven error handling.
 - Bundlizer and NoCopy.
 
-## Whiteboard:
+## Whiteboard
 
 - Compose
 - Testing.
