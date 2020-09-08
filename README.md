@@ -45,8 +45,7 @@ lost/kidnapped children.
 - Hide the id from the ui layer
 - Encryption, Redacted
 - Firebase Crashlytics?
-- Use Monads to abstract over data types (RxJava, Coroutines,...) in
-  data modules.
+- Use Monads to abstract over (RxJava, Coroutines,...) in data modules.
 - Replace RxJava with Kotlin Coroutines and Flow.
 - Package per feature?
 - Use AndroidX's App Startup
