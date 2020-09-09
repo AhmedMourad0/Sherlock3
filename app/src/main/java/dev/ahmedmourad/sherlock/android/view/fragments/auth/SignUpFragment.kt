@@ -119,7 +119,9 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
 
                 null -> Unit
             }.exhaust()
-            viewModel.onSignUpStateHandled()
+            if (state != null) {
+                viewModel.onSignUpStateHandled()
+            }
         })
 
         binding?.let { b ->

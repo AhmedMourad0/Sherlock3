@@ -196,7 +196,9 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
 
                 null -> Unit
             }.exhaust()
-            viewModel.onStartInvestigationStateHandled()
+            if (state != null) {
+                viewModel.onStartInvestigationStateHandled()
+            }
         })
 
         binding?.startInvestigation?.setOnClickListener {

@@ -71,7 +71,9 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
 
                 null -> Unit
             }.exhaust()
-            viewModel.onResetPasswordStateHandled()
+            if (state != null) {
+                viewModel.onResetPasswordStateHandled()
+            }
         })
         binding?.let { b ->
             arrayOf(b.sendEmailButton).forEach { it.setOnClickListener(this) }

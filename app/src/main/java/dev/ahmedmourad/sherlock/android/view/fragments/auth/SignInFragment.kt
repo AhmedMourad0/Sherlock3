@@ -108,7 +108,9 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
 
                 null -> Unit
             }.exhaust()
-            viewModel.onSignInStateHandled()
+            if (state != null) {
+                viewModel.onSignInStateHandled()
+            }
         })
 
         binding?.let { b ->

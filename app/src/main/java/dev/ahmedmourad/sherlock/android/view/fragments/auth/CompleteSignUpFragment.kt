@@ -88,7 +88,9 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
 
                 null -> Unit
             }.exhaust()
-            viewModel.onCompleteSignUpStateHandled()
+            if (state != null) {
+                viewModel.onCompleteSignUpStateHandled()
+            }
         })
 
         binding?.let { b ->
