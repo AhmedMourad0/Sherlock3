@@ -31,13 +31,6 @@ internal fun ObserveSignedInUserInteractor.Exception.localizedMessage(): String 
     }
 }
 
-internal fun ObserveUserAuthStateInteractor.Exception.localizedMessage(): String {
-    return when (this) {
-        is ObserveUserAuthStateInteractor.Exception.UnknownException ->
-            somethingWentWrong(this.origin)
-    }
-}
-
 internal fun SendPasswordResetEmailInteractor.Exception.localizedMessage(): String {
     return when (this) {
         is SendPasswordResetEmailInteractor.Exception.NonExistentEmailException ->

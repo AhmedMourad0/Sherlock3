@@ -13,11 +13,6 @@ import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnect
 internal interface AuthBindingsModule {
 
     @Binds
-    fun bindObserveUserAuthStateInteractor(
-            impl: ObserveUserAuthStateInteractorImpl
-    ): ObserveUserAuthStateInteractor
-
-    @Binds
     fun bindObserveSignedInUserInteractor(
             impl: ObserveSignedInUserInteractorImpl
     ): ObserveSignedInUserInteractor
