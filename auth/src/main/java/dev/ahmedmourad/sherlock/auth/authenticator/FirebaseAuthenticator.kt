@@ -578,7 +578,7 @@ internal class FirebaseAuthenticator @Inject constructor(
     ): Single<Either<Throwable, UserId>> {
         return Single.create<Either<Throwable, UserId>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(userId.right())
             }
 
