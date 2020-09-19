@@ -80,22 +80,6 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setupBackdrop()
         setupNavigation()
 
-        observe(globalViewModel.authState, Observer { state ->
-            when (state) {
-
-                GlobalViewModel.AuthState.Authenticated,
-                GlobalViewModel.AuthState.Unauthenticated,
-                GlobalViewModel.AuthState.Loading -> {
-                    invalidateOptionsMenu()
-                    updateBackdropDestination()
-                }
-
-                GlobalViewModel.AuthState.Error -> {
-                    invalidateOptionsMenu()
-                }
-            }.exhaust()
-        })
-
         observe(globalViewModel.userState, Observer { state ->
             when (state) {
                 is GlobalViewModel.UserState.Authenticated,
@@ -294,8 +278,15 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         val item = menu?.findItem(R.id.main_menu_show_or_hide_backdrop)
                 ?.apply { this.isEnabled = true } ?: return super.onPrepareOptionsMenu(menu)
 
-        val isUserSignedIn = globalViewModel.authState.value is GlobalViewModel.AuthState.Authenticated
-        menu.findItem(R.id.main_menu_sign_out)?.isVisible = isUserSignedIn
+        when (globalViewModel.userState.value) {
+            is GlobalViewModel.UserState.Authenticated,
+            is GlobalViewModel.UserState.Incomplete -> {
+                menu.findItem(R.id.main_menu_sign_out)?.isVisible = true
+            }
+            else -> {
+                menu.findItem(R.id.main_menu_sign_out)?.isVisible = false
+            }
+        }.exhaust()
 
         if (!viewModel.isInPrimaryContentMode.value!!) {
             item.icon = ContextCompat.getDrawable(this, R.drawable.ic_cancel)

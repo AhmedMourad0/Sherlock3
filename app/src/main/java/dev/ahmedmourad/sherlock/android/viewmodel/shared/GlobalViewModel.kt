@@ -10,7 +10,6 @@ import dagger.Reusable
 import dev.ahmedmourad.sherlock.android.utils.toLiveData
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveSignedInUserInteractor
-import dev.ahmedmourad.sherlock.domain.interactors.auth.ObserveUserAuthStateInteractor
 import dev.ahmedmourad.sherlock.domain.interactors.common.ObserveInternetConnectivityInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
@@ -26,7 +25,6 @@ import javax.inject.Provider
 internal class GlobalViewModel(
         @Suppress("UNUSED_PARAMETER") savedStateHandle: SavedStateHandle,
         observeInternetConnectivityInteractor: Lazy<ObserveInternetConnectivityInteractor>,
-        observeUserAuthStateInteractor: Lazy<ObserveUserAuthStateInteractor>,
         observeSignedInUserInteractor: Lazy<ObserveSignedInUserInteractor>
 ) : ViewModel() {
 
@@ -54,31 +52,6 @@ internal class GlobalViewModel(
                             })
                         }
                 ).observeOn(AndroidSchedulers.mainThread())
-                .toLiveData()
-    }
-
-    val authState by lazy {
-        Flowable.just<AuthState>(AuthState.Loading)
-                .concatWith(observeUserAuthStateInteractor.get()
-                        .invoke()
-                        .map { resultsEither ->
-                            resultsEither.fold<AuthState>(ifLeft = { e ->
-                                when (e) {
-                                    is ObserveUserAuthStateInteractor.Exception.UnknownException -> {
-                                        Timber.error(message = e::toString)
-                                        AuthState.Error
-                                    }
-                                }
-                            }, ifRight = { isAuthenticated ->
-                                if (isAuthenticated) {
-                                    AuthState.Authenticated
-                                } else {
-                                    AuthState.Unauthenticated
-                                }
-                            })
-                        }
-                ).retryWhen { refreshSubject.toFlowable(BackpressureStrategy.LATEST) }
-                .observeOn(AndroidSchedulers.mainThread())
                 .toLiveData()
     }
 
@@ -129,13 +102,6 @@ internal class GlobalViewModel(
         object Error : InternetConnectivityState()
     }
 
-    sealed class AuthState {
-        object Authenticated : AuthState()
-        object Unauthenticated : AuthState()
-        object Loading : AuthState()
-        object Error : AuthState()
-    }
-
     sealed class UserState {
         data class Authenticated(val user: SignedInUser) : UserState()
         data class Incomplete(val user: IncompleteUser) : UserState()
@@ -148,14 +114,12 @@ internal class GlobalViewModel(
     @Reusable
     class Factory @Inject constructor(
             private val observeInternetConnectivityInteractor: Provider<Lazy<ObserveInternetConnectivityInteractor>>,
-            private val observeUserAuthStateInteractor: Provider<Lazy<ObserveUserAuthStateInteractor>>,
             private val observeSignedInUserInteractor: Provider<Lazy<ObserveSignedInUserInteractor>>
     ) : AssistedViewModelFactory<GlobalViewModel> {
         override fun invoke(handle: SavedStateHandle): GlobalViewModel {
             return GlobalViewModel(
                     handle,
                     observeInternetConnectivityInteractor.get(),
-                    observeUserAuthStateInteractor.get(),
                     observeSignedInUserInteractor.get()
             )
         }
