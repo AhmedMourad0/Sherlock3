@@ -308,9 +308,9 @@ internal class SignInViewModel(
     }
 
     fun onSignIn() {
-        disposable = toUserCredentials()?.let {
+        disposable = toUserCredentials()?.let { credentials ->
             signInInteractor.get()
-                    .invoke(it)
+                    .invoke(credentials)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ either ->
                         either.fold(ifLeft = { e ->
