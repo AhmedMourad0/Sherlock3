@@ -107,7 +107,8 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
 
     //This's temporary and is here for debugging purposes
     private fun addErrorObservers() {
-        observeAll(viewModel.firstNameError,
+        observeAll(viewModel.userError,
+                viewModel.firstNameError,
                 viewModel.lastNameError,
                 viewModel.nameError,
                 viewModel.locationError,
@@ -120,6 +121,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                 viewModel.queryError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onUserErrorHandled()
                 viewModel.onFirstNameErrorHandled()
                 viewModel.onLastNameErrorHandled()
                 viewModel.onNameErrorHandled()

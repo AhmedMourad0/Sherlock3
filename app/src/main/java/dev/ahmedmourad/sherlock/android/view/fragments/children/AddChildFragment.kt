@@ -129,7 +129,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     //This's temporary and is here for debugging purposes
     private fun addErrorObservers() {
-        observeAll(viewModel.firstNameError,
+        observeAll(viewModel.userError,
+                viewModel.firstNameError,
                 viewModel.lastNameError,
                 viewModel.nameError,
                 viewModel.minAgeError,
@@ -144,6 +145,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                 viewModel.childError, observer = Observer { msg ->
             msg?.let {
                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                viewModel.onUserErrorHandled()
                 viewModel.onFirstNameErrorHandled()
                 viewModel.onLastNameErrorHandled()
                 viewModel.onNameErrorHandled()
