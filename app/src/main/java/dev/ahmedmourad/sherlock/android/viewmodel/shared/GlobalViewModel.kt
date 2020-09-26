@@ -39,7 +39,7 @@ internal class GlobalViewModel(
                             resultsEither.fold<InternetConnectivityState>(ifLeft = { e ->
                                 when (e) {
                                     is ObserveInternetConnectivityInteractor.Exception.UnknownException -> {
-                                        Timber.error(message = e::toString)
+                                        Timber.error(e.origin, e::toString)
                                         InternetConnectivityState.Error
                                     }
                                 }
@@ -66,9 +66,13 @@ internal class GlobalViewModel(
                                 UserState.NoInternet
                             }
 
-                            is ObserveSignedInUserInteractor.Exception.InternalException,
+                            is ObserveSignedInUserInteractor.Exception.InternalException -> {
+                                Timber.error(e.origin, e::toString)
+                                UserState.Error
+                            }
+
                             is ObserveSignedInUserInteractor.Exception.UnknownException -> {
-                                Timber.error(message = e::toString)
+                                Timber.error(e.origin, e::toString)
                                 UserState.Error
                             }
                         }

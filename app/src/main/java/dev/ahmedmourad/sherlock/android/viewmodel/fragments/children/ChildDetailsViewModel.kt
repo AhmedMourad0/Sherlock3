@@ -49,12 +49,12 @@ internal class ChildDetailsViewModel(
                                     }
 
                                     is FindChildInteractor.Exception.InternalException -> {
-                                        Timber.error(message = e::toString)
+                                        Timber.error(e.origin, e::toString)
                                         State.Error
                                     }
 
                                     is FindChildInteractor.Exception.UnknownException -> {
-                                        Timber.error(message = e::toString)
+                                        Timber.error(e.origin, e::toString)
                                         State.Error
                                     }
                                 }
