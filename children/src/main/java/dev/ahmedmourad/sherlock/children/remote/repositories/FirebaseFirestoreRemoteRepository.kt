@@ -225,7 +225,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap { either ->
+                .switchMap { either ->
                     either.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { snapshot ->
@@ -364,7 +364,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                                     RemoteRepository.FindAllInvestigationsException.NoInternetConnectionException.left()
                             )
                     })
-                }.flatMap { isUserSignedInEither ->
+                }.switchMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { signedInUser ->
@@ -582,7 +582,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                             }
                         }
                     }
-                }.flatMap { either ->
+                }.switchMap { either ->
                     either.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { snapshotsToUserIds ->
