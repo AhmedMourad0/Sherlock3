@@ -54,26 +54,21 @@ internal object Contract {
             }
         }
 
-        object ChildrenUserSpecifics {
+        object Investigations {
 
-            const val PATH = "children_user_specifics"
+            const val PATH = "investigations"
 
-            object Investigations {
-
-                const val PATH = "investigations"
-
-                const val USER_ID = "user_id"
-                const val TIMESTAMP = "timestamp"
-                const val FIRST_NAME = "first_name"
-                const val LAST_NAME = "last_name"
-                const val LATITUDE = "latitude"
-                const val LONGITUDE = "longitude"
-                const val GENDER = "gender"
-                const val SKIN = "skin"
-                const val HAIR = "hair"
-                const val AGE = "age"
-                const val HEIGHT = "height"
-            }
+            const val USER_ID = "user_id"
+            const val TIMESTAMP = "timestamp"
+            const val FIRST_NAME = "first_name"
+            const val LAST_NAME = "last_name"
+            const val LATITUDE = "latitude"
+            const val LONGITUDE = "longitude"
+            const val GENDER = "gender"
+            const val SKIN = "skin"
+            const val HAIR = "hair"
+            const val AGE = "age"
+            const val HEIGHT = "height"
         }
     }
 }

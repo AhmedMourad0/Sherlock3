@@ -40,6 +40,8 @@ internal class FirebaseStorageImageRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                ImageRepository.StoreUserPictureException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 ImageRepository.StoreUserPictureException.UnknownException(this.origin)
         }

@@ -3,7 +3,6 @@ package dev.ahmedmourad.sherlock.android.view.fragments.children
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -58,7 +57,6 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChildDetailsBinding.bind(view)
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding?.toolbar)
 
         observe(viewModel.state, Observer { state ->
             when (state) {
@@ -146,7 +144,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
             )
 
             val name = textFormatter.get().formatName(result.first.name)
-            b.toolbar.title = name
+            b.title.text = name
             b.childName.text = name
 
             b.childAge.text = textFormatter.get().formatAge(result.first.appearance.ageRange)

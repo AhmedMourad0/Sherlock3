@@ -8,6 +8,7 @@ import dev.ahmedmourad.sherlock.android.interpreters.model.localizedMessage
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
+import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePathNullable
 import dev.ahmedmourad.sherlock.domain.model.auth.SignUpUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
@@ -62,6 +63,23 @@ internal fun validatePhoneNumber(fullNumber: String?): Either<String, PhoneNumbe
     }
 
     return PhoneNumber.of(fullNumber).mapLeft(PhoneNumber.Exception::localizedMessage)
+}
+
+internal fun validatePictureEitherNullable(value: String?): Either<String, Either<Url, PicturePath>?> {
+
+    if (value == null) {
+        return null.right()
+    }
+
+    return Url.of(value).fold(ifLeft = { _ ->
+        validatePicturePathNullable(value).fold<Either<String, Either<Url, PicturePath>?>>(ifLeft = {
+            it.left()
+        }, ifRight = {
+            it?.right()?.right() ?: null.right()
+        })
+    }, ifRight = {
+        it.left().right()
+    })
 }
 
 internal fun validateAppCompletedUser(

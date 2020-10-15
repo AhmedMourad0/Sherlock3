@@ -113,10 +113,10 @@
 	<dimen name="displayChildCardCornerRadius">1dp</dimen>
 	<dimen name="displayChildCardElevation">2dp</dimen>
 	
-	<!-- SearchResultsController -->
+	<!-- Recyclers -->
 	
-	<dimen name="searchResultsRecyclerPaddingBottom">4dp</dimen>
-	<dimen name="searchResultsRecyclerPaddingTop">4dp</dimen>
+	<dimen name="recyclerPaddingBottom">12dp</dimen>
+	<dimen name="recyclerPaddingTop">28dp</dimen>
 	
 	<!-- ResultItem -->
 	

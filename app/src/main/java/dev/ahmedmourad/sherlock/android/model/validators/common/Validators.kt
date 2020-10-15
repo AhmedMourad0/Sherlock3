@@ -1,9 +1,15 @@
 package dev.ahmedmourad.sherlock.android.model.validators.common
 
 import arrow.core.Either
+import arrow.core.right
 import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
 import splitties.init.appCtx
+
+internal fun validatePicturePathNullable(value: String?): Either<String, PicturePath?> {
+    value ?: return null.right()
+    return validatePicturePath(value)
+}
 
 internal fun validatePicturePath(value: String): Either<String, PicturePath> {
     return PicturePath.of(value).mapLeft {

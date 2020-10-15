@@ -59,7 +59,7 @@
 			app:srcCompat="@drawable/ic_google_maps" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/materialTextView3"
+			android:id="@+id/age_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:paddingStart="@dimen/findChildrenLabelPaddingStart"
@@ -76,14 +76,14 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="20dp"
-			app:layout_constraintStart_toEndOf="@+id/materialTextView3"
+			app:layout_constraintStart_toEndOf="@+id/age_text_view"
 			app:layout_constraintTop_toBottomOf="@+id/location"
 			app:maxValue="30"
 			app:minValue="0"
 			app:value="@integer/find_children_age_number_picker_default_value" />
 		
 		<com.google.android.material.textview.MaterialTextView
-			android:id="@+id/materialTextView4"
+			android:id="@+id/height_text_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="32dp"
@@ -101,7 +101,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			app:layout_constraintBottom_toBottomOf="@+id/age_number_picker"
-			app:layout_constraintStart_toEndOf="@+id/materialTextView4"
+			app:layout_constraintStart_toEndOf="@+id/height_text_view"
 			app:layout_constraintTop_toTopOf="@+id/age_number_picker"
 			app:maxValue="200"
 			app:minValue="30"

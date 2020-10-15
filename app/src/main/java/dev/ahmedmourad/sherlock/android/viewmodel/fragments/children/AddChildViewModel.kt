@@ -11,10 +11,11 @@ import arrow.core.orNull
 import arrow.core.toOption
 import dagger.Lazy
 import dagger.Reusable
+import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
-import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
+import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePathNullable
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.services.SherlockServiceIntentFactory
@@ -203,7 +204,7 @@ internal class AddChildViewModel(
                 .childPublishingState
                 .retry()
                 .observeOn(AndroidSchedulers.mainThread())
-                .toFlowable(BackpressureStrategy.LATEST)
+                .toFlowable(BackpressureStrategy.BUFFER)
                 .toLiveData()
     }
 
@@ -217,10 +218,10 @@ internal class AddChildViewModel(
         return Either.fx<Unit, AppChildToPublish> {
 
             val u = !user.toOption().toEither {
-                savedStateHandle.set(KEY_ERROR_USER, "This action requires authentication")
+                savedStateHandle.set(KEY_ERROR_USER, appCtx.getString(R.string.authentication_needed))
             }
 
-            val firstName = !validateName(firstName.value).mapLeft {
+            val firstName = !validateNameNullable(firstName.value).mapLeft {
                 savedStateHandle.set(KEY_ERROR_FIRST_NAME, it)
             }
 
@@ -240,7 +241,7 @@ internal class AddChildViewModel(
                 savedStateHandle.set(KEY_ERROR_MAX_AGE, it)
             }
 
-            val ageRange = !validateAgeRange(minAge, maxAge).mapLeft {
+            val ageRange = !validateAgeRangeNullable(minAge, maxAge).mapLeft {
                 savedStateHandle.set(KEY_ERROR_AGE, it)
             }
 
@@ -252,7 +253,7 @@ internal class AddChildViewModel(
                 savedStateHandle.set(KEY_ERROR_MAX_HEIGHT, it)
             }
 
-            val heightRange = !validateHeightRange(minHeight, maxHeight).mapLeft {
+            val heightRange = !validateHeightRangeNullable(minHeight, maxHeight).mapLeft {
                 savedStateHandle.set(KEY_ERROR_HEIGHT, it)
             }
 
@@ -266,28 +267,25 @@ internal class AddChildViewModel(
                 savedStateHandle.set(KEY_ERROR_APPEARANCE, it)
             }
 
-            val coordinates = location.value?.let { placePicker ->
-                validateCoordinates(placePicker.latitude, placePicker.longitude).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                }.bind()
+            val coordinates = !validateCoordinatesNullable(
+                    location.value?.latitude,
+                    location.value?.longitude
+            ).mapLeft {
+                savedStateHandle.set(KEY_ERROR_LOCATION, it)
             }
 
-            val location = location.value?.let { loc ->
-                validateLocation(
-                        loc.id,
-                        loc.name,
-                        loc.address,
-                        coordinates
-                ).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                }.bind()
+            val location = !validateLocationNullable(
+                    location.value?.id,
+                    location.value?.name,
+                    location.value?.address,
+                    coordinates
+            ).mapLeft {
+                savedStateHandle.set(KEY_ERROR_LOCATION, it)
             }
 
-            val picturePath = picturePath.value?.let { picturePath ->
-                validatePicturePath(picturePath.value).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
-                }
-            }?.bind()
+            val picturePath = !validatePicturePathNullable(picturePath.value?.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
+            }
 
             validateAppPublishedChild(
                     u.simplify(),

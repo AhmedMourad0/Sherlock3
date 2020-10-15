@@ -54,7 +54,7 @@ internal fun validateNameNullable(value: String?): Either<String, Name?> {
     return value?.let(::validateName) ?: null.right()
 }
 
-internal fun validateAgeRange(
+internal fun validateAgeRangeNullable(
         minAge: Age?,
         maxAge: Age?
 ): Either<String, AgeRange?> {
@@ -87,7 +87,7 @@ internal fun validateAgeNullable(value: Int?): Either<String, Age?> {
     }
 }
 
-internal fun validateHeightRange(
+internal fun validateHeightRangeNullable(
         minHeight: Height?,
         maxHeight: Height?
 ): Either<String, HeightRange?> {
@@ -150,17 +150,19 @@ internal fun validateHair(hair: Int?): Either<String, Hair> {
             ?: appCtx.getString(R.string.hair_color_missing).left()
 }
 
-internal fun validateCoordinates(latitude: Double?, longitude: Double?): Either<String, Coordinates?> {
+internal fun validateCoordinatesNullable(latitude: Double?, longitude: Double?): Either<String, Coordinates?> {
     latitude ?: return null.right()
     longitude ?: return null.right()
     return Coordinates.of(latitude, longitude).mapLeft(Coordinates.Exception::localizedMessage)
 }
 
-internal fun validateCoordinates(coordinates: Coordinates?): Either<String, Coordinates> {
-    return coordinates?.right() ?: appCtx.getString(R.string.invalid_last_known_location).left()
+internal fun validateCoordinates(latitude: Double?, longitude: Double?): Either<String, Coordinates> {
+    latitude ?: return appCtx.getString(R.string.invalid_last_known_location).left()
+    longitude ?: return appCtx.getString(R.string.invalid_last_known_location).left()
+    return Coordinates.of(latitude, longitude).mapLeft(Coordinates.Exception::localizedMessage)
 }
 
-internal fun validateLocation(
+internal fun validateLocationNullable(
         id: String?,
         name: String?,
         address: String?,

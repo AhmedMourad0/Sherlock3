@@ -1,5 +1,8 @@
 package dev.ahmedmourad.sherlock.domain.constants
 
-enum class BackgroundState {
-    FAILURE, ONGOING, SUCCESS
+sealed class BackgroundState {
+    object Ongoing : BackgroundState()
+    data class Success(val consume: () -> Unit) : BackgroundState()
+    data class Failure(val consume: () -> Unit) : BackgroundState()
+    object Idle : BackgroundState()
 }

@@ -48,7 +48,7 @@ data class ChildrenQuery private constructor(
                      appearance: ExactAppearance,
                      page: Int
         ): Exception? {
-            return if (page < 0) {
+            return if (page >= 0) {
                 null
             } else {
                 Exception.InvalidPageNumberException

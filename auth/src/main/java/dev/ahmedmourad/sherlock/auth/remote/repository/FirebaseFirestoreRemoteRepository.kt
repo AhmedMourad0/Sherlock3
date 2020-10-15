@@ -60,6 +60,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.StoreSignUpUserException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.StoreSignUpUserException.UnknownException(this.origin)
         }
@@ -133,6 +135,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.FindSignedInUserException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.FindSignedInUserException.UnknownException(this.origin)
         }
@@ -214,6 +218,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.FindSimpleUsersException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.FindSimpleUsersException.UnknownException(this.origin)
         }
@@ -291,6 +297,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.UpdateUserLastLoginDateException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.UpdateUserLastLoginDateException.UnknownException(this.origin)
         }

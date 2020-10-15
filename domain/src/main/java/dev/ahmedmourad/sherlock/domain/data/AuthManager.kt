@@ -55,6 +55,7 @@ interface AuthManager {
     fun signOut(): Single<Either<SignOutException, Unit>>
 
     sealed class ObserveUserAuthStateException {
+        object NoInternetConnectionException : ObserveUserAuthStateException()
         data class UnknownException(val origin: Throwable) : ObserveUserAuthStateException()
     }
 

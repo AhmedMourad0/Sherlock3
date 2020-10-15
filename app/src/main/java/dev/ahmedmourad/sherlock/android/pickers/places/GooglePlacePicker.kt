@@ -41,11 +41,9 @@ internal class GooglePlacePicker @Inject constructor() : PlacePicker {
         }
     }
 
-    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect) {
+    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect): Boolean? {
         if (requestCode == this.requestCode) {
-
-            val place = DelegatePlacePicker.getPlace(appCtx, data) ?: return
-
+            val place = DelegatePlacePicker.getPlace(appCtx, data) ?: return false
             onSelect(PlacePicker.Location(
                     place.id,
                     place.name.toString(),
@@ -53,6 +51,9 @@ internal class GooglePlacePicker @Inject constructor() : PlacePicker {
                     place.latLng.latitude,
                     place.latLng.longitude
             ))
+            return true
+        } else {
+            return null
         }
     }
 }

@@ -7,27 +7,19 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import arrow.core.Either
 import arrow.core.extensions.fx
-import arrow.core.left
 import arrow.core.orNull
-import arrow.core.right
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.bundlizer.bundle
 import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppCompletedUser
-import dev.ahmedmourad.sherlock.android.model.validators.auth.validateAppCompletedUser
-import dev.ahmedmourad.sherlock.android.model.validators.auth.validateDisplayName
-import dev.ahmedmourad.sherlock.android.model.validators.auth.validateEmail
-import dev.ahmedmourad.sherlock.android.model.validators.auth.validatePhoneNumber
-import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
+import dev.ahmedmourad.sherlock.android.model.validators.auth.*
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.CompleteSignUpInteractor
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
-import dev.ahmedmourad.sherlock.domain.model.common.PicturePath
-import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import dev.ahmedmourad.sherlock.domain.utils.disposable
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
@@ -187,15 +179,9 @@ internal class CompleteSignUpViewModel(
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
             }
 
-            val picture = picture.value?.let { pic ->
-                Url.of(pic.value).fold(ifLeft = {
-                    validatePicturePath(pic.value).bimap(leftOperation = {
-                        savedStateHandle.set(KEY_ERROR_PICTURE, it)
-                    }, rightOperation = PicturePath::right)
-                }, ifRight = {
-                    it.left().right()
-                })
-            }?.bind()
+            val picture = !validatePictureEitherNullable(picture.value?.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PICTURE, it)
+            }
 
             validateAppCompletedUser(
                     id,

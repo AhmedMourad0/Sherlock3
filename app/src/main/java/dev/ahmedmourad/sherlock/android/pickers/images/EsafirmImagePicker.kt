@@ -52,10 +52,13 @@ internal class EsafirmImagePicker @Inject constructor() : ImagePicker {
         }
     }
 
-    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect) {
+    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect): Boolean? {
         if (requestCode == this.requestCode) {
-            val path = DelegateImagePicker.getFirstImageOrNull(data)?.path ?: return
+            val path = DelegateImagePicker.getFirstImageOrNull(data)?.path ?: return false
             onSelect(ImagePicker.PicturePath(path))
+            return true
+        } else {
+            return null
         }
     }
 }

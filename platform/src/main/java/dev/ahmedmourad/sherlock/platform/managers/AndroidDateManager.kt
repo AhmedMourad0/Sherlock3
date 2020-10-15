@@ -17,7 +17,7 @@ internal class AndroidDateManager @Inject constructor() : DateManager {
                 timeMillis,
                 minResolution,
                 transitionResolution,
-                DateUtils.FORMAT_ABBREV_MONTH or DateUtils.FORMAT_ABBREV_WEEKDAY
+                0
         ).toString()
     }
 }

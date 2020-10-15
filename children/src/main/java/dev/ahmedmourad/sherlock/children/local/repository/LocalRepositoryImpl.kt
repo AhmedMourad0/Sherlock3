@@ -21,10 +21,10 @@ internal class LocalRepositoryImpl @Inject constructor(
         @InternalApi private val childrenDao: ChildrenDao
 ) : LocalRepository {
 
-    override fun updateRetainingWeight(
+    override fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
     ): Flowable<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
-        return childrenDao.updateRetainingWeight(item)
+        return childrenDao.insertOrReplaceRetainingWeight(item)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .map<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> { it.right() }

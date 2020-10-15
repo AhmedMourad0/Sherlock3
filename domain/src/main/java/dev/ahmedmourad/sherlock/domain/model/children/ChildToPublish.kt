@@ -101,7 +101,7 @@ data class ChildToPublish private constructor(
                      appearance: ApproximateAppearance,
                      picture: ByteArray?
         ): Exception? {
-            return if (name != null || notes != null || location != null || picture != null) {
+            return if (name != null || location != null || picture != null) {
                 null
             } else {
                 Exception.NotEnoughDetailsException

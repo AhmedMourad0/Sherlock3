@@ -26,7 +26,7 @@ internal class InvestigationsRecyclerAdapter(
     private val items = ArrayList<Investigation>()
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(container.context).inflate(R.layout.item_child_result, container, false))
+        return ViewHolder(LayoutInflater.from(container.context).inflate(R.layout.item_investigation, container, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(items[position])

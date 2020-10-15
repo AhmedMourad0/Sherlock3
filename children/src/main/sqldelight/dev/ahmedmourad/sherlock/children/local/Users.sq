@@ -39,3 +39,14 @@ WHERE id = ?;
 
 deleteAll:
 DELETE FROM users;
+
+findUserById:
+SELECT
+    display_name,
+    picture_url,
+    timestamp,
+    last_login_timestamp,
+    email,
+    username,
+    phone_number
+FROM users WHERE id = ?;

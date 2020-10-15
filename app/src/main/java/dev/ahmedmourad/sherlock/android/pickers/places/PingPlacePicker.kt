@@ -45,9 +45,9 @@ internal class PingPlacePicker @Inject constructor() : PlacePicker {
         }
     }
 
-    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect) {
+    override fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect): Boolean? {
         if (requestCode == this.requestCode) {
-            val place = DelegatePlacePicker.getPlace(data) ?: return
+            val place = DelegatePlacePicker.getPlace(data) ?: return false
             onSelect(PlacePicker.Location(
                     place.id,
                     place.name,
@@ -55,6 +55,9 @@ internal class PingPlacePicker @Inject constructor() : PlacePicker {
                     place.latLng?.latitude,
                     place.latLng?.longitude
             ))
+            return true
+        } else {
+            return null
         }
     }
 }

@@ -5,7 +5,7 @@ interface DateManager {
     fun getRelativeDateTimeString(
             timeMillis: Long,
             minResolution: Long = MINUTE_IN_MILLIS,
-            transitionResolution: Long = YEAR_IN_MILLIS
+            transitionResolution: Long = WEEK_IN_MILLIS
     ): String
 
     companion object {

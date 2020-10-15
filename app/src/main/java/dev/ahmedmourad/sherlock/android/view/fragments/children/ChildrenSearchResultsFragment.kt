@@ -25,6 +25,7 @@ import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.ChildrenSea
 import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
+import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import splitties.init.appCtx
 import javax.inject.Inject
@@ -217,7 +218,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
             adapter = adapterFactory {
                 findNavController().navigate(
                         ChildrenSearchResultsFragmentDirections
-                                .actionChildrenSearchResultsFragmentToChildDetailsFragment(it.a.bundle(SimpleRetrievedChild.serializer()))
+                                .actionChildrenSearchResultsFragmentToChildDetailsFragment(it.a.id.bundle(ChildId.serializer()))
                 )
             }
 
