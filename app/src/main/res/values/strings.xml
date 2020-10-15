@@ -76,7 +76,7 @@
 	<string name="sign_in_with_google">Sign in with Google</string>
 	<string name="sign_in_with_facebook">Sign in with Facebook</string>
 	<string name="sign_in_with_twitter">Sign in with Twitter</string>
-	<string name="email_address">Email address</string>
+	<string name="email_address">Email Address</string>
 	<string name="password">Password</string>
 	<string name="your_name">Your name</string>
 	<string name="confirm_password">Confirm password</string>
@@ -86,12 +86,12 @@
 	<string name="sign_up_with_facebook">Sign up with Facebook</string>
 	<string name="sign_up_with_google">Sign up with Google</string>
 	<string name="sign_up_with_twitter">Sign up with Twitter</string>
-	<string name="phone_number">Phone number</string>
+	<string name="phone_number">Phone Number</string>
 	<string name="upload_profile_picture">Upload profile picture</string>
 	<string name="change_profile_picture">Change profile picture</string>
 	<string name="complete">Complete</string>
 	<string name="send_email">Send email</string>
-	<string name="joined_on">Joined on</string>
+	<string name="joined_on">Joined On</string>
 	<string name="child_data_missing">This child\'s data doesn\'t exists or has been deleted!</string>
 	<string name="child_not_enough_details">Please provide more details about the child</string>
 	<string name="first_name_missing">A child cannot have a last name without a first name</string>
@@ -191,5 +191,8 @@
 	<string name="not_signed_in">You are not signed in!</string>
 	<string name="sign_in_needed_to_view">You need to be signed in to view this!</string>
 	<string name="starting_investigation">Starting investigation!</string>
+	<string name="child_details">Child Details</string>
+	<string name="child_description">Child Description</string>
+	<string name="other_details">Other Details</string>
 
 </resources>

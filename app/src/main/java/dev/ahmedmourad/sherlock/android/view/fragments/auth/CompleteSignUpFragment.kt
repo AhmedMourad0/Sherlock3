@@ -98,6 +98,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
                     b.pictureTextView,
                     b.completeButton
             ).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 

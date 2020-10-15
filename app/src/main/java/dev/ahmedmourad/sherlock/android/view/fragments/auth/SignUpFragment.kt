@@ -133,6 +133,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
                     b.signUpWithFacebookImageView,
                     b.signUpWithTwitterImageView
             ).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 

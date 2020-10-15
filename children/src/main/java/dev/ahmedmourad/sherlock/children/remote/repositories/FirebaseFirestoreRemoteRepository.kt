@@ -1,9 +1,6 @@
 package dev.ahmedmourad.sherlock.children.remote.repositories
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.orNull
-import arrow.core.right
+import arrow.core.*
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
 import dagger.Lazy
@@ -34,6 +31,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import splitties.init.appCtx
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Reusable
@@ -67,6 +65,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.PublishException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.PublishException.UnknownException(this.origin)
         }
@@ -144,6 +144,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.FindException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.FindException.UnknownException(this.origin)
         }
@@ -274,6 +276,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.AddInvestigationException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.AddInvestigationException.UnknownException(this.origin)
         }
@@ -325,9 +329,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 )
             }
 
-            db.get().collection(Contract.Database.ChildrenUserSpecifics.PATH)
-                    .document(investigation.user.id.value)
-                    .collection(Contract.Database.ChildrenUserSpecifics.Investigations.PATH)
+            db.get().collection(Contract.Database.Investigations.PATH)
                     .document(UUID.randomUUID().toString())
                     .set(investigation.toMap())
                     .addOnSuccessListener(successListener)
@@ -399,9 +401,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             }
 
             val registration = db.get()
-                    .collection(Contract.Database.ChildrenUserSpecifics.PATH)
-                    .document(user.id.value)
-                    .collection(Contract.Database.ChildrenUserSpecifics.Investigations.PATH)
+                    .collection(Contract.Database.Investigations.PATH)
+                    .whereEqualTo(Contract.Database.Investigations.USER_ID, user.id.value)
                     .addSnapshotListener(snapshotListener)
 
             emitter.setCancellable { registration.remove() }
@@ -419,6 +420,8 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }
 
         fun AuthManager.ObserveUserAuthStateException.map() = when (this) {
+            AuthManager.ObserveUserAuthStateException.NoInternetConnectionException ->
+                RemoteRepository.FindAllException.NoInternetConnectionException
             is AuthManager.ObserveUserAuthStateException.UnknownException ->
                 RemoteRepository.FindAllException.UnknownException(this.origin)
         }
@@ -462,8 +465,18 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 }.switchMap { queryResultsEither ->
                     queryResultsEither.fold(ifLeft = {
                         Flowable.just(it.left())
-                    }, ifRight = {
-                        findChildren(it)
+                    }, ifRight = { results ->
+                        results.chunked(10)
+                                .map(this::findChildren)
+                                .reduceOrNull { acc, flowable ->
+                                    acc.switchMap { firstEither ->
+                                        flowable.map { secondEither ->
+                                            firstEither.flatMap { first ->
+                                                secondEither.map { second -> first + second }
+                                            }
+                                        }
+                                    }
+                                } ?: Flowable.just(emptyMap<SimpleRetrievedChild, Weight>().right())
                     })
                 }
     }
@@ -509,11 +522,11 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
                 } else if (snapshot != null) {
 
-                    emitter.onNext(
-                            snapshot.documents
-                                    .filter(DocumentSnapshot::exists)
-                                    .mapNotNull { extractQueryResult(it).orNull() }
-                                    .right()
+                    emitter.onNext(snapshot.documents
+                            .filter(DocumentSnapshot::exists)
+                            .mapNotNull { extractQueryResult(it).orNull() }
+                            .distinct()
+                            .right()
                     )
                 }
             }
@@ -526,7 +539,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
             emitter.setCancellable { registration.remove() }
 
-        }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+        }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .debounce(1, TimeUnit.SECONDS)
     }
 
     private fun findChildren(
@@ -586,15 +601,15 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     either.fold(ifLeft = {
                         Flowable.just(it.left())
                     }, ifRight = { snapshotsToUserIds ->
-                        findSimpleUsers.invoke(snapshotsToUserIds.map(Pair<DocumentSnapshot, UserId>::second))
+                        findSimpleUsers.invoke(snapshotsToUserIds.map(Pair<DocumentSnapshot, UserId>::second).distinct())
                                 .map { either ->
                                     either.fold(ifLeft = {
                                         it.map().left()
                                     }) { users ->
-                                        users.mapNotNull { user ->
-                                            snapshotsToUserIds.firstOrNull { (_, id) ->
-                                                id == user.id
-                                            }?.let { pair -> pair.first to user }
+                                        snapshotsToUserIds.mapNotNull { (snapshot, id) ->
+                                            users.firstOrNull { user ->
+                                                user.id == id
+                                            }?.let { snapshot to it }
                                         }.mapNotNull { (snapshot, user) ->
                                             extractSimpleRetrievedChild(snapshot, user).orNull()
                                         }.associateWith { child ->

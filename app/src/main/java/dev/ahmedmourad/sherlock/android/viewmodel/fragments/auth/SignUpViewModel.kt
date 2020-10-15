@@ -15,7 +15,7 @@ import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.loader.ImageLoader
 import dev.ahmedmourad.sherlock.android.model.auth.AppSignUpUser
 import dev.ahmedmourad.sherlock.android.model.validators.auth.*
-import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePath
+import dev.ahmedmourad.sherlock.android.model.validators.common.validatePicturePathNullable
 import dev.ahmedmourad.sherlock.android.pickers.images.ImagePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.interactors.auth.SignInWithFacebookInteractor
@@ -461,11 +461,9 @@ internal class SignUpViewModel(
                 savedStateHandle.set(KEY_ERROR_PHONE_NUMBER, it)
             }
 
-            val picturePath = picturePath.value?.let { pp ->
-                validatePicturePath(pp.value).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
-                }
-            }?.bind()
+            val picturePath = !validatePicturePathNullable(picturePath.value?.value).mapLeft {
+                savedStateHandle.set(KEY_ERROR_PICTURE_PATH, it)
+            }
 
             validateAppSignUpUser(
                     credentials,

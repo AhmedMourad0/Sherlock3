@@ -29,7 +29,9 @@
 			app:argType="android.os.Bundle" />
 		<action
 			android:id="@+id/action_addChildFragment_to_childDetailsFragment"
-			app:destination="@id/childDetailsFragment" />
+			app:destination="@id/childDetailsFragment"
+			app:popUpTo="@id/addChildFragment"
+			app:popUpToInclusive="true" />
 	</fragment>
 	<fragment
 		android:id="@+id/findChildrenFragment"

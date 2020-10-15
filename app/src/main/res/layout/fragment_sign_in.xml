@@ -100,7 +100,8 @@
 				android:imeOptions="actionNext"
 				android:inputType="textEmailAddress"
 				android:maxLines="1"
-				tools:targetApi="o" />
+				tools:targetApi="o"
+				android:alpha="0.6" />
 		
 		</com.google.android.material.textfield.TextInputLayout>
 		
@@ -125,7 +126,8 @@
 				android:imeOptions="actionDone"
 				android:inputType="textVisiblePassword"
 				android:maxLines="1"
-				tools:targetApi="o" />
+				tools:targetApi="o"
+				android:alpha="0.6" />
 		
 		</com.google.android.material.textfield.TextInputLayout>
 		

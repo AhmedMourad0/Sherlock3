@@ -81,17 +81,17 @@ fun ChildrenQuery.toMap(): Map<String, Any?> = hashMapOf(
 )
 
 fun Investigation.toMap(): Map<String, Any?> = hashMapOf(
-        Contract.Database.ChildrenUserSpecifics.Investigations.TIMESTAMP to FieldValue.serverTimestamp(),
-        Contract.Database.ChildrenUserSpecifics.Investigations.USER_ID to this.user.id.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.FIRST_NAME to this.fullName.first.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.LAST_NAME to this.fullName.last.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.LATITUDE to this.coordinates.latitude,
-        Contract.Database.ChildrenUserSpecifics.Investigations.LONGITUDE to this.coordinates.longitude,
-        Contract.Database.ChildrenUserSpecifics.Investigations.GENDER to this.appearance.gender.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.SKIN to this.appearance.skin.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.HAIR to this.appearance.hair.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.AGE to this.appearance.age.value,
-        Contract.Database.ChildrenUserSpecifics.Investigations.HEIGHT to this.appearance.height.value
+        Contract.Database.Investigations.TIMESTAMP to FieldValue.serverTimestamp(),
+        Contract.Database.Investigations.USER_ID to this.user.id.value,
+        Contract.Database.Investigations.FIRST_NAME to this.fullName.first.value,
+        Contract.Database.Investigations.LAST_NAME to this.fullName.last.value,
+        Contract.Database.Investigations.LATITUDE to this.coordinates.latitude,
+        Contract.Database.Investigations.LONGITUDE to this.coordinates.longitude,
+        Contract.Database.Investigations.GENDER to this.appearance.gender.value,
+        Contract.Database.Investigations.SKIN to this.appearance.skin.value,
+        Contract.Database.Investigations.HAIR to this.appearance.hair.value,
+        Contract.Database.Investigations.AGE to this.appearance.age.value,
+        Contract.Database.Investigations.HEIGHT to this.appearance.height.value
 )
 
 internal fun extractQueryResult(
@@ -101,7 +101,7 @@ internal fun extractQueryResult(
     val id = QueryId(snapshot.id)
 
     val childId = snapshot.getString(Contract.Database.Queries.Results.CHILD_ID)
-            ?.let(::ChildId) ?: return ModelCreationException("timestamp is null for id=$id").left()
+            ?.let(::ChildId) ?: return ModelCreationException("childId is null for id=$id").left()
 
     return Either.fx {
 
@@ -125,19 +125,19 @@ internal fun extractChildInvestigation(
 
     val id = snapshot.id
 
-    val timestamp = snapshot.getTimestamp(Contract.Database.ChildrenUserSpecifics.Investigations.TIMESTAMP)
+    val timestamp = snapshot.getTimestamp(Contract.Database.Investigations.TIMESTAMP)
             ?.seconds
             ?.let { it * 1000L }
             ?: return ModelCreationException("timestamp is null for id=$id").left()
 
     return Either.fx {
 
-        val firstName = snapshot.getString(Contract.Database.ChildrenUserSpecifics.Investigations.FIRST_NAME)
+        val firstName = snapshot.getString(Contract.Database.Investigations.FIRST_NAME)
                 ?.let(Name.Companion::of)
                 ?.mapLeft { ModelCreationException(it.toString()) }
                 ?: ModelCreationException("first name is null for id=$id").left()
 
-        val lastName = snapshot.getString(Contract.Database.ChildrenUserSpecifics.Investigations.LAST_NAME)
+        val lastName = snapshot.getString(Contract.Database.Investigations.LAST_NAME)
                 ?.let(Name.Companion::of)
                 ?.mapLeft { ModelCreationException(it.toString()) }
                 ?: ModelCreationException("last name is null for id=$id").left()
@@ -146,8 +146,8 @@ internal fun extractChildInvestigation(
 
         val coordinates = extractCoordinates(
                 snapshot,
-                Contract.Database.ChildrenUserSpecifics.Investigations.LATITUDE,
-                Contract.Database.ChildrenUserSpecifics.Investigations.LONGITUDE
+                Contract.Database.Investigations.LATITUDE,
+                Contract.Database.Investigations.LONGITUDE
         ).bind()?.right() ?: ModelCreationException("last name is null for id=$id").left()
 
         val appearance = extractExactAppearance(snapshot, id).bind()
@@ -373,31 +373,31 @@ private fun extractExactAppearance(
 ): Either<ModelCreationException, ExactAppearance> {
     return Either.fx {
 
-        val gender = snapshot.getLong(Contract.Database.ChildrenUserSpecifics.Investigations.GENDER)
+        val gender = snapshot.getLong(Contract.Database.Investigations.GENDER)
                 ?.toInt()
                 ?.let { findEnum(it, Gender.values()) }
                 ?.right()
                 ?: ModelCreationException("gender is null for id=$id").left()
 
-        val skin = snapshot.getLong(Contract.Database.ChildrenUserSpecifics.Investigations.SKIN)
+        val skin = snapshot.getLong(Contract.Database.Investigations.SKIN)
                 ?.toInt()
                 ?.let { findEnum(it, Skin.values()) }
                 ?.right()
                 ?: ModelCreationException("skin is null for id=$id").left()
 
-        val hair = snapshot.getLong(Contract.Database.ChildrenUserSpecifics.Investigations.HAIR)
+        val hair = snapshot.getLong(Contract.Database.Investigations.HAIR)
                 ?.toInt()
                 ?.let { findEnum(it, Hair.values()) }
                 ?.right()
                 ?: ModelCreationException("hair is null for id=$id").left()
 
-        val age = snapshot.getLong(Contract.Database.ChildrenUserSpecifics.Investigations.AGE)
+        val age = snapshot.getLong(Contract.Database.Investigations.AGE)
                 ?.toInt()
                 ?.let(Age.Companion::of)
                 ?.mapLeft { ModelCreationException(it.toString()) }
                 ?: ModelCreationException("age is null for id=$id").left()
 
-        val height = snapshot.getLong(Contract.Database.ChildrenUserSpecifics.Investigations.HEIGHT)
+        val height = snapshot.getLong(Contract.Database.Investigations.HEIGHT)
                 ?.toInt()
                 ?.let(Height.Companion::of)
                 ?.mapLeft { ModelCreationException(it.toString()) }

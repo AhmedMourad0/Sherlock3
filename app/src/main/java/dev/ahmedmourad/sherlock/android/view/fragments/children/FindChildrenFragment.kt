@@ -76,6 +76,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         initializeNumberPickers()
         initializeLocationTextView()
         addErrorObservers()
+        addOpacityObservers()
 
         observe(globalViewModel.internetConnectivityState, Observer { state ->
             when (state) {
@@ -101,7 +102,9 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     b.hair.hairBlonde,
                     b.hair.hairBrown,
                     b.hair.hairDark,
-                    b.searchButton).forEach { it.setOnClickListener(this) }
+                    b.searchButton
+            ).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 
@@ -137,6 +140,53 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         })
     }
 
+    private fun addOpacityObservers() {
+        binding?.let { b ->
+
+            observe(viewModel.firstName, Observer {
+                b.name.firstNameEditText.alpha = if (it == null) 0.3f else 0.6f
+            })
+
+            observe(viewModel.lastName, Observer {
+                b.name.lastNameEditText.alpha = if (it == null) 0.3f else 0.6f
+            })
+
+            observe(viewModel.skin, Observer {
+                b.skin.skinWhite.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinWheat.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinDark.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.hair, Observer {
+                b.hair.hairBlonde.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairBrown.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairDark.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.gender, Observer {
+                b.gender.genderRadioGroup.alpha = if (it == null) 0.6f else 1f
+                b.gender.genderTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.location, Observer {
+                b.location.alpha = if (it == null) 0.6f else 1f
+                b.locationImageView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.age, Observer {
+                b.ageNumberPicker.alpha = if (it == null) 0.6f else 1f
+                b.ageTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.height, Observer {
+                b.heightNumberPicker.alpha = if (it == null) 0.6f else 1f
+                b.heightTextView.alpha = if (it == null) 0.6f else 1f
+            })
+        }
+    }
+
     private fun setInternetDependantViewsEnabled(enabled: Boolean) {
         setLocationEnabled(enabled)
     }
@@ -148,9 +198,8 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     ColorSelector.newItem(Skin.WHEAT, b.skin.skinWheat, R.color.colorSkinWheat),
                     ColorSelector.newItem(Skin.DARK, b.skin.skinDark, R.color.colorSkinDark),
                     default = viewModel.skin.value?.let { findEnum(it, Skin.values()) }
-                            ?: Skin.WHITE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.onSkinChange(it.value) }
+                onSelectionChangeListeners.add { viewModel.onSkinChange(it?.value) }
             }
         }
     }
@@ -162,9 +211,8 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
                     ColorSelector.newItem(Hair.BROWN, b.hair.hairBrown, R.color.colorHairBrown),
                     ColorSelector.newItem(Hair.DARK, b.hair.hairDark, R.color.colorHairDark),
                     default = viewModel.hair.value?.let { findEnum(it, Hair.values()) }
-                            ?: Hair.BLONDE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.onHairChange(it.value) }
+                onSelectionChangeListeners.add { viewModel.onHairChange(it?.value) }
             }
         }
     }
@@ -217,6 +265,22 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
             b.heightNumberPicker.setOnValueChangedListener { _, _, newVal ->
                 viewModel.onHeightChange(newVal)
             }
+
+            b.ageNumberPicker.setOnClickListener {
+                viewModel.onAgeChange(b.ageNumberPicker.value)
+            }
+
+            b.heightNumberPicker.setOnClickListener {
+                viewModel.onHeightChange(b.heightNumberPicker.value)
+            }
+
+            b.ageNumberPicker.setOnScrollListener { _, _ ->
+                viewModel.onAgeChange(b.ageNumberPicker.value)
+            }
+
+            b.heightNumberPicker.setOnScrollListener { _, _ ->
+                viewModel.onHeightChange(b.heightNumberPicker.value)
+            }
         }
     }
 
@@ -234,7 +298,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
         when (globalViewModel.userState.value) {
 
             is GlobalViewModel.UserState.Authenticated -> {
-                viewModel.toChildQuery(globalViewModel.signedInUserSimplified.value)
+                viewModel.toChildQuery(globalViewModel.signedInUserSimplified)
                         ?.bundle(ChildrenQuery.serializer())
                         ?.let {
                             findNavController().navigate(

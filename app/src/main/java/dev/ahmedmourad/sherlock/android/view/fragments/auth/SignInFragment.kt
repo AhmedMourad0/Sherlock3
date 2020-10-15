@@ -121,6 +121,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
                     b.signInWithFacebookImageView,
                     b.signInWithTwitterImageView
             ).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 

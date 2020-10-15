@@ -1,9 +1,7 @@
 package dev.ahmedmourad.sherlock.android.viewmodel.shared
 
 import android.os.Bundle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import dagger.Lazy
 import dagger.Reusable
@@ -89,13 +87,15 @@ internal class GlobalViewModel(
                 .toLiveData()
     }
 
-    val signedInUserSimplified: LiveData<SignedInUser?> = Transformations.map(userState) {
-        if (it is UserState.Authenticated) {
-            it.user
-        } else {
-            null
+    val signedInUserSimplified: SignedInUser?
+        get() {
+            val state = userState.value
+            return if (state is UserState.Authenticated) {
+                state.user
+            } else {
+                null
+            }
         }
-    }
 
     fun onRefresh() = refreshSubject.onNext(Unit)
 

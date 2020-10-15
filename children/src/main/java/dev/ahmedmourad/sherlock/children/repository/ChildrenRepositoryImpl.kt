@@ -101,20 +101,28 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     ChildrenRepository.PublishException.UnknownException(it).left()
                 }.doOnSuccess { childEither ->
                     childEither.fold(ifLeft = {
-                        bus.get().childPublishingState.accept(
-                                PublishingState.Failure(child, it.toPublishStateException())
-                        )
+                        bus.get().childPublishingState.apply {
+                            accept(PublishingState.Failure(child, it.toPublishStateException()) {
+                                accept(PublishingState.Idle)
+                            })
+                        }
                     }, ifRight = {
-                        bus.get().childPublishingState.accept(PublishingState.Success(it))
+                        bus.get().childPublishingState.apply {
+                            accept(PublishingState.Success(it) {
+                                accept(PublishingState.Idle)
+                            })
+                        }
                     })
                 }.doOnSubscribe { bus.get().childPublishingState.accept(PublishingState.Ongoing(child)) }
                 .doOnError {
-                    bus.get().childPublishingState.accept(
-                            PublishingState.Failure(
-                                    child,
-                                    ChildrenRepository.PublishException.UnknownException(it).toPublishStateException()
-                            )
-                    )
+                    bus.get().childPublishingState.apply {
+                        accept(PublishingState.Failure(
+                                child,
+                                ChildrenRepository.PublishException.UnknownException(it).toPublishStateException()
+                        ) {
+                            accept(PublishingState.Idle)
+                        })
+                    }
                 }
     }
 
@@ -156,7 +164,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                             Flowable.just(null.right())
                         } else {
                             localRepository.get()
-                                    .updateRetainingWeight(child)
+                                    .insertOrReplaceRetainingWeight(child)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
                                     .map { either ->
@@ -166,9 +174,20 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     })
                 }.onErrorReturn {
                     ChildrenRepository.FindException.UnknownException(it).left()
-                }.doOnSubscribe { bus.get().childFindingState.accept(BackgroundState.ONGOING) }
-                .doOnNext { bus.get().childFindingState.accept(BackgroundState.SUCCESS) }
-                .doOnError { bus.get().childFindingState.accept(BackgroundState.FAILURE) }
+                }.doOnSubscribe { bus.get().childFindingState.accept(BackgroundState.Ongoing) }
+                .doOnNext {
+                    bus.get().childFindingState.apply {
+                        accept(BackgroundState.Success {
+                            accept(BackgroundState.Idle)
+                        })
+                    }
+                }.doOnError {
+                    bus.get().childFindingState.apply {
+                        accept(BackgroundState.Failure {
+                            accept(BackgroundState.Idle)
+                        })
+                    }
+                }
     }
 
     override fun findAll(
@@ -212,9 +231,20 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                     })
                 }.onErrorReturn {
                     ChildrenRepository.FindAllException.UnknownException(it).left()
-                }.doOnSubscribe { bus.get().childrenFindingState.accept(BackgroundState.ONGOING) }
-                .doOnNext { bus.get().childrenFindingState.accept(BackgroundState.SUCCESS) }
-                .doOnError { bus.get().childrenFindingState.accept(BackgroundState.FAILURE) }
+                }.doOnSubscribe { bus.get().childrenFindingState.accept(BackgroundState.Ongoing) }
+                .doOnNext {
+                    bus.get().childrenFindingState.apply {
+                        accept(BackgroundState.Success {
+                            accept(BackgroundState.Idle)
+                        })
+                    }
+                }.doOnError {
+                    bus.get().childrenFindingState.apply {
+                        accept(BackgroundState.Failure {
+                            accept(BackgroundState.Idle)
+                        })
+                    }
+                }
     }
 
     override fun findLastSearchResults():

@@ -36,8 +36,8 @@ INSERT OR REPLACE INTO children (
     notes
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-insert:
-INSERT INTO children (
+insertOrReplace:
+INSERT OR REPLACE INTO children (
     id,
     user_id,
     timestamp,
@@ -112,29 +112,8 @@ FROM
     children
 WHERE id = ?;
 
-updateRetainingWeight:
-UPDATE
-    children
-SET
-    user_id = ?,
-    timestamp = ?,
-    first_name = ?,
-    last_name = ?,
-    location_id = ?,
-    location_name = ?,
-    location_address = ?,
-    location_latitude = ?,
-    location_longitude = ?,
-    gender = ?,
-    skin = ?,
-    hair = ?,
-    min_age = ?,
-    max_age = ?,
-    min_height = ?,
-    max_height = ?,
-    picture_url = ?,
-    notes = ?
-WHERE id = ?;
+findWeight:
+SELECT weight FROM children WHERE id = ?;
 
 deleteAll:
 DELETE FROM children;

@@ -18,7 +18,7 @@ internal interface PlacePicker {
 
     fun start(fragment: Fragment, onError: OnError = { })
 
-    fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect)
+    fun handleActivityResult(requestCode: Int, data: Intent, onSelect: OnSelect): Boolean?
 
     @Parcelize
     data class Location(

@@ -34,7 +34,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				app:barrierDirection="right"
-				app:constraint_referenced_ids="materialTextView,materialTextView2"
+				app:constraint_referenced_ids="age_text_view,height_text_view"
 				tools:layout_editor_absoluteX="415dp" />
 			
 			<androidx.constraintlayout.widget.Guideline
@@ -101,7 +101,7 @@
 				app:layout_constraintTop_toTopOf="@+id/location_image_view" />
 			
 			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/materialTextView"
+				android:id="@+id/age_text_view"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="@string/age"
@@ -112,7 +112,7 @@
 				app:layout_constraintTop_toTopOf="@+id/age_seek_bar" />
 			
 			<com.google.android.material.textview.MaterialTextView
-				android:id="@+id/materialTextView2"
+				android:id="@+id/height_text_view"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:paddingStart="0dp"

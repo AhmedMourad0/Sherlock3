@@ -31,12 +31,20 @@ internal class AuthManagerImpl @Inject constructor(
 ) : AuthManager {
 
     override fun observeUserAuthState(): Flowable<Either<AuthManager.ObserveUserAuthStateException, Boolean>> {
+
+        fun Authenticator.ObserveUserAuthStateException.map() = when (this) {
+            Authenticator.ObserveUserAuthStateException.NoInternetConnectionException ->
+                AuthManager.ObserveUserAuthStateException.NoInternetConnectionException
+            is Authenticator.ObserveUserAuthStateException.UnknownException ->
+                AuthManager.ObserveUserAuthStateException.UnknownException(this.origin)
+        }
+
         return authenticator.get()
                 .observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map<Either<AuthManager.ObserveUserAuthStateException, Boolean>> {
-                    it.right()
+                .map { either ->
+                    either.mapLeft(Authenticator.ObserveUserAuthStateException::map)
                 }.onErrorReturn {
                     AuthManager.ObserveUserAuthStateException.UnknownException(it).left()
                 }
@@ -44,6 +52,13 @@ internal class AuthManagerImpl @Inject constructor(
 
     override fun observeSignedInUser():
             Flowable<Either<AuthManager.ObserveSignedInUserException, Either<IncompleteUser, SignedInUser>?>> {
+
+        fun Authenticator.ObserveSignedInUserException.map() = when (this) {
+            Authenticator.ObserveSignedInUserException.NoInternetConnectionException ->
+                AuthManager.ObserveSignedInUserException.NoInternetConnectionException
+            is Authenticator.ObserveSignedInUserException.UnknownException ->
+                AuthManager.ObserveSignedInUserException.UnknownException(this.origin)
+        }
 
         fun RemoteRepository.FindSignedInUserException.map() = when (this) {
 
@@ -76,19 +91,23 @@ internal class AuthManagerImpl @Inject constructor(
                 .observeSignedInUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .switchMap { incompleteUserOption ->
-                    incompleteUserOption.fold(ifEmpty = {
-                        Flowable.just(null.right())
-                    }, ifSome = { incompleteUser ->
-                        remoteRepository.get()
-                                .updateUserLastLoginDate(incompleteUser.id)
-                                .flatMap { either ->
-                                    either.fold(ifLeft = { e ->
-                                        Single.just(e.map()?.left() ?: null.right())
-                                    }, ifRight = {
-                                        Single.just(incompleteUser.right())
-                                    })
-                                }.toFlowable()
+                .switchMap { incompleteUserEither ->
+                    incompleteUserEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { incompleteUser ->
+                        if (incompleteUser == null) {
+                            Flowable.just(null.right())
+                        } else {
+                            remoteRepository.get()
+                                    .updateUserLastLoginDate(incompleteUser.id)
+                                    .flatMap { either ->
+                                        either.fold(ifLeft = { e ->
+                                            Single.just(e.map()?.left() ?: null.right())
+                                        }, ifRight = {
+                                            Single.just(incompleteUser.right())
+                                        })
+                                    }.toFlowable()
+                        }
                     })
                 }.switchMap { incompleteUserEither ->
                     incompleteUserEither.fold(ifLeft = {
@@ -590,6 +609,13 @@ internal class AuthManagerImpl @Inject constructor(
 
     override fun signOut(): Single<Either<AuthManager.SignOutException, Unit>> {
 
+        fun Authenticator.ObserveSignedInUserException.map() = when (this) {
+            Authenticator.ObserveSignedInUserException.NoInternetConnectionException ->
+                AuthManager.SignOutException.NoInternetConnectionException
+            is Authenticator.ObserveSignedInUserException.UnknownException ->
+                AuthManager.SignOutException.UnknownException(this.origin)
+        }
+
         fun Authenticator.SignOutException.map() = when (this) {
 
             Authenticator.SignOutException.NoInternetConnectionException ->
@@ -618,15 +644,19 @@ internal class AuthManagerImpl @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .firstOrError()
-                .flatMap { userOption ->
-                    userOption.fold(ifEmpty = {
-                        Single.just(Unit.right())
-                    }, ifSome = { user ->
-                        remoteRepository.get()
-                                .updateUserLastLoginDate(user.id)
-                                .map { either ->
-                                    either.mapLeft(RemoteRepository.UpdateUserLastLoginDateException::map)
-                                }
+                .flatMap { userEither ->
+                    userEither.fold(ifLeft = {
+                        Single.just(it.map().left())
+                    }, ifRight = { user ->
+                        if (user == null) {
+                            Single.just(Unit.right())
+                        } else {
+                            remoteRepository.get()
+                                    .updateUserLastLoginDate(user.id)
+                                    .map { either ->
+                                        either.mapLeft(RemoteRepository.UpdateUserLastLoginDateException::map)
+                                    }
+                        }
                     })
                 }.flatMap { either ->
                     either.fold(ifLeft = {

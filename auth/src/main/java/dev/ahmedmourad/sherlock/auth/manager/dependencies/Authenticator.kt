@@ -1,7 +1,6 @@
 package dev.ahmedmourad.sherlock.auth.manager.dependencies
 
 import arrow.core.Either
-import arrow.core.Option
 import dev.ahmedmourad.sherlock.domain.model.auth.IncompleteUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.Email
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
@@ -11,9 +10,9 @@ import io.reactivex.Single
 
 internal interface Authenticator {
 
-    fun observeUserAuthState(): Flowable<Boolean>
+    fun observeUserAuthState(): Flowable<Either<ObserveUserAuthStateException, Boolean>>
 
-    fun observeSignedInUser(): Flowable<Option<IncompleteUser>>
+    fun observeSignedInUser(): Flowable<Either<ObserveSignedInUserException, IncompleteUser?>>
 
     fun signIn(credentials: UserCredentials): Single<Either<SignInException, IncompleteUser>>
 
@@ -28,6 +27,16 @@ internal interface Authenticator {
     fun sendPasswordResetEmail(email: Email): Single<Either<SendPasswordResetEmailException, Unit>>
 
     fun signOut(): Single<Either<SignOutException, UserId?>>
+
+    sealed class ObserveUserAuthStateException {
+        object NoInternetConnectionException : ObserveUserAuthStateException()
+        data class UnknownException(val origin: Throwable) : ObserveUserAuthStateException()
+    }
+
+    sealed class ObserveSignedInUserException {
+        object NoInternetConnectionException : ObserveSignedInUserException()
+        data class UnknownException(val origin: Throwable) : ObserveSignedInUserException()
+    }
 
     sealed class SignInException {
         object AccountDoesNotExistOrHasBeenDisabledException : SignInException()

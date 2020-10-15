@@ -27,6 +27,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
+import timber.log.error
 import javax.inject.Inject
 
 interface ChildrenDao {
@@ -39,7 +41,7 @@ interface ChildrenDao {
 
     fun findById(id: ChildId): Flowable<Option<Tuple2<RetrievedChild, Weight?>>>
 
-    fun updateRetainingWeight(
+    fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
     ): Flowable<Tuple2<RetrievedChild, Weight?>>
 }
@@ -239,8 +241,12 @@ internal class ChildrenDaoImpl @Inject constructor(
             }
         }.asObservable()
                 .mapToList()
-                .map {
-                    it.firstOrNull()?.orNull().toOption()
+                .map { l ->
+                    Timber.error { l.toString() }
+                    l.firstOrNull()?.mapLeft {
+                        Timber.error(it, it::toString)
+                        it
+                    }?.orNull().toOption()
                 }.subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
     }
@@ -286,10 +292,10 @@ internal class ChildrenDaoImpl @Inject constructor(
     ): Either<ModelCreationException, Location?> {
         return Either.fx {
 
-            latitude ?: null.right().bind()
-            longitude ?: null.right().bind()
+            latitude ?: return@fx null.right().bind()
+            longitude ?: return@fx null.right().bind()
 
-            val coordinates = Coordinates.of(latitude!!, longitude!!)
+            val coordinates = Coordinates.of(latitude, longitude)
                     .mapLeft { ModelCreationException(it.toString()) }
                     .bind()
 
@@ -359,7 +365,7 @@ internal class ChildrenDaoImpl @Inject constructor(
         }
     }
 
-    override fun updateRetainingWeight(
+    override fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
     ): Flowable<Tuple2<RetrievedChild, Weight?>> {
         return Completable.fromAction {
@@ -372,13 +378,25 @@ internal class ChildrenDaoImpl @Inject constructor(
 
             childrenQueries.transaction {
 
-                usersQueries.updateSimple(
-                        id = item.user.id.value,
-                        display_name = item.user.displayName.value,
-                        picture_url = item.user.pictureUrl?.value
-                )
+                val user = usersQueries.findUserById(item.user.id.value).executeAsOneOrNull()
 
-                childrenQueries.updateRetainingWeight(
+                if (user == null) {
+                    usersQueries.insertOrReplaceSimple(
+                            id = item.user.id.value,
+                            display_name = item.user.displayName.value,
+                            picture_url = item.user.pictureUrl?.value
+                    )
+                } else {
+                    usersQueries.updateSimple(
+                            id = item.user.id.value,
+                            display_name = item.user.displayName.value,
+                            picture_url = item.user.pictureUrl?.value
+                    )
+                }
+
+                val weight = childrenQueries.findWeight(item.id.value).executeAsOneOrNull()?.weight
+
+                childrenQueries.insertOrReplace(
                         id = item.id.value,
                         user_id = item.user.id.value,
                         timestamp = item.timestamp,
@@ -397,12 +415,13 @@ internal class ChildrenDaoImpl @Inject constructor(
                         min_height = item.appearance.heightRange?.min?.value?.toLong(),
                         max_height = item.appearance.heightRange?.max?.value?.toLong(),
                         picture_url = item.pictureUrl?.value,
+                        weight = weight,
                         notes = item.notes,
                 )
             }
 
         }.andThen(findById(item.id).map { it.orNull()!! })
-                .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
     }
 }

@@ -9,11 +9,13 @@ import arrow.core.extensions.fx
 import arrow.core.orNull
 import arrow.core.toOption
 import dagger.Reusable
+import dev.ahmedmourad.sherlock.android.R
 import dev.ahmedmourad.sherlock.android.model.validators.children.*
 import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.domain.model.auth.SignedInUser
 import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
+import splitties.init.appCtx
 import javax.inject.Inject
 
 internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -140,12 +142,11 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
         savedStateHandle.set(KEY_ERROR_QUERY, null)
     }
 
-
     fun toChildQuery(user: SignedInUser?): ChildrenQuery? {
         return Either.fx<Unit, ChildrenQuery> {
 
             val u = !user.toOption().toEither {
-                savedStateHandle.set(KEY_ERROR_USER, "This action requires authentication")
+                savedStateHandle.set(KEY_ERROR_USER, appCtx.getString(R.string.authentication_needed))
             }
 
             val firstName = !validateName(firstName.value).mapLeft {
@@ -190,13 +191,10 @@ internal class FindChildrenViewModel(private val savedStateHandle: SavedStateHan
                 savedStateHandle.set(KEY_ERROR_APPEARANCE, it)
             }
 
-            val coordinatesNullable = location.value?.let { l ->
-                validateCoordinates(l.latitude, l.longitude).mapLeft {
-                    savedStateHandle.set(KEY_ERROR_LOCATION, it)
-                }.bind()
-            }
-
-            val coordinates = !validateCoordinates(coordinatesNullable).mapLeft {
+            val coordinates = !validateCoordinates(
+                    location.value?.latitude,
+                    location.value?.longitude
+            ).mapLeft {
                 savedStateHandle.set(KEY_ERROR_LOCATION, it)
             }
 

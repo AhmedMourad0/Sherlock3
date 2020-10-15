@@ -56,38 +56,70 @@ internal class FirebaseAuthenticator @Inject constructor(
         Twitter.initialize(config)
     }
 
-    override fun observeUserAuthState(): Flowable<Boolean> {
-        return createObserveUserAuthState()
+    override fun observeUserAuthState(): Flowable<Either<Authenticator.ObserveUserAuthStateException, Boolean>> {
+
+        fun ConnectivityManager.ObserveInternetConnectivityException.map() = when (this) {
+            is ConnectivityManager.ObserveInternetConnectivityException.UnknownException ->
+                Authenticator.ObserveUserAuthStateException.UnknownException(this.origin)
+        }
+
+        return connectivityManager.get()
+                .observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
+                .switchMap { either ->
+                    either.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isConnected ->
+                        if (isConnected) {
+                            createObserveUserAuthState()
+                        } else {
+                            Flowable.just(
+                                    Authenticator.ObserveUserAuthStateException.NoInternetConnectionException.left()
+                            )
+                        }
+                    })
+                }
     }
 
-    private fun createObserveUserAuthState(): Flowable<Boolean> {
-        return Flowable.create<Boolean>({ emitter ->
+    private fun createObserveUserAuthState(): Flowable<Either<Authenticator.ObserveUserAuthStateException, Boolean>> {
+        return Flowable.create<Either<Authenticator.ObserveUserAuthStateException, Boolean>>({ emitter ->
 
             val authStateListener = { firebaseAuth: FirebaseAuth ->
-                emitter.onNext(firebaseAuth.currentUser != null)
+                emitter.onNext((firebaseAuth.currentUser != null).right())
             }
 
             emitter.setCancellable { auth.get().removeAuthStateListener(authStateListener) }
 
-            emitter.onNext(auth.get().currentUser != null)
+            emitter.onNext((auth.get().currentUser != null).right())
 
             auth.get().addAuthStateListener(authStateListener)
 
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
-    override fun observeSignedInUser(): Flowable<Option<IncompleteUser>> {
+    override fun observeSignedInUser(): Flowable<Either<Authenticator.ObserveSignedInUserException, IncompleteUser?>> {
+
+        fun Authenticator.ObserveUserAuthStateException.map() = when (this) {
+            Authenticator.ObserveUserAuthStateException.NoInternetConnectionException ->
+                Authenticator.ObserveSignedInUserException.NoInternetConnectionException
+            is Authenticator.ObserveUserAuthStateException.UnknownException ->
+                Authenticator.ObserveSignedInUserException.UnknownException(this.origin)
+        }
+
         return observeUserAuthState()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .switchMap { isUserSignedIn ->
-                    if (isUserSignedIn) {
-                        Flowable.just(auth.get().currentUser?.toIncompleteUser().toOption())
-                    } else {
-                        Flowable.just(none())
-                    }
+                .switchMap { isUserSignedInEither ->
+                    isUserSignedInEither.fold(ifLeft = {
+                        Flowable.just(it.map().left())
+                    }, ifRight = { isUserSignedIn ->
+                        if (isUserSignedIn) {
+                            Flowable.just(auth.get().currentUser?.toIncompleteUser().right())
+                        } else {
+                            Flowable.just(null.right())
+                        }
+                    })
                 }
     }
 
@@ -598,7 +630,7 @@ internal class FirebaseAuthenticator @Inject constructor(
     ): Single<Either<Throwable, UserId>> {
         return Single.create<Either<Throwable, UserId>> { emitter ->
 
-            val successListener = { _: Void ->
+            val successListener = { _: Void? ->
                 emitter.onSuccess(userId.right())
             }
 

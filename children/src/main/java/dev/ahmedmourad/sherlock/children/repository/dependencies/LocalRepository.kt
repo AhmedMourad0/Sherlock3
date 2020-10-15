@@ -10,7 +10,7 @@ import io.reactivex.Single
 
 internal interface LocalRepository {
 
-    fun updateRetainingWeight(
+    fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
     ): Flowable<Either<UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>>
 

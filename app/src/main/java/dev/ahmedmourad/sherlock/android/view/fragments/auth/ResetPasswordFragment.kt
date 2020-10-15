@@ -77,6 +77,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
         })
         binding?.let { b ->
             arrayOf(b.sendEmailButton).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 

@@ -27,6 +27,7 @@ import dev.ahmedmourad.sherlock.android.pickers.places.PlacePicker
 import dev.ahmedmourad.sherlock.android.utils.DefaultOnRangeChangedListener
 import dev.ahmedmourad.sherlock.android.utils.observe
 import dev.ahmedmourad.sherlock.android.utils.observeAll
+import dev.ahmedmourad.sherlock.android.utils.somethingWentWrong
 import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
@@ -34,9 +35,10 @@ import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.AddChildVie
 import dev.ahmedmourad.sherlock.android.viewmodel.shared.GlobalViewModel
 import dev.ahmedmourad.sherlock.domain.constants.*
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
+import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import dev.ahmedmourad.sherlock.domain.utils.exhaust
 import kotlinx.serialization.builtins.nullable
+import splitties.init.appCtx
 import timber.log.Timber
 import timber.log.error
 import javax.inject.Inject
@@ -92,6 +94,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         initializePictureImageView()
         initializeLocationTextView()
         addErrorObservers()
+        addOpacityObservers()
 
         observe(globalViewModel.internetConnectivityState, Observer { state ->
             when (state) {
@@ -124,6 +127,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     b.pictureTextView,
                     b.pictureTextView
             ).forEach { it.setOnClickListener(this) }
+            b.root.requestFocus()
         }
     }
 
@@ -164,26 +168,135 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
         })
     }
 
+    private fun addOpacityObservers() {
+        binding?.let { b ->
+
+            observe(viewModel.firstName, Observer {
+                b.name.firstNameEditText.alpha = if (it == null) 0.3f else 0.6f
+            })
+
+            observe(viewModel.lastName, Observer {
+                b.name.lastNameEditText.alpha = if (it == null) 0.3f else 0.6f
+            })
+
+            observe(viewModel.skin, Observer {
+                b.skin.skinWhite.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinWheat.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinDark.alpha = if (it == null) 0.6f else 1f
+                b.skin.skinTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.hair, Observer {
+                b.hair.hairBlonde.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairBrown.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairDark.alpha = if (it == null) 0.6f else 1f
+                b.hair.hairTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.gender, Observer {
+                b.gender.genderRadioGroup.alpha = if (it == null) 0.6f else 1f
+                b.gender.genderTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.location, Observer {
+                b.location.alpha = if (it == null) 0.6f else 1f
+                b.locationImageView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.minAge, Observer {
+                b.ageSeekBar.alpha = if (it == null) 0.6f else 1f
+                b.ageTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.maxAge, Observer {
+                b.ageSeekBar.alpha = if (it == null) 0.6f else 1f
+                b.ageTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.minHeight, Observer {
+                b.heightSeekBar.alpha = if (it == null) 0.6f else 1f
+                b.heightTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.maxHeight, Observer {
+                b.heightSeekBar.alpha = if (it == null) 0.6f else 1f
+                b.heightTextView.alpha = if (it == null) 0.6f else 1f
+            })
+
+            observe(viewModel.notes, Observer {
+                b.notesEditText.alpha = if (it == null) 0.3f else 0.6f
+            })
+
+            observe(viewModel.picturePath, Observer {
+                b.pictureTextView.alpha = if (it == null) 0.6f else 1f
+                b.childPicture.alpha = if (it == null) 0.6f else 1f
+            })
+        }
+    }
+
     private fun publish() {
         setUserInteractionsEnabled(false)
-        viewModel.onPublish(globalViewModel.signedInUserSimplified.value)
+        when (globalViewModel.userState.value) {
+
+            is GlobalViewModel.UserState.Authenticated -> {
+                viewModel.onPublish(globalViewModel.signedInUserSimplified)
+            }
+
+            is GlobalViewModel.UserState.Incomplete -> {
+                Toast.makeText(appCtx, R.string.authentication_completion_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                setUserInteractionsEnabled(true)
+            }
+
+            GlobalViewModel.UserState.Unauthenticated -> {
+                Toast.makeText(appCtx, R.string.authentication_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
+                setUserInteractionsEnabled(true)
+            }
+
+            GlobalViewModel.UserState.Loading -> {
+                Toast.makeText(appCtx, R.string.authentication_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                setUserInteractionsEnabled(true)
+            }
+
+            GlobalViewModel.UserState.NoInternet -> {
+                Toast.makeText(appCtx, R.string.internet_connection_needed, Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                setUserInteractionsEnabled(true)
+            }
+
+            GlobalViewModel.UserState.Error -> {
+                Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
+                (requireActivity() as BackdropActivity).setInPrimaryContentMode(true)
+                setUserInteractionsEnabled(true)
+            }
+
+            null -> {
+                Toast.makeText(appCtx, somethingWentWrong(), Toast.LENGTH_LONG).show()
+                setUserInteractionsEnabled(true)
+            }
+        }.exhaust()
     }
 
     private fun handlePublishingStateValue(value: PublishingState?) {
         when (value) {
-            is PublishingState.Success -> moveToChildDetailsFragment(value.child)
+            is PublishingState.Success -> {
+                moveToChildDetailsFragment(value.child)
+                value.consume()
+            }
             is PublishingState.Ongoing -> setUserInteractionsEnabled(false)
             is PublishingState.Failure -> {
                 setUserInteractionsEnabled(true)
                 if (value.error is PublishingState.Exception.NoSignedInUserException) {
                     (requireActivity() as BackdropActivity).setInPrimaryContentMode(false)
-                } else {
-                    setInternetDependantViewsEnabled(
-                            globalViewModel.internetConnectivityState.value is GlobalViewModel.InternetConnectivityState.Connected
-                    )
                 }
+                setInternetDependantViewsEnabled(
+                        globalViewModel.internetConnectivityState.value is GlobalViewModel.InternetConnectivityState.Connected
+                )
+                value.consume()
             }
-            null -> {
+            PublishingState.Idle, null -> {
                 setUserInteractionsEnabled(true)
                 setInternetDependantViewsEnabled(
                         globalViewModel.internetConnectivityState.value is GlobalViewModel.InternetConnectivityState.Connected
@@ -194,9 +307,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
 
     private fun moveToChildDetailsFragment(child: RetrievedChild) {
         findNavController().apply {
-            popBackStack()
             navigate(AddChildFragmentDirections.actionAddChildFragmentToChildDetailsFragment(
-                    child.simplify().bundle(SimpleRetrievedChild.serializer())
+                    child.simplify().id.bundle(ChildId.serializer())
             ))
         }
     }
@@ -245,10 +357,12 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     ColorSelector.newItem(Skin.WHEAT, b.skin.skinWheat, R.color.colorSkinWheat),
                     ColorSelector.newItem(Skin.DARK, b.skin.skinDark, R.color.colorSkinDark),
                     default = viewModel.skin.value?.let { findEnum(it, Skin.values()) }
-                            ?: Skin.WHITE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.onSkinChange(it.value) }
+                onSelectionChangeListeners.add { viewModel.onSkinChange(it?.value) }
             }
+            b.skin.skinWhite.alpha = 0.6f
+            b.skin.skinWheat.alpha = 0.6f
+            b.skin.skinDark.alpha = 0.6f
         }
     }
 
@@ -259,9 +373,8 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
                     ColorSelector.newItem(Hair.BROWN, b.hair.hairBrown, R.color.colorHairBrown),
                     ColorSelector.newItem(Hair.DARK, b.hair.hairDark, R.color.colorHairDark),
                     default = viewModel.hair.value?.let { findEnum(it, Hair.values()) }
-                            ?: Hair.BLONDE
             ).apply {
-                onSelectionChangeListeners.add { viewModel.onHairChange(it.value) }
+                onSelectionChangeListeners.add { viewModel.onHairChange(it?.value) }
             }
         }
     }

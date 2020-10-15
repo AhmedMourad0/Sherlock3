@@ -6,7 +6,7 @@ import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import dev.ahmedmourad.sherlock.android.R
 
-internal class ColorSelector<T : Enum<T>>(vararg items: Item<T>, default: T = items[0].id) {
+internal class ColorSelector<T : Enum<T>>(vararg items: Item<T>, default: T? = null) {
 
     private val items = arrayOf(*items)
 
@@ -16,7 +16,7 @@ internal class ColorSelector<T : Enum<T>>(vararg items: Item<T>, default: T = it
             onSelectionChangeListeners.forEach { it(selectedItemId) }
         }
 
-    val onSelectionChangeListeners = mutableListOf<(T) -> Unit>()
+    val onSelectionChangeListeners = mutableListOf<(T?) -> Unit>()
 
     init {
 
@@ -24,10 +24,7 @@ internal class ColorSelector<T : Enum<T>>(vararg items: Item<T>, default: T = it
             "The items list cannot be empty!"
         }
 
-        requireNotNull(items.find { it.id == default }?.setSelected(true)) {
-            "$default was not found in the items list!"
-        }
-
+        items.firstOrNull { it.id == default }?.setSelected(true)
         onSelectionChangeListeners.forEach { it(selectedItemId) }
     }
 
