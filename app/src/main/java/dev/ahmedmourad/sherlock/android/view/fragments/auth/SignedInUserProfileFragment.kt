@@ -59,6 +59,7 @@ internal class SignedInUserProfileFragment : Fragment(R.layout.fragment_signed_i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignedInUserProfileBinding.bind(view)
+        (requireActivity() as BackdropActivity).setBackdropTitle(getString(R.string.your_profile))
         observe(globalViewModel.userState, Observer { state ->
             when (state) {
 

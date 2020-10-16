@@ -57,6 +57,7 @@ internal class ChildDetailsFragment : Fragment(R.layout.fragment_child_details) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChildDetailsBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(null)
 
         observe(viewModel.state, Observer { state ->
             when (state) {

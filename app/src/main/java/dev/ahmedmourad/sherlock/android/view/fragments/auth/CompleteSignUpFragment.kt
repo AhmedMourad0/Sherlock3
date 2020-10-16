@@ -61,6 +61,7 @@ internal class CompleteSignUpFragment : Fragment(R.layout.fragment_complete_sign
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCompleteSignUpBinding.bind(view)
+        (requireActivity() as BackdropActivity).setBackdropTitle(getString(R.string.complete_sign_up))
 
         initializeEditTexts()
         initializePictureImageView()

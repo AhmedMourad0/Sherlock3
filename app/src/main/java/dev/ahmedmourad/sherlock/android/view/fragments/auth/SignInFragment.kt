@@ -50,6 +50,7 @@ internal class SignInFragment : Fragment(R.layout.fragment_sign_in), View.OnClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignInBinding.bind(view)
+        (requireActivity() as BackdropActivity).setBackdropTitle(getString(R.string.sign_in))
 
         initializeEditTexts()
         addErrorObservers()

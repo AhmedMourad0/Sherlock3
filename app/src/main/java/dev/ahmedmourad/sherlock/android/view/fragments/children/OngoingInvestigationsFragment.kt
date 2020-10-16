@@ -52,6 +52,7 @@ internal class OngoingInvestigationsFragment : Fragment(R.layout.fragment_ongoin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentOngoingInvestigationsBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(getString(R.string.ongoing_investigations))
         initializeRecyclerView()
 
         observe(viewModel.state, Observer { state ->

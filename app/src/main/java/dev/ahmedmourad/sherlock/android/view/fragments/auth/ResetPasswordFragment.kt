@@ -46,6 +46,7 @@ internal class ResetPasswordFragment : Fragment(R.layout.fragment_reset_password
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentResetPasswordBinding.bind(view)
+        (requireActivity() as BackdropActivity).setBackdropTitle(getString(R.string.reset_password))
         initializeEditTexts()
         addErrorObservers()
         observe(viewModel.passwordResetState, Observer { state ->
