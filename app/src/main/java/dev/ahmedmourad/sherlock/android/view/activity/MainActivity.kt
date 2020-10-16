@@ -124,8 +124,8 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
 
         binding.dummyView.requestFocusFromTouch()
 
-        binding.backdropScrollView.post {
-            binding.backdropScrollView.updatePadding(
+        binding.backdropContainer.post {
+            binding.backdropContainer.updatePadding(
                     bottom = binding.primaryContentRoot.height / PRIMARY_CONTENT_COLLAPSE_FACTOR.toInt()
             )
         }
@@ -176,7 +176,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
             binding.appbar.elevation =
                     animatedValue * resources.getDimensionPixelSize(R.dimen.defaultAppBarElevation).toFloat()
 
-            binding.backdropScrollView.translationY =
+            binding.backdropContainer.translationY =
                     (1 - animatedValue) * resources.getDimensionPixelSize(R.dimen.backdropTranslationY).toFloat()
 
             binding.primaryContentOverlay.alpha =
