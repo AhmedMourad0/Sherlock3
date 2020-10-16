@@ -51,6 +51,9 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
     private lateinit var appNavHostFragment: Fragment
     private lateinit var authNavHostFragment: Fragment
 
+    private lateinit var mainTitle: String
+    private lateinit var backdropTitle: String
+
     private val viewModel: MainActivityViewModel by viewModels {
         SimpleSavedStateViewModelFactory(
                 this,
@@ -75,6 +78,8 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         setContentView(binding.root)
         injector.inject(this)
 
+        mainTitle = getString(R.string.app_name)
+        backdropTitle = getString(R.string.app_name)
         setSupportActionBar(binding.toolbar)
 
         setupBackdrop()
@@ -97,6 +102,7 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
         })
 
         observe(viewModel.isInPrimaryContentMode, Observer { newValue ->
+            refreshTitle()
             invalidateOptionsMenu()
             binding.primaryContentOverlay.visibility = View.VISIBLE
             binding.dummyView.requestFocusFromTouch()
@@ -381,6 +387,24 @@ internal class MainActivity : AppCompatActivity(), BackdropActivity {
                     .setPrimaryNavigationFragment(authNavHostFragment)
                     .commitNow()
         }
+    }
+
+    private fun refreshTitle() {
+        binding.toolbar.title = if (viewModel.isInPrimaryContentMode.value != false) {
+            mainTitle
+        } else {
+            backdropTitle
+        }
+    }
+
+    override fun setTitle(title: String?) {
+        mainTitle = title ?: getString(R.string.app_name)
+        refreshTitle()
+    }
+
+    override fun setBackdropTitle(title: String?) {
+        backdropTitle = title ?: getString(R.string.app_name)
+        refreshTitle()
     }
 
     override fun onStop() {

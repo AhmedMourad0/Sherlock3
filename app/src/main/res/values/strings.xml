@@ -16,20 +16,20 @@
 	<string name="cd_section_image">Section image</string>
 	
 	<string name="search">Search</string>
-	<string name="found_a_child">Found a child</string>
-	<string name="coming_soon">Coming soon</string>
-	<string name="first_name">First name</string>
-	<string name="last_name">Last name</string>
+	<string name="found_a_child">Found A Child</string>
+	<string name="coming_soon">Coming Soon</string>
+	<string name="first_name">First Name</string>
+	<string name="last_name">Last Name</string>
 	<string name="point_location_on_map">Point coordinates on map</string>
 	<string name="age">Age:</string>
 	<string name="height">Height:</string>
 	<string name="gender">Gender:</string>
 	<string name="skin_color">Skin color:</string>
 	<string name="hair_color">Hair color:</string>
-	<string name="choose_a_picture">Choose a picture</string>
+	<string name="choose_a_picture">Choose A Picture</string>
 	<string name="notes">Notes</string>
 	<string name="publish">Publish</string>
-	<string name="no_location_specified">No location specified…</string>
+	<string name="no_location_specified">No Location Specified…</string>
 	<string name="no_last_known_location_specified">No last known coordinates specified…</string>
 	
 	<string name="pick_a_folder">Pick a folder</string>
@@ -68,7 +68,7 @@
 	<string name="connecting">Connecting</string>
 	<string name="back_online">Connected</string>
 	<string name="no_connection">No connection</string>
-	<string name="sign_in">Sign in</string>
+	<string name="sign_in">Sign In</string>
 	<string name="sign_out">Sign out</string>
 	<string name="forgot_my_password">Forgot my password</string>
 	<string name="or_sign_up">Or sign up</string>
@@ -80,7 +80,7 @@
 	<string name="password">Password</string>
 	<string name="your_name">Your name</string>
 	<string name="confirm_password">Confirm password</string>
-	<string name="sign_up">Sign up</string>
+	<string name="sign_up">Sign Up</string>
 	<string name="or_sign_in">Or sign in</string>
 	<string name="sign_up_with">Sign up with</string>
 	<string name="sign_up_with_facebook">Sign up with Facebook</string>
@@ -194,5 +194,9 @@
 	<string name="child_details">Child Details</string>
 	<string name="child_description">Child Description</string>
 	<string name="other_details">Other Details</string>
+	<string name="complete_sign_up">Complete Sign Up</string>
+	<string name="reset_password">Reset Password</string>
+	<string name="your_profile">Your Profile</string>
+	<string name="ongoing_investigations">Ongoing Investigations</string>
 
 </resources>

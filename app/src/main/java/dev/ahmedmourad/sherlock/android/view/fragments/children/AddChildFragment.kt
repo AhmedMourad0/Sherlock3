@@ -83,6 +83,7 @@ internal class AddChildFragment : Fragment(R.layout.fragment_add_child), View.On
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddChildBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(getString(R.string.found_a_child))
 
         setUserInteractionsEnabled(args.child.unbundle(AppChildToPublish.serializer().nullable) == null)
 

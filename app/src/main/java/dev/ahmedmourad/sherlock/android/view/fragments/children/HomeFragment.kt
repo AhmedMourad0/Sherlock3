@@ -15,6 +15,7 @@ import dev.ahmedmourad.sherlock.android.databinding.FragmentHomeBinding
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.android.model.children.AppChildToPublish
 import dev.ahmedmourad.sherlock.android.model.common.AppSection
+import dev.ahmedmourad.sherlock.android.view.BackdropActivity
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.AssistedViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.factory.SimpleSavedStateViewModelFactory
 import dev.ahmedmourad.sherlock.android.viewmodel.fragments.children.HomeViewModel
@@ -50,6 +51,7 @@ internal class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(null)
         initializeRecyclerView()
     }
 

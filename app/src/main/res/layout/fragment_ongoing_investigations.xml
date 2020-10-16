@@ -10,7 +10,7 @@
 		android:layout_height="match_parent"
 		android:background="@color/colorRecyclerBackground"
 		android:clipToPadding="false"
-		android:paddingTop="20dp"
+		android:paddingTop="24dp"
 		android:paddingBottom="@dimen/recyclerPaddingBottom"
 		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
 		android:visibility="gone" />

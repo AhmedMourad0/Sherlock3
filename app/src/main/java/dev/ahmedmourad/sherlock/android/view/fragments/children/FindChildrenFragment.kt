@@ -68,6 +68,7 @@ internal class FindChildrenFragment : Fragment(R.layout.fragment_find_children),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFindChildrenBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(getString(R.string.search))
 
         createSkinColorViews()
         createHairColorViews()

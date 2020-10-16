@@ -60,6 +60,7 @@ internal class SignUpFragment : Fragment(R.layout.fragment_sign_up), View.OnClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignUpBinding.bind(view)
+        (requireActivity() as BackdropActivity).setBackdropTitle(getString(R.string.sign_up))
         initializeEditTexts()
         initializePictureImageView()
         addErrorObservers()

@@ -60,6 +60,7 @@ internal class ChildrenSearchResultsFragment : Fragment(R.layout.fragment_childr
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChildrenSearchResultsBinding.bind(view)
+        (requireActivity() as BackdropActivity).setTitle(getString(R.string.search_results))
         initializeRecyclerView()
 
         //TODO: either give the option to update or not, or onPublish new values to the bottom
