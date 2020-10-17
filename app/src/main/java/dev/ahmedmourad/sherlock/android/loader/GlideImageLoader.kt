@@ -26,8 +26,9 @@ internal class GlideImageLoader @Inject constructor() : ImageLoader {
             @DrawableRes error: Int
     ) {
         glide.load(src)
-                .placeholder(error)
-                .error(placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .placeholder(placeholder)
+                .error(error)
                 .into(target)
     }
 
