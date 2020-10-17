@@ -11,10 +11,11 @@ import dev.ahmedmourad.bundlizer.unbundle
 import dev.ahmedmourad.sherlock.android.di.injector
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
-import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.PairSerializer
 import splitties.init.appCtx
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
@@ -28,9 +29,11 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
 
-        val children = requireNotNull(
-                intent.getBundleExtra(EXTRA_HACK_BUNDLE)?.getBundle(EXTRA_CHILDREN_RESULTS)
-        ).unbundle(MapSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
+        val children = intent.getBundleExtra(EXTRA_HACK_BUNDLE)
+                ?.getParcelableArrayList<Bundle>(EXTRA_CHILDREN)
+                ?.map {
+                    it.unbundle(PairSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
+                }?.toMap() ?: emptyMap()
 
         return childrenRemoteViewsFactoryFactory(
                 applicationContext,
@@ -43,18 +46,16 @@ internal class ChildrenRemoteViewsService : RemoteViewsService() {
         /** This's as ridiculous as it looks, but it's the only way this works */
         const val EXTRA_HACK_BUNDLE =
                 "dev.ahmedmourad.sherlock.android.widget.adapter.extra.HACK_BUNDLE"
-        const val EXTRA_CHILDREN_RESULTS =
-                "dev.ahmedmourad.sherlock.android.widget.adapter.extra.CHILDREN_RESULTS"
+        const val EXTRA_CHILDREN =
+                "dev.ahmedmourad.sherlock.android.widget.adapter.extra.CHILDREN"
 
         fun create(appWidgetId: Int, results: Map<SimpleRetrievedChild, Weight>): Intent {
 
             val hackBundle = Bundle(1).apply {
-                putBundle(
-                        EXTRA_CHILDREN_RESULTS,
-                        results.bundle(MapSerializer(
-                                SimpleRetrievedChild.serializer(),
-                                Weight.serializer()
-                        ))
+                putParcelableArrayList(EXTRA_CHILDREN,
+                        ArrayList(results.entries.map {
+                            it.toPair().bundle(PairSerializer(SimpleRetrievedChild.serializer(), Weight.serializer()))
+                        })
                 )
             }
 

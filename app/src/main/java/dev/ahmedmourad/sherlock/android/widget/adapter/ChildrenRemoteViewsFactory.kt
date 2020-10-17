@@ -41,12 +41,18 @@ internal class ChildrenRemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews? {
 
-        if (position >= count)
+        if (position >= count) {
             return null
+        }
 
         val result = results[position]
 
         val views = RemoteViews(context.packageName, R.layout.item_widget_result)
+
+        views.setTextViewText(
+                R.id.widget_result_user,
+                textFormatter.get().formatDisplayName(result.a.user.displayName)
+        )
 
         //TODO: needs to change over time
         views.setTextViewText(
@@ -56,7 +62,7 @@ internal class ChildrenRemoteViewsFactory(
 
         views.setTextViewText(
                 R.id.widget_result_notes,
-                result.a.notes
+                textFormatter.get().formatNotes(result.a.notes)
         )
 
         views.setTextViewText(
@@ -73,12 +79,16 @@ internal class ChildrenRemoteViewsFactory(
     }
 
     private fun setPicture(views: RemoteViews, pictureUrl: Url?) {
-        imageLoader.get().fetch(pictureUrl?.value).fold(ifLeft = {
-            Timber.error(it, it::toString)
+        if (pictureUrl == null) {
             views.setImageViewResource(R.id.widget_result_picture, R.drawable.placeholder)
-        }, ifRight = {
-            views.setImageViewBitmap(R.id.widget_result_picture, it)
-        })
+        } else {
+            imageLoader.get().fetch(pictureUrl.value).fold(ifLeft = {
+                Timber.error(it, it::toString)
+                views.setImageViewResource(R.id.widget_result_picture, R.drawable.placeholder)
+            }, ifRight = {
+                views.setImageViewBitmap(R.id.widget_result_picture, it)
+            })
+        }
     }
 
     override fun getLoadingView() = null

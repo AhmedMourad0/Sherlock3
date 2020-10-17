@@ -13,19 +13,20 @@
 	android:orientation="vertical"
 	tools:ignore="UnusedAttribute">
 	
-	<com.google.android.material.textview.MaterialTextView
+	<TextView
+		android:id="@+id/widget_result_user"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:ellipsize="end"
 		android:gravity="center_vertical"
 		android:maxLines="1"
 		android:scrollHorizontally="true"
-		android:text="@string/ahmed_mourad"
+		tools:text="@string/ahmed_mourad"
 		android:textColor="@android:color/black"
 		android:textSize="@dimen/widgetResultUserTextSize"
 		android:textStyle="bold" />
 	
-	<com.google.android.material.textview.MaterialTextView
+	<TextView
 		android:id="@+id/widget_result_date"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -45,7 +46,7 @@
 		android:contentDescription="@string/child"
 		tools:src="@drawable/placeholder" />
 	
-	<com.google.android.material.textview.MaterialTextView
+	<TextView
 		android:id="@+id/widget_result_notes"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -64,14 +65,14 @@
 		android:orientation="horizontal"
 		android:paddingTop="@dimen/widgetResultLocationPaddingTop">
 		
-		<com.google.android.material.textview.MaterialTextView
+		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/location_label"
 			android:textColor="@android:color/black"
 			android:textSize="@dimen/widgetResultLocationTextSize" />
 		
-		<com.google.android.material.textview.MaterialTextView
+		<TextView
 			android:id="@+id/widget_result_location"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"

@@ -27,8 +27,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import timber.log.error
 import javax.inject.Inject
 
 interface ChildrenDao {
@@ -242,11 +240,7 @@ internal class ChildrenDaoImpl @Inject constructor(
         }.asObservable()
                 .mapToList()
                 .map { l ->
-                    Timber.error { l.toString() }
-                    l.firstOrNull()?.mapLeft {
-                        Timber.error(it, it::toString)
-                        it
-                    }?.orNull().toOption()
+                    l.firstOrNull()?.orNull().toOption()
                 }.subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
     }
