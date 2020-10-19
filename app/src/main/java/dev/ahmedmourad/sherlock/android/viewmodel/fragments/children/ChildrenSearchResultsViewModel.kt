@@ -149,11 +149,21 @@ internal class ChildrenSearchResultsViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ }, {
                     Timber.error(it, it::toString)
-                }))
+                })
+        )
     }
 
     override fun onCleared() {
-        compositeDisposable.dispose()
+        compositeDisposable.add(invalidateAllQueriesInteractor.get()
+                .invoke()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    compositeDisposable.dispose()
+                }, {
+                    Timber.error(it, it::toString)
+                    compositeDisposable.dispose()
+                })
+        )
         super.onCleared()
     }
 
