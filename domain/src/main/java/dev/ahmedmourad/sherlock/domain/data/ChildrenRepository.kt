@@ -66,7 +66,6 @@ interface ChildrenRepository {
     }
 
     sealed class FindLastSearchResultsException {
-        data class InternalException(val origin: Throwable) : FindLastSearchResultsException()
         data class UnknownException(val origin: Throwable) : FindLastSearchResultsException()
     }
 }

@@ -12,16 +12,11 @@ import javax.inject.Inject
 fun interface FindLastSearchResultsInteractor :
         () -> Flowable<Either<FindLastSearchResultsInteractor.Exception, Map<SimpleRetrievedChild, Weight>>> {
     sealed class Exception {
-        data class InternalException(val origin: Throwable) : Exception()
         data class UnknownException(val origin: Throwable) : Exception()
     }
 }
 
 private fun ChildrenRepository.FindLastSearchResultsException.map() = when (this) {
-
-    is ChildrenRepository.FindLastSearchResultsException.InternalException ->
-        FindLastSearchResultsInteractor.Exception.InternalException(this.origin)
-
     is ChildrenRepository.FindLastSearchResultsException.UnknownException ->
         FindLastSearchResultsInteractor.Exception.UnknownException(this.origin)
 }

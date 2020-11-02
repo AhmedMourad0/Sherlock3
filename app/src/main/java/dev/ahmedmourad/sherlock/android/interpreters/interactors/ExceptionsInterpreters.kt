@@ -207,8 +207,6 @@ internal fun FindAllInvestigationsInteractor.Exception.localizedMessage(): Strin
 
 internal fun FindLastSearchResultsInteractor.Exception.localizedMessage(): String {
     return when (this) {
-        is FindLastSearchResultsInteractor.Exception.InternalException ->
-            somethingWentWrong(this.origin)
         is FindLastSearchResultsInteractor.Exception.UnknownException ->
             somethingWentWrong(this.origin)
     }
