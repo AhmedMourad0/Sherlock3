@@ -15,7 +15,7 @@ internal class FakeLocalRepository : LocalRepository {
     var triggerInternalException = false
     var triggerUnknownException = false
 
-    override fun updateRetainingWeight(
+    override fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
     ): Flowable<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
         return Flowable.defer {
@@ -91,5 +91,9 @@ internal class FakeLocalRepository : LocalRepository {
                 }
             }
         }
+    }
+
+    fun allResults(): MutableList<Pair<Either<SimpleRetrievedChild, RetrievedChild>, Weight?>> {
+        return fakeDb
     }
 }

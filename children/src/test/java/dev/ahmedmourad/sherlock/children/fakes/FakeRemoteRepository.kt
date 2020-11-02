@@ -16,6 +16,7 @@ import io.reactivex.Single
 internal class FakeRemoteRepository : RemoteRepository {
 
     private val fakeChildrenDb = mutableListOf<RetrievedChild>()
+    private val fakeQueriesDb = mutableListOf<ChildrenQuery>()
     private val fakeInvestigationsDb = mutableListOf<Investigation>()
 
     var hasInternet = true
@@ -160,6 +161,7 @@ internal class FakeRemoteRepository : RemoteRepository {
                 }
 
                 else -> {
+                    fakeQueriesDb.add(query)
                     Flowable.just(fakeChildrenDb.dropLast(query.page * 20)
                             .takeLast(20)
                             .map(RetrievedChild::simplify)
@@ -173,7 +175,9 @@ internal class FakeRemoteRepository : RemoteRepository {
     }
 
     override fun invalidateAllQueries(): Completable {
-        return Completable.complete()
+        return Completable.fromAction {
+            fakeQueriesDb.clear()
+        }
     }
 
     fun allChildren(): List<RetrievedChild> {
@@ -182,5 +186,9 @@ internal class FakeRemoteRepository : RemoteRepository {
 
     fun allInvestigations(): List<Investigation> {
         return fakeInvestigationsDb
+    }
+
+    fun allQueries(): List<ChildrenQuery> {
+        return fakeQueriesDb
     }
 }
