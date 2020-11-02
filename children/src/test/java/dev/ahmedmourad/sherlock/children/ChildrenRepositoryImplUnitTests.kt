@@ -17,6 +17,7 @@ import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
 import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
+import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -71,6 +72,8 @@ class ChildrenRepositoryImplUnitTests {
         ).orNull()!!
     }
 
+    private val investigation = queryFactory(0).toInvestigation()
+
     private lateinit var localRepository: FakeLocalRepository
     private lateinit var remoteRepository: FakeRemoteRepository
     private lateinit var imageRepository: FakeImageRepository
@@ -99,7 +102,7 @@ class ChildrenRepositoryImplUnitTests {
             val retrieved = childToPublish.toRetrievedChild(result.id, result.timestamp, result.pictureUrl)
             assertTrue(remoteRepository.allChildren().contains(retrieved))
             assertEquals(1, remoteRepository.allChildren().size)
-            result.id == retrieved.id
+            childToPublish.matches(result)
         }
     }
 
@@ -403,13 +406,320 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
+    fun `findAll should add the query to the remote repo`() {
+
+        assertEquals(0, remoteRepository.allQueries().size)
+
+        val query = queryFactory(0)
+
+        repo.findAll(query).test().await()
+
+        assertEquals(1, remoteRepository.allQueries().size)
+
+        assertEquals(query, remoteRepository.allQueries()[0])
+    }
+
+    @Test
     fun `findAll should replace the local db contents with its results`() {
 
+        assertEquals(0, localRepository.allResults().size)
+
+        Single.defer {
+            remoteRepository.publish(
+                    ChildId(UUID.randomUUID().toString()),
+                    childToPublish,
+                    null
+            )
+        }.repeat(15).test().await()
+
+        repo.findAll(queryFactory(0)).test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            result!!.size == 15
+        }
+
+        assertEquals(15, localRepository.allResults().size)
     }
 
     @Test
     fun `findAll should return an empty map when there are no results`() {
 
+        repo.findAll(queryFactory(0)).test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            result!!.isEmpty()
+        }
+
+        assertEquals(0, localRepository.allResults().size)
+    }
+
+    @Test
+    fun `findAll should propagate the NoSignedInUserException`() {
+
+        fun go() {
+            repo.findAll(queryFactory(0)).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.FindAllException.NoSignedInUserException
+            }
+        }
+
+        remoteRepository.isUserSignedIn = false
+        go()
+    }
+
+    @Test
+    fun `findAll should propagate the NoInternetConnectionException`() {
+
+        fun go() {
+            repo.findAll(queryFactory(0)).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.FindAllException.NoInternetConnectionException
+            }
+        }
+
+        remoteRepository.hasInternet = false
+        go()
+    }
+
+    @Test
+    fun `findAll should propagate the InternalException`() {
+
+        fun go() {
+            repo.findAll(queryFactory(0)).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.FindAllException.InternalException
+            }
+        }
+
+        remoteRepository.triggerInternalException = true
+        go()
+    }
+
+    @Test
+    fun `findAll should propagate the UnknownException`() {
+
+        fun go() {
+            repo.findAll(queryFactory(0)).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.FindAllException.UnknownException
+            }
+        }
+
+        remoteRepository.triggerUnknownException = true
+        localRepository.triggerUnknownException = false
+        go()
+
+        remoteRepository.triggerUnknownException = false
+        localRepository.triggerUnknownException = true
+        go()
+
+        remoteRepository.triggerUnknownException = true
+        localRepository.triggerUnknownException = true
+        go()
+    }
+
+    @Test
+    fun `invalidateAllQueries should clear all queries from the remote repo`() {
+
+        assertEquals(0, remoteRepository.allQueries().size)
+
+        repo.findAll(queryFactory(0)).test().await()
+
+        assertEquals(1, remoteRepository.allQueries().size)
+
+        repo.invalidateAllQueries().test().await()
+
+        assertEquals(0, remoteRepository.allQueries().size)
+    }
+
+    @Test
+    fun `addInvestigation should add the investigation to the remote repo and return it`() {
+        repo.addInvestigation(investigation).test().await().assertValue {
+            val result = it.orNull()!!
+            assertTrue(remoteRepository.allInvestigations().contains(investigation))
+            assertEquals(1, remoteRepository.allInvestigations().size)
+            result == investigation
+        }
+    }
+
+    @Test
+    fun `addInvestigation should propagate the NoSignedInUserException`() {
+
+        fun go() {
+            repo.addInvestigation(investigation).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.AddInvestigationException.NoSignedInUserException
+            }
+        }
+
+        remoteRepository.isUserSignedIn = false
+        go()
+    }
+
+    @Test
+    fun `addInvestigation should propagate the NoInternetConnectionException`() {
+
+        fun go() {
+            repo.addInvestigation(investigation).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.AddInvestigationException.NoInternetConnectionException
+            }
+        }
+
+        remoteRepository.hasInternet = false
+        go()
+    }
+
+    @Test
+    fun `addInvestigation should propagate the UnknownException`() {
+
+        fun go() {
+            repo.addInvestigation(investigation).test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.AddInvestigationException.UnknownException
+            }
+        }
+
+        remoteRepository.triggerUnknownException = true
+        go()
+    }
+
+    @Test
+    fun `findAllInvestigations should return all ongoing investigations`() {
+
+        Single.defer {
+            remoteRepository.addInvestigation(investigation)
+        }.repeat(10).test().await()
+
+        repo.findAllInvestigations().test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            result!!.size == 10
+        }
+    }
+
+    @Test
+    fun `findAllInvestigations should return an empty list when there are no ongoing investigations`() {
+        repo.findAllInvestigations().test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            result!!.isEmpty()
+        }
+    }
+
+    @Test
+    fun `findAllInvestigations should propagate the NoSignedInUserException`() {
+
+        fun go() {
+            repo.findAllInvestigations().test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.FindAllInvestigationsException.NoSignedInUserException
+            }
+        }
+
+        remoteRepository.isUserSignedIn = false
+        go()
+    }
+
+    @Test
+    fun `findAllInvestigations should propagate the NoInternetConnectionException`() {
+
+        fun go() {
+            repo.findAllInvestigations().test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a == ChildrenRepository.FindAllInvestigationsException.NoInternetConnectionException
+            }
+        }
+
+        remoteRepository.hasInternet = false
+        go()
+    }
+
+    @Test
+    fun `findAllInvestigations should propagate the InternalException`() {
+
+        fun go() {
+            repo.findAllInvestigations().test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.FindAllInvestigationsException.InternalException
+            }
+        }
+
+        remoteRepository.triggerInternalException = true
+        go()
+    }
+
+    @Test
+    fun `findAllInvestigations should propagate the UnknownException`() {
+
+        fun go() {
+            repo.findAllInvestigations().test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.FindAllInvestigationsException.UnknownException
+            }
+        }
+
+        remoteRepository.triggerUnknownException = true
+        go()
+    }
+
+    @Test
+    fun `findLastSearchResults should return all results in the local repo that contain a weight`() {
+
+        val items = mutableMapOf<SimpleRetrievedChild, Weight>()
+        repeat(10) {
+            items[childToPublish.toRetrievedChild(
+                    ChildId(UUID.randomUUID().toString()),
+                    System.currentTimeMillis(),
+                    null
+            ).simplify()] = Weight.of((700..1000).random() / 1000.0).orNull()!!
+        }
+
+        localRepository.replaceAll(items).test().await()
+
+        repo.findLastSearchResults().test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            items == result
+        }
+    }
+
+    @Test
+    fun `findLastSearchResults should return an empty map when there are no results`() {
+
+        repo.findLastSearchResults().test().await().assertValue {
+            val result = it.orNull()
+            assertNotNull(result)
+            result!!.isEmpty()
+        }
+
+        assertEquals(0, localRepository.allResults().size)
+    }
+
+    @Test
+    fun `findLastSearchResults should propagate the UnknownException`() {
+
+        fun go() {
+            repo.findLastSearchResults().test().await().assertValue {
+                assertTrue(it is Either.Left)
+                it as Either.Left
+                it.a is ChildrenRepository.FindLastSearchResultsException.UnknownException
+            }
+        }
+
+        localRepository.triggerUnknownException = true
+        go()
     }
 }
 
