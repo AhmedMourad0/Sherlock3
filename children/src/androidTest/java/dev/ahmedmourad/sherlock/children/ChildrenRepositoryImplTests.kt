@@ -1,5 +1,6 @@
 package dev.ahmedmourad.sherlock.children
 
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import arrow.core.Either
 import arrow.core.orNull
 import arrow.core.right
@@ -27,11 +28,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.util.*
 
-@RunWith(RobolectricTestRunner::class)
-class ChildrenRepositoryImplUnitTests {
+@RunWith(AndroidJUnit4ClassRunner::class)
+class ChildrenRepositoryImplTests {
 
     private val childToPublish = ChildToPublish.of(
             SimpleRetrievedUser.of(
@@ -96,7 +96,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `publish should add the child to the remote repo and return it as a retrieved child`() {
+    fun publish_shouldAddTheChildToTheRemoteRepoAndReturnItAsRetrievedChild() {
         repo.publish(childToPublish).test().await().assertValue {
             val result = it.orNull()!!
             val retrieved = childToPublish.toRetrievedChild(result.id, result.timestamp, result.pictureUrl)
@@ -107,7 +107,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `publish should propagate the NoSignedInUserException`() {
+    fun publish_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
             repo.publish(childToPublish).test().await().assertValue {
@@ -131,7 +131,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `publish should propagate the NoInternetConnectionException`() {
+    fun publish_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
             repo.publish(childToPublish).test().await().assertValue {
@@ -155,7 +155,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `publish should propagate the InternalException`() {
+    fun publish_shouldPropagateTheInternalException() {
 
         fun go() {
             repo.publish(childToPublish).test().await().assertValue {
@@ -170,7 +170,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `publish should propagate the UnknownException`() {
+    fun publish_shouldPropagateTheUnknownException() {
 
         fun go() {
             repo.publish(childToPublish).test().await().assertValue {
@@ -194,7 +194,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should return the child without weight when it exists in the remote repo only`() {
+    fun find_shouldReturnTheChildWithoutWeightWhenItExistsInTheRemoteRepoOnly() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -214,7 +214,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should return the child with weight when it exists in the remote and local repos`() {
+    fun find_shouldReturnTheChildWithWeightWhenItExistsInTheRemoteAndLocalRepos() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -242,7 +242,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should return null when the child exists in the local repo only`() {
+    fun find_shouldReturnNullWhenTheChildExistsInTheLocalRepoOnly() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -262,7 +262,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should return null when the child doesn't exist`() {
+    fun find_shouldReturnNullWhenTheChildDoesNotExist() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -274,7 +274,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should propagate the NoSignedInUserException`() {
+    fun find_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
             repo.find(ChildId(UUID.randomUUID().toString())).test().await().assertValue {
@@ -289,7 +289,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should propagate the NoInternetConnectionException`() {
+    fun find_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
             repo.find(ChildId(UUID.randomUUID().toString())).test().await().assertValue {
@@ -304,7 +304,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should propagate the InternalException`() {
+    fun find_shouldPropagateTheInternalException() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -336,7 +336,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `find should propagate the UnknownException`() {
+    fun find_shouldPropagateTheUnknownException() {
 
         val childId = ChildId(UUID.randomUUID().toString())
 
@@ -368,7 +368,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should return a page size of children at max`() {
+    fun findAll_shouldReturnPageSizeOfChildrenAtMax() {
 
         Single.defer {
             remoteRepository.publish(
@@ -406,7 +406,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should add the query to the remote repo`() {
+    fun findAll_shouldAddTheQueryToTheRemoteRepo() {
 
         assertEquals(0, remoteRepository.allQueries().size)
 
@@ -420,7 +420,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should replace the local db contents with its results`() {
+    fun findAll_shouldReplaceTheLocalDbContentsWithItsResults() {
 
         assertEquals(0, localRepository.allResults().size)
 
@@ -442,7 +442,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should return an empty map when there are no results`() {
+    fun findAll_shouldReturnAnEmptyMapWhenThereAreNoResults() {
 
         repo.findAll(queryFactory(0)).test().await().assertValue {
             val result = it.orNull()
@@ -454,7 +454,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should propagate the NoSignedInUserException`() {
+    fun findAll_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
             repo.findAll(queryFactory(0)).test().await().assertValue {
@@ -469,7 +469,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should propagate the NoInternetConnectionException`() {
+    fun findAll_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
             repo.findAll(queryFactory(0)).test().await().assertValue {
@@ -484,7 +484,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should propagate the InternalException`() {
+    fun findAll_shouldPropagateTheInternalException() {
 
         fun go() {
             repo.findAll(queryFactory(0)).test().await().assertValue {
@@ -499,7 +499,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAll should propagate the UnknownException`() {
+    fun findAll_shouldPropagateTheUnknownException() {
 
         fun go() {
             repo.findAll(queryFactory(0)).test().await().assertValue {
@@ -523,7 +523,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `invalidateAllQueries should clear all queries from the remote repo`() {
+    fun invalidateAllQueries_shouldClearAllQueriesFromTheRemoteRepo() {
 
         assertEquals(0, remoteRepository.allQueries().size)
 
@@ -537,7 +537,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `addInvestigation should add the investigation to the remote repo and return it`() {
+    fun addInvestigation_shouldAddTheInvestigationToTheRemoteRepoAndReturnIt() {
         repo.addInvestigation(investigation).test().await().assertValue {
             val result = it.orNull()!!
             assertTrue(remoteRepository.allInvestigations().contains(investigation))
@@ -547,7 +547,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `addInvestigation should propagate the NoSignedInUserException`() {
+    fun addInvestigation_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
             repo.addInvestigation(investigation).test().await().assertValue {
@@ -562,7 +562,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `addInvestigation should propagate the NoInternetConnectionException`() {
+    fun addInvestigation_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
             repo.addInvestigation(investigation).test().await().assertValue {
@@ -577,7 +577,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `addInvestigation should propagate the UnknownException`() {
+    fun addInvestigation_shouldPropagateTheUnknownException() {
 
         fun go() {
             repo.addInvestigation(investigation).test().await().assertValue {
@@ -592,7 +592,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should return all ongoing investigations`() {
+    fun findAllInvestigations_shouldReturnAllOngoingInvestigations() {
 
         Single.defer {
             remoteRepository.addInvestigation(investigation)
@@ -606,7 +606,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should return an empty list when there are no ongoing investigations`() {
+    fun findAllInvestigations_shouldReturnAnEmptyListWhenThereAreNoOngoingInvestigations() {
         repo.findAllInvestigations().test().await().assertValue {
             val result = it.orNull()
             assertNotNull(result)
@@ -615,7 +615,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should propagate the NoSignedInUserException`() {
+    fun findAllInvestigations_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
             repo.findAllInvestigations().test().await().assertValue {
@@ -630,7 +630,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should propagate the NoInternetConnectionException`() {
+    fun findAllInvestigations_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
             repo.findAllInvestigations().test().await().assertValue {
@@ -645,7 +645,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should propagate the InternalException`() {
+    fun findAllInvestigations_shouldPropagateTheInternalException() {
 
         fun go() {
             repo.findAllInvestigations().test().await().assertValue {
@@ -660,7 +660,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findAllInvestigations should propagate the UnknownException`() {
+    fun findAllInvestigations_shouldPropagateTheUnknownException() {
 
         fun go() {
             repo.findAllInvestigations().test().await().assertValue {
@@ -675,7 +675,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findLastSearchResults should return all results in the local repo that contain a weight`() {
+    fun findLastSearchResults_shouldReturnAllResultsInTheLocalRepoThatHaveWeight() {
 
         val items = mutableMapOf<SimpleRetrievedChild, Weight>()
         repeat(10) {
@@ -696,7 +696,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findLastSearchResults should return an empty map when there are no results`() {
+    fun findLastSearchResults_shouldReturnAnEmptyMapWhenThereAreNoResults() {
 
         repo.findLastSearchResults().test().await().assertValue {
             val result = it.orNull()
@@ -708,7 +708,7 @@ class ChildrenRepositoryImplUnitTests {
     }
 
     @Test
-    fun `findLastSearchResults should propagate the UnknownException`() {
+    fun findLastSearchResults_shouldPropagateTheUnknownException() {
 
         fun go() {
             repo.findLastSearchResults().test().await().assertValue {
