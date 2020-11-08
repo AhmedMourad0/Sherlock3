@@ -332,11 +332,8 @@ private fun extractLocation(
     return Either.fx {
 
         val locationId = snapshot.getString(Contract.Database.Children.LOCATION_ID)
-                ?: return@fx null
         val locationName = snapshot.getString(Contract.Database.Children.LOCATION_NAME)
-                ?: return@fx null
         val locationAddress = snapshot.getString(Contract.Database.Children.LOCATION_ADDRESS)
-                ?: return@fx null
 
         val coordinates = extractCoordinates(
                 snapshot,
