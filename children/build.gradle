@@ -15,12 +15,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         multiDexEnabled true
-        resValue "string", "firebase_application_id", sherlockTestApplicationId
-        resValue "string", "firebase_api_key", sherlockTestApiKey
-        resValue "string", "firebase_project_id", sherlockTestProjectId
-        resValue "string", "firebase_database_url", sherlockTestDatabaseUrl
-        resValue "string", "firebase_storage_bucket", sherlockTestStorageBucket
-        resValue "string", "firebase_gcm_sender_id", sherlockTestGcmSenderId
     }
     buildTypes {
         release {
