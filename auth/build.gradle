@@ -64,12 +64,12 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:1.2.0"
 
-    implementation 'com.google.firebase:firebase-core:17.5.0'
+    implementation 'com.google.firebase:firebase-core:18.0.0'
     api "com.google.firebase:firebase-storage:19.2.0"
-    api "com.google.firebase:firebase-firestore-ktx:21.6.0"
-    api "com.google.firebase:firebase-auth:19.4.0"
-    api 'com.google.firebase:firebase-messaging:20.2.4'
-    api 'com.google.firebase:firebase-analytics:17.5.0'
+    api "com.google.firebase:firebase-firestore-ktx:22.0.0"
+    api "com.google.firebase:firebase-auth:20.0.0"
+    api 'com.google.firebase:firebase-messaging:21.0.0'
+    api 'com.google.firebase:firebase-analytics:18.0.0'
     implementation "com.google.android.gms:play-services-auth:18.1.0"
 
     implementation 'com.facebook.android:facebook-login:7.1.0'
