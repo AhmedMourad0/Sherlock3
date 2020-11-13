@@ -41,7 +41,7 @@ import timber.log.Timber
 import java.util.*
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class FirebaseFirestoreRemoteRepositoryTests {
+class FirebaseFirestoreRemoteRepositoryImplTests {
 
     private val simpleUserFactory = { userId: UserId ->
         SimpleRetrievedUser.of(
