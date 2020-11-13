@@ -72,7 +72,7 @@ class ChildrenRepositoryImplTests {
         ).orNull()!!
     }
 
-    private val investigation = queryFactory(0).toInvestigation()
+    private val investigationFactory = queryFactory(0).toInvestigation()
 
     private lateinit var localRepository: FakeLocalRepository
     private lateinit var remoteRepository: FakeRemoteRepository
@@ -484,21 +484,6 @@ class ChildrenRepositoryImplTests {
     }
 
     @Test
-    fun findAll_shouldPropagateTheInternalException() {
-
-        fun go() {
-            repo.findAll(queryFactory(0)).test().await().assertValue {
-                assertTrue(it is Either.Left)
-                it as Either.Left
-                it.a is ChildrenRepository.FindAllException.InternalException
-            }
-        }
-
-        remoteRepository.triggerInternalException = true
-        go()
-    }
-
-    @Test
     fun findAll_shouldPropagateTheUnknownException() {
 
         fun go() {
@@ -538,11 +523,11 @@ class ChildrenRepositoryImplTests {
 
     @Test
     fun addInvestigation_shouldAddTheInvestigationToTheRemoteRepoAndReturnIt() {
-        repo.addInvestigation(investigation).test().await().assertValue {
+        repo.addInvestigation(investigationFactory).test().await().assertValue {
             val result = it.orNull()!!
-            assertTrue(remoteRepository.allInvestigations().contains(investigation))
+            assertTrue(remoteRepository.allInvestigations().contains(investigationFactory))
             assertEquals(1, remoteRepository.allInvestigations().size)
-            result == investigation
+            result == investigationFactory
         }
     }
 
@@ -550,7 +535,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
-            repo.addInvestigation(investigation).test().await().assertValue {
+            repo.addInvestigation(investigationFactory).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.AddInvestigationException.NoSignedInUserException
@@ -565,7 +550,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
-            repo.addInvestigation(investigation).test().await().assertValue {
+            repo.addInvestigation(investigationFactory).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.AddInvestigationException.NoInternetConnectionException
@@ -580,7 +565,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheUnknownException() {
 
         fun go() {
-            repo.addInvestigation(investigation).test().await().assertValue {
+            repo.addInvestigation(investigationFactory).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a is ChildrenRepository.AddInvestigationException.UnknownException
@@ -595,7 +580,7 @@ class ChildrenRepositoryImplTests {
     fun findAllInvestigations_shouldReturnAllOngoingInvestigations() {
 
         Single.defer {
-            remoteRepository.addInvestigation(investigation)
+            remoteRepository.addInvestigation(investigationFactory)
         }.repeat(10).test().await()
 
         repo.findAllInvestigations().test().await().assertValue {
@@ -641,21 +626,6 @@ class ChildrenRepositoryImplTests {
         }
 
         remoteRepository.hasInternet = false
-        go()
-    }
-
-    @Test
-    fun findAllInvestigations_shouldPropagateTheInternalException() {
-
-        fun go() {
-            repo.findAllInvestigations().test().await().assertValue {
-                assertTrue(it is Either.Left)
-                it as Either.Left
-                it.a is ChildrenRepository.FindAllInvestigationsException.InternalException
-            }
-        }
-
-        remoteRepository.triggerInternalException = true
         go()
     }
 
