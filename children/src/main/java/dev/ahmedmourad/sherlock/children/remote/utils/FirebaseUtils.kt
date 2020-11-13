@@ -350,7 +350,7 @@ private fun extractLocation(
     }
 }
 
-private fun extractCoordinates(
+internal fun extractCoordinates(
         snapshot: DocumentSnapshot,
         latitudeKey: String,
         longitudeKey: String
@@ -364,7 +364,7 @@ private fun extractCoordinates(
     return Coordinates.of(latitude, longitude).mapLeft { ModelCreationException(it.toString()) }
 }
 
-private fun extractExactAppearance(
+internal fun extractExactAppearance(
         snapshot: DocumentSnapshot,
         id: String
 ): Either<ModelCreationException, ExactAppearance> {

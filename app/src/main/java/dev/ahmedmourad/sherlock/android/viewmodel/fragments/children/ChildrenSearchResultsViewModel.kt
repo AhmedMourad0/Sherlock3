@@ -73,11 +73,6 @@ internal class ChildrenSearchResultsViewModel(
                                         State.NoSignedInUser
                                     }
 
-                                    is FindChildrenInteractor.Exception.InternalException -> {
-                                        Timber.error(e.origin, e::toString)
-                                        State.Error
-                                    }
-
                                     is FindChildrenInteractor.Exception.UnknownException -> {
                                         Timber.error(e.origin, e::toString)
                                         State.Error

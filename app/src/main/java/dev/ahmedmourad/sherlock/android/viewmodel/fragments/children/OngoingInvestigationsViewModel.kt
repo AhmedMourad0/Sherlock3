@@ -45,11 +45,6 @@ internal class OngoingInvestigationsViewModel(
                                         State.NoSignedInUser
                                     }
 
-                                    is FindAllInvestigationsInteractor.Exception.InternalException -> {
-                                        Timber.error(e.origin, e::toString)
-                                        State.Error
-                                    }
-
                                     is FindAllInvestigationsInteractor.Exception.UnknownException -> {
                                         Timber.error(e.origin, e::toString)
                                         State.Error

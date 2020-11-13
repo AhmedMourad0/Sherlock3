@@ -192,8 +192,6 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 RemoteRepository.FindException.NoInternetConnectionException
             AuthManager.FindSimpleUsersException.NoSignedInUserException ->
                 RemoteRepository.FindException.NoSignedInUserException
-            is AuthManager.FindSimpleUsersException.InternalException ->
-                RemoteRepository.FindException.InternalException(this.origin)
             is AuthManager.FindSimpleUsersException.UnknownException ->
                 RemoteRepository.FindException.UnknownException(this.origin)
         }
@@ -253,13 +251,13 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                                 }.map { either ->
                                     either.fold(ifLeft = {
                                         it.left()
-                                    }) { user ->
+                                    }, ifRight = { user ->
                                         snapshot.let { s ->
                                             extractRetrievedChild(s, user).mapLeft {
                                                 RemoteRepository.FindException.InternalException(it)
                                             }
                                         }
-                                    }
+                                    })
                                 }
                     })
                 }
@@ -339,6 +337,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
     }
 
     //TODO: this needs to be cached locally
+    //TODO: create RetrievedInvestigation and InvestigationToAdd
     override fun findAllInvestigations():
             Flowable<Either<RemoteRepository.FindAllInvestigationsException, List<Investigation>>> {
 
@@ -355,16 +354,17 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     isInternetConnectedEither.fold(ifLeft = {
                         Flowable.just(it.map().left())
                     }, ifRight = { isInternetConnected ->
-                        if (isInternetConnected)
+                        if (isInternetConnected) {
                             simpleSignedInUserObservable.invoke().map { option ->
                                 option.toEither {
                                     RemoteRepository.FindAllInvestigationsException.NoSignedInUserException
                                 }
                             }
-                        else
+                        } else {
                             Flowable.just(
                                     RemoteRepository.FindAllInvestigationsException.NoInternetConnectionException.left()
                             )
+                        }
                     })
                 }.switchMap { isUserSignedInEither ->
                     isUserSignedInEither.fold(ifLeft = {
@@ -390,12 +390,11 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
 
                 } else if (snapshot != null) {
 
-                    emitter.onNext(
-                            snapshot.documents
-                                    .filter(DocumentSnapshot::exists)
-                                    .mapNotNull { extractChildInvestigation(user, it).orNull() }
-                                    .distinct()
-                                    .right()
+                    emitter.onNext(snapshot.documents
+                            .filter(DocumentSnapshot::exists)
+                            .mapNotNull { extractChildInvestigation(user, it).orNull() }
+                            .distinct()
+                            .right()
                     )
                 }
             }
@@ -410,6 +409,9 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
     }
 
+    //TODO: this and the firebase functions should add a flag that indicates
+    // when the results are ready to harvest, we then filter returned data
+    // accordingly to avoid returning incomplete results to the consumer
     override fun findAll(
             query: ChildrenQuery
     ): Flowable<Either<RemoteRepository.FindAllException, Map<SimpleRetrievedChild, Weight>>> {
@@ -553,8 +555,6 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                 RemoteRepository.FindAllException.NoInternetConnectionException
             AuthManager.FindSimpleUsersException.NoSignedInUserException ->
                 RemoteRepository.FindAllException.NoSignedInUserException
-            is AuthManager.FindSimpleUsersException.InternalException ->
-                RemoteRepository.FindAllException.InternalException(this.origin)
             is AuthManager.FindSimpleUsersException.UnknownException ->
                 RemoteRepository.FindAllException.UnknownException(this.origin)
         }

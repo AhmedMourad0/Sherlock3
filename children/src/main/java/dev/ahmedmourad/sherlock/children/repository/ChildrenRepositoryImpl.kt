@@ -202,9 +202,6 @@ internal class ChildrenRepositoryImpl @Inject constructor(
             RemoteRepository.FindAllException.NoSignedInUserException ->
                 ChildrenRepository.FindAllException.NoSignedInUserException
 
-            is RemoteRepository.FindAllException.InternalException ->
-                ChildrenRepository.FindAllException.InternalException(this.origin)
-
             is RemoteRepository.FindAllException.UnknownException ->
                 ChildrenRepository.FindAllException.UnknownException(this.origin)
         }
@@ -310,9 +307,6 @@ internal class ChildrenRepositoryImpl @Inject constructor(
 
             RemoteRepository.FindAllInvestigationsException.NoSignedInUserException ->
                 ChildrenRepository.FindAllInvestigationsException.NoSignedInUserException
-
-            is RemoteRepository.FindAllInvestigationsException.InternalException ->
-                ChildrenRepository.FindAllInvestigationsException.InternalException(this.origin)
 
             is RemoteRepository.FindAllInvestigationsException.UnknownException ->
                 ChildrenRepository.FindAllInvestigationsException.UnknownException(this.origin)

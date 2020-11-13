@@ -48,7 +48,6 @@ interface ChildrenRepository {
     sealed class FindAllException {
         object NoInternetConnectionException : FindAllException()
         object NoSignedInUserException : FindAllException()
-        data class InternalException(val origin: Throwable) : FindAllException()
         data class UnknownException(val origin: Throwable) : FindAllException()
     }
 
@@ -61,7 +60,6 @@ interface ChildrenRepository {
     sealed class FindAllInvestigationsException {
         object NoInternetConnectionException : FindAllInvestigationsException()
         object NoSignedInUserException : FindAllInvestigationsException()
-        data class InternalException(val origin: Throwable) : FindAllInvestigationsException()
         data class UnknownException(val origin: Throwable) : FindAllInvestigationsException()
     }
 
