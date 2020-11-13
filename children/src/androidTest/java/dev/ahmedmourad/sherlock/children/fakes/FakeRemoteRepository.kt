@@ -123,10 +123,6 @@ internal class FakeRemoteRepository : RemoteRepository {
                     Flowable.just(RemoteRepository.FindAllInvestigationsException.NoSignedInUserException.left())
                 }
 
-                triggerInternalException -> {
-                    Flowable.just(RemoteRepository.FindAllInvestigationsException.InternalException(RuntimeException()).left())
-                }
-
                 triggerUnknownException -> {
                     Flowable.just(RemoteRepository.FindAllInvestigationsException.UnknownException(RuntimeException()).left())
                 }
@@ -150,10 +146,6 @@ internal class FakeRemoteRepository : RemoteRepository {
 
                 !isUserSignedIn -> {
                     Flowable.just(RemoteRepository.FindAllException.NoSignedInUserException.left())
-                }
-
-                triggerInternalException -> {
-                    Flowable.just(RemoteRepository.FindAllException.InternalException(RuntimeException()).left())
                 }
 
                 triggerUnknownException -> {

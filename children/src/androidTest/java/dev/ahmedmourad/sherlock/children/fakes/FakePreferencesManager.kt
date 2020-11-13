@@ -5,9 +5,13 @@ import java.util.*
 
 internal class FakePreferencesManager : PreferencesManager {
 
-    private val deviceId = UUID.randomUUID().toString()
+    private var deviceId = UUID.randomUUID().toString()
 
     override fun getDeviceId(): String {
         return deviceId
+    }
+
+    fun invalidateDeviceId() {
+        deviceId = UUID.randomUUID().toString()
     }
 }
