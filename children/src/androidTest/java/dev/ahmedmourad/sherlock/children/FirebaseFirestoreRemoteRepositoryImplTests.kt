@@ -43,48 +43,6 @@ import java.util.*
 @RunWith(AndroidJUnit4ClassRunner::class)
 class FirebaseFirestoreRemoteRepositoryImplTests {
 
-    private val simpleUserFactory = { userId: UserId ->
-        SimpleRetrievedUser.of(
-                userId,
-                DisplayName.of("Ahmed Mourad").orNull()!!,
-                null
-        )
-    }
-
-    private val childToPublishFactory = { userId: UserId ->
-        ChildToPublish.of(
-                simpleUserFactory(userId),
-                FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!).right(),
-                null,
-                Location.of(null, null, null, Coordinates.of(77.0, 88.0).orNull()!!),
-                ApproximateAppearance.of(
-                        Gender.MALE,
-                        Skin.WHEAT,
-                        Hair.BROWN,
-                        AgeRange.of(Age.of(11).orNull()!!, Age.of(17).orNull()!!).orNull()!!,
-                        HeightRange.of(Height.of(70).orNull()!!, Height.of(120).orNull()!!).orNull()!!
-                ).orNull()!!,
-                null
-        ).orNull()!!
-    }
-    private val queryFactory = { page: Int, userId: UserId ->
-        ChildrenQuery.of(
-                simpleUserFactory(userId),
-                FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!),
-                Coordinates.of((-90..90).random().toDouble(), (-180..180).random().toDouble()).orNull()!!,
-                ExactAppearance.of(
-                        Gender.MALE,
-                        Skin.WHEAT,
-                        Hair.BROWN,
-                        Age.of((7..15).random()).orNull()!!,
-                        Height.of((70..140).random()).orNull()!!
-                ),
-                page
-        ).orNull()!!
-    }
-
-    private val investigationFactory = { userId: UserId -> queryFactory(0, userId).toInvestigation() }
-
     private lateinit var preferencesManager: FakePreferencesManager
     private lateinit var connectivityManager: FakeConnectivityManager
     private lateinit var authStateObservable: FakeObserveUserAuthState
@@ -1265,4 +1223,49 @@ internal fun extractChildQuery(
                 page.bind()
         ).mapLeft { ModelCreationException(it.toString()) }.bind()
     }
+}
+
+private fun simpleUserFactory(userId: UserId): SimpleRetrievedUser {
+    return SimpleRetrievedUser.of(
+            userId,
+            DisplayName.of("Ahmed Mourad").orNull()!!,
+            null
+    )
+}
+
+private fun childToPublishFactory(userId: UserId): ChildToPublish {
+    return ChildToPublish.of(
+            simpleUserFactory(userId),
+            FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!).right(),
+            null,
+            Location.of(null, null, null, Coordinates.of(77.0, 88.0).orNull()!!),
+            ApproximateAppearance.of(
+                    Gender.MALE,
+                    Skin.WHEAT,
+                    Hair.BROWN,
+                    AgeRange.of(Age.of(11).orNull()!!, Age.of(17).orNull()!!).orNull()!!,
+                    HeightRange.of(Height.of(70).orNull()!!, Height.of(120).orNull()!!).orNull()!!
+            ).orNull()!!,
+            null
+    ).orNull()!!
+}
+
+private fun queryFactory(page: Int, userId: UserId): ChildrenQuery {
+    return ChildrenQuery.of(
+            simpleUserFactory(userId),
+            FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!),
+            Coordinates.of((-90..90).random().toDouble(), (-180..180).random().toDouble()).orNull()!!,
+            ExactAppearance.of(
+                    Gender.MALE,
+                    Skin.WHEAT,
+                    Hair.BROWN,
+                    Age.of((7..15).random()).orNull()!!,
+                    Height.of((70..140).random()).orNull()!!
+            ),
+            page
+    ).orNull()!!
+}
+
+private fun investigationFactory(userId: UserId): Investigation {
+    return queryFactory(0, userId).toInvestigation()
 }

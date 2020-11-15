@@ -15,10 +15,7 @@ import dev.ahmedmourad.sherlock.domain.constants.Skin
 import dev.ahmedmourad.sherlock.domain.data.ChildrenRepository
 import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
 import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
-import dev.ahmedmourad.sherlock.domain.model.children.ChildToPublish
-import dev.ahmedmourad.sherlock.domain.model.children.ChildrenQuery
-import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
+import dev.ahmedmourad.sherlock.domain.model.children.*
 import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
 import dev.ahmedmourad.sherlock.domain.model.common.Name
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
@@ -32,47 +29,6 @@ import java.util.*
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class ChildrenRepositoryImplTests {
-
-    private val childToPublish = ChildToPublish.of(
-            SimpleRetrievedUser.of(
-                    UserId(UUID.randomUUID().toString()),
-                    DisplayName.of("Ahmed Mourad").orNull()!!,
-                    null
-            ),
-            FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!).right(),
-            null,
-            Location.of(null, null, null, Coordinates.of(77.0, 88.0).orNull()!!),
-            ApproximateAppearance.of(
-                    Gender.MALE,
-                    Skin.WHEAT,
-                    Hair.BROWN,
-                    AgeRange.of(Age.of(11).orNull()!!, Age.of(17).orNull()!!).orNull()!!,
-                    HeightRange.of(Height.of(70).orNull()!!, Height.of(120).orNull()!!).orNull()!!
-            ).orNull()!!,
-            null
-    ).orNull()!!
-
-    private val queryFactory = { page: Int ->
-        ChildrenQuery.of(
-                SimpleRetrievedUser.of(
-                        UserId(UUID.randomUUID().toString()),
-                        DisplayName.of("Ahmed Mourad").orNull()!!,
-                        null
-                ),
-                FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!),
-                Coordinates.of(77.0, 88.0).orNull()!!,
-                ExactAppearance.of(
-                        Gender.MALE,
-                        Skin.WHEAT,
-                        Hair.BROWN,
-                        Age.of(14).orNull()!!,
-                        Height.of(100).orNull()!!
-                ),
-                page
-        ).orNull()!!
-    }
-
-    private val investigationFactory = queryFactory(0).toInvestigation()
 
     private lateinit var localRepository: FakeLocalRepository
     private lateinit var remoteRepository: FakeRemoteRepository
@@ -97,12 +53,13 @@ class ChildrenRepositoryImplTests {
 
     @Test
     fun publish_shouldAddTheChildToTheRemoteRepoAndReturnItAsRetrievedChild() {
-        repo.publish(childToPublish).test().await().assertValue {
+        val child = childToPublish()
+        repo.publish(child).test().await().assertValue {
             val result = it.orNull()!!
-            val retrieved = childToPublish.toRetrievedChild(result.id, result.timestamp, result.pictureUrl)
+            val retrieved = child.toRetrievedChild(result.id, result.timestamp, result.pictureUrl)
             assertTrue(remoteRepository.allChildren().contains(retrieved))
             assertEquals(1, remoteRepository.allChildren().size)
-            childToPublish.matches(result)
+            child.matches(result)
         }
     }
 
@@ -110,7 +67,7 @@ class ChildrenRepositoryImplTests {
     fun publish_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
-            repo.publish(childToPublish).test().await().assertValue {
+            repo.publish(childToPublish()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.PublishException.NoSignedInUserException
@@ -134,7 +91,7 @@ class ChildrenRepositoryImplTests {
     fun publish_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
-            repo.publish(childToPublish).test().await().assertValue {
+            repo.publish(childToPublish()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.PublishException.NoInternetConnectionException
@@ -158,7 +115,7 @@ class ChildrenRepositoryImplTests {
     fun publish_shouldPropagateTheInternalException() {
 
         fun go() {
-            repo.publish(childToPublish).test().await().assertValue {
+            repo.publish(childToPublish()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a is ChildrenRepository.PublishException.InternalException
@@ -173,7 +130,7 @@ class ChildrenRepositoryImplTests {
     fun publish_shouldPropagateTheUnknownException() {
 
         fun go() {
-            repo.publish(childToPublish).test().await().assertValue {
+            repo.publish(childToPublish()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a is ChildrenRepository.PublishException.UnknownException
@@ -197,10 +154,11 @@ class ChildrenRepositoryImplTests {
     fun find_shouldReturnTheChildWithoutWeightWhenItExistsInTheRemoteRepoOnly() {
 
         val childId = ChildId(UUID.randomUUID().toString())
+        val child = childToPublish()
 
         remoteRepository.publish(
                 childId,
-                childToPublish,
+                child,
                 null
         ).test().await()
 
@@ -209,7 +167,7 @@ class ChildrenRepositoryImplTests {
             assertNotNull(result)
             assertNull(result!!.b)
             assertEquals(childId, result.a.id)
-            childToPublish.matches(result.a)
+            child.matches(result.a)
         }
     }
 
@@ -217,19 +175,20 @@ class ChildrenRepositoryImplTests {
     fun find_shouldReturnTheChildWithWeightWhenItExistsInTheRemoteAndLocalRepos() {
 
         val childId = ChildId(UUID.randomUUID().toString())
+        val child = childToPublish()
 
         remoteRepository.publish(
                 childId,
-                childToPublish,
+                child,
                 null
         ).test().await()
 
         localRepository.replaceAll(
-                mapOf(childToPublish.toRetrievedChild(
+                mapOf(child.toRetrievedChild(
                         childId,
                         System.currentTimeMillis(),
                         null
-                ).simplify() to Weight.of(0.78).orNull()!!)
+                ).simplify() to Weight.of((0..100).random() / 100.0).orNull()!!)
         ).test().await()
 
         repo.find(childId).test().await().assertValue {
@@ -237,7 +196,7 @@ class ChildrenRepositoryImplTests {
             assertNotNull(result)
             assertNotNull(result!!.b)
             assertEquals(childId, result.a.id)
-            childToPublish.matches(result.a)
+            child.matches(result.a)
         }
     }
 
@@ -247,7 +206,7 @@ class ChildrenRepositoryImplTests {
         val childId = ChildId(UUID.randomUUID().toString())
 
         localRepository.replaceAll(
-                mapOf(childToPublish.toRetrievedChild(
+                mapOf(childToPublish().toRetrievedChild(
                         childId,
                         System.currentTimeMillis(),
                         null
@@ -310,7 +269,7 @@ class ChildrenRepositoryImplTests {
 
         remoteRepository.publish(
                 childId,
-                childToPublish,
+                childToPublish(),
                 null
         ).test().await()
 
@@ -323,15 +282,6 @@ class ChildrenRepositoryImplTests {
         }
 
         remoteRepository.triggerInternalException = true
-        localRepository.triggerInternalException = false
-        go()
-
-        remoteRepository.triggerInternalException = false
-        localRepository.triggerInternalException = true
-        go()
-
-        remoteRepository.triggerInternalException = true
-        localRepository.triggerInternalException = true
         go()
     }
 
@@ -342,7 +292,7 @@ class ChildrenRepositoryImplTests {
 
         remoteRepository.publish(
                 childId,
-                childToPublish,
+                childToPublish(),
                 null
         ).test().await()
 
@@ -373,7 +323,7 @@ class ChildrenRepositoryImplTests {
         Single.defer {
             remoteRepository.publish(
                     ChildId(UUID.randomUUID().toString()),
-                    childToPublish,
+                    childToPublish(),
                     null
             )
         }.repeat(10).test().await()
@@ -387,7 +337,7 @@ class ChildrenRepositoryImplTests {
         Single.defer {
             remoteRepository.publish(
                     ChildId(UUID.randomUUID().toString()),
-                    childToPublish,
+                    childToPublish(),
                     null
             )
         }.repeat(20).test().await()
@@ -427,7 +377,7 @@ class ChildrenRepositoryImplTests {
         Single.defer {
             remoteRepository.publish(
                     ChildId(UUID.randomUUID().toString()),
-                    childToPublish,
+                    childToPublish(),
                     null
             )
         }.repeat(15).test().await()
@@ -523,11 +473,12 @@ class ChildrenRepositoryImplTests {
 
     @Test
     fun addInvestigation_shouldAddTheInvestigationToTheRemoteRepoAndReturnIt() {
-        repo.addInvestigation(investigationFactory).test().await().assertValue {
+        val investigation = investigationFactory()
+        repo.addInvestigation(investigation).test().await().assertValue {
             val result = it.orNull()!!
-            assertTrue(remoteRepository.allInvestigations().contains(investigationFactory))
+            assertTrue(remoteRepository.allInvestigations().contains(investigation))
             assertEquals(1, remoteRepository.allInvestigations().size)
-            result == investigationFactory
+            result == investigation
         }
     }
 
@@ -535,7 +486,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheNoSignedInUserException() {
 
         fun go() {
-            repo.addInvestigation(investigationFactory).test().await().assertValue {
+            repo.addInvestigation(investigationFactory()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.AddInvestigationException.NoSignedInUserException
@@ -550,7 +501,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheNoInternetConnectionException() {
 
         fun go() {
-            repo.addInvestigation(investigationFactory).test().await().assertValue {
+            repo.addInvestigation(investigationFactory()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a == ChildrenRepository.AddInvestigationException.NoInternetConnectionException
@@ -565,7 +516,7 @@ class ChildrenRepositoryImplTests {
     fun addInvestigation_shouldPropagateTheUnknownException() {
 
         fun go() {
-            repo.addInvestigation(investigationFactory).test().await().assertValue {
+            repo.addInvestigation(investigationFactory()).test().await().assertValue {
                 assertTrue(it is Either.Left)
                 it as Either.Left
                 it.a is ChildrenRepository.AddInvestigationException.UnknownException
@@ -580,7 +531,7 @@ class ChildrenRepositoryImplTests {
     fun findAllInvestigations_shouldReturnAllOngoingInvestigations() {
 
         Single.defer {
-            remoteRepository.addInvestigation(investigationFactory)
+            remoteRepository.addInvestigation(investigationFactory())
         }.repeat(10).test().await()
 
         repo.findAllInvestigations().test().await().assertValue {
@@ -649,7 +600,7 @@ class ChildrenRepositoryImplTests {
 
         val items = mutableMapOf<SimpleRetrievedChild, Weight>()
         repeat(10) {
-            items[childToPublish.toRetrievedChild(
+            items[childToPublish().toRetrievedChild(
                     ChildId(UUID.randomUUID().toString()),
                     System.currentTimeMillis(),
                     null
@@ -691,6 +642,51 @@ class ChildrenRepositoryImplTests {
         localRepository.triggerUnknownException = true
         go()
     }
+}
+
+private fun childToPublish(): ChildToPublish {
+    return ChildToPublish.of(
+            SimpleRetrievedUser.of(
+                    UserId(UUID.randomUUID().toString()),
+                    DisplayName.of("Ahmed Mourad").orNull()!!,
+                    null
+            ),
+            FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!).right(),
+            null,
+            Location.of(null, null, null, Coordinates.of(77.0, 88.0).orNull()!!),
+            ApproximateAppearance.of(
+                    Gender.MALE,
+                    Skin.WHEAT,
+                    Hair.BROWN,
+                    AgeRange.of(Age.of(11).orNull()!!, Age.of(17).orNull()!!).orNull()!!,
+                    HeightRange.of(Height.of(70).orNull()!!, Height.of(120).orNull()!!).orNull()!!
+            ).orNull()!!,
+            null
+    ).orNull()!!
+}
+
+private fun queryFactory(page: Int): ChildrenQuery {
+    return ChildrenQuery.of(
+            SimpleRetrievedUser.of(
+                    UserId(UUID.randomUUID().toString()),
+                    DisplayName.of("Ahmed Mourad").orNull()!!,
+                    null
+            ),
+            FullName.of(Name.of("Jack").orNull()!!, Name.of("McBigFeet").orNull()!!),
+            Coordinates.of(77.0, 88.0).orNull()!!,
+            ExactAppearance.of(
+                    Gender.MALE,
+                    Skin.WHEAT,
+                    Hair.BROWN,
+                    Age.of(14).orNull()!!,
+                    Height.of(100).orNull()!!
+            ),
+            page
+    ).orNull()!!
+}
+
+private fun investigationFactory(): Investigation {
+    return queryFactory(0).toInvestigation()
 }
 
 private fun ChildToPublish.matches(other: RetrievedChild): Boolean {
