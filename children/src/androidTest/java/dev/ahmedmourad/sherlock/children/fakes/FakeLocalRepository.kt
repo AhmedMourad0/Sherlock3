@@ -12,22 +12,17 @@ internal class FakeLocalRepository : LocalRepository {
 
     private val fakeDb = mutableListOf<Pair<Either<SimpleRetrievedChild, RetrievedChild>, Weight?>>()
 
-    var triggerInternalException = false
     var triggerUnknownException = false
 
     override fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
-    ): Flowable<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
+    ): Flowable<Either<LocalRepository.InsertOrReplaceRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
         return Flowable.defer {
 
             when {
 
-                triggerInternalException -> {
-                    Flowable.just(LocalRepository.UpdateRetainingWeightException.InternalException(RuntimeException()).left())
-                }
-
                 triggerUnknownException -> {
-                    Flowable.just(LocalRepository.UpdateRetainingWeightException.UnknownException(RuntimeException()).left())
+                    Flowable.just(LocalRepository.InsertOrReplaceRetainingWeightException.UnknownException(RuntimeException()).left())
                 }
 
                 else -> {
