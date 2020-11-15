@@ -1,6 +1,7 @@
 package dev.ahmedmourad.sherlock.children.preferences
 
 import android.content.Context.MODE_PRIVATE
+import androidx.annotation.VisibleForTesting
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.children.repository.dependencies.PreferencesManager
 import splitties.init.appCtx
@@ -17,13 +18,22 @@ class PreferencesManagerImpl @Inject constructor() : PreferencesManager {
     override fun getDeviceId(): String {
 
         if (!preferences.contains(KEY_DEVICE_ID)) {
-            with(preferences.edit()) {
-                putString(KEY_DEVICE_ID, UUID.randomUUID().toString())
-                commit()
-            }
+            markDevice()
         }
 
         return preferences.getString(KEY_DEVICE_ID, null)!!
+    }
+
+    private fun markDevice() {
+        with(preferences.edit()) {
+            putString(KEY_DEVICE_ID, UUID.randomUUID().toString())
+            commit()
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun simulateNewDevice() {
+        markDevice()
     }
 
     companion object {
