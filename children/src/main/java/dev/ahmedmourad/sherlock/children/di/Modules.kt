@@ -11,8 +11,6 @@ import dev.ahmedmourad.sherlock.children.images.repository.FirebaseStorageImageR
 import dev.ahmedmourad.sherlock.children.local.ChildrenDatabase
 import dev.ahmedmourad.sherlock.children.local.ChildrenQueries
 import dev.ahmedmourad.sherlock.children.local.UsersQueries
-import dev.ahmedmourad.sherlock.children.local.daos.ChildrenDao
-import dev.ahmedmourad.sherlock.children.local.daos.ChildrenDaoImpl
 import dev.ahmedmourad.sherlock.children.local.database.childrenDatabase
 import dev.ahmedmourad.sherlock.children.local.database.sqliteDriver
 import dev.ahmedmourad.sherlock.children.local.repository.LocalRepositoryImpl
@@ -51,12 +49,6 @@ internal interface ChildrenBindingsModule {
     fun bindLocalRepository(
             impl: LocalRepositoryImpl
     ): LocalRepository
-
-    @Binds
-    @InternalApi
-    fun bindChildrenDao(
-            impl: ChildrenDaoImpl
-    ): ChildrenDao
 
     @Binds
     @InternalApi

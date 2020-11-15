@@ -40,7 +40,6 @@ internal interface RemoteRepository {
     sealed class FindSimpleUsersException {
         object NoInternetConnectionException : FindSimpleUsersException()
         object NoSignedInUserException : FindSimpleUsersException()
-        data class InternalException(val origin: Throwable) : FindSimpleUsersException()
         data class UnknownException(val origin: Throwable) : FindSimpleUsersException()
     }
 

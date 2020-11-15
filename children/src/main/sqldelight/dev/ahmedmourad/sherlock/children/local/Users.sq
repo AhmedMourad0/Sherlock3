@@ -29,6 +29,18 @@ INSERT INTO users (
     phone_number
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
+findAllUsers:
+SELECT
+    id,
+    display_name,
+    picture_url,
+    timestamp,
+    last_login_timestamp,
+    email,
+    username,
+    phone_number
+FROM users;
+
 updateSimple:
 UPDATE
     users

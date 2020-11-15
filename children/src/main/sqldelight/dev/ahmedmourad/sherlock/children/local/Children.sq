@@ -60,6 +60,30 @@ INSERT OR REPLACE INTO children (
     notes
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
+findAllChildren:
+SELECT
+    id,
+    user_id,
+    timestamp,
+    first_name,
+    last_name,
+    location_id,
+    location_name,
+    location_address,
+    location_latitude,
+    location_longitude,
+    gender,
+    skin,
+    hair,
+    min_age,
+    max_age,
+    min_height,
+    max_height,
+    picture_url,
+    weight,
+    notes
+FROM children;
+
 findAllSimpleWhereWeightExists:
 SELECT
     children.id,
@@ -75,7 +99,7 @@ SELECT
     users.display_name,
     users.picture_url
 FROM
-    children INNER JOIN users
+    children INNER JOIN users ON children.user_id = users.id
 WHERE weight IS NOT NULL;
 
 findChildById:
@@ -102,7 +126,7 @@ SELECT
     users.display_name,
     users.picture_url
 FROM
-    children INNER JOIN users
+    children INNER JOIN users ON children.user_id = users.id
 WHERE children.id = ?;
 
 findWeightById:

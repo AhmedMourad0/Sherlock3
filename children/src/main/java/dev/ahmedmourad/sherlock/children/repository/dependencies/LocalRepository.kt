@@ -12,7 +12,7 @@ internal interface LocalRepository {
 
     fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
-    ): Flowable<Either<UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>>
+    ): Flowable<Either<InsertOrReplaceRetainingWeightException, Tuple2<RetrievedChild, Weight?>>>
 
     fun findAllSimpleWhereWeightExists():
             Flowable<Either<FindAllSimpleWhereWeightExistsException, Map<SimpleRetrievedChild, Weight>>>
@@ -21,9 +21,8 @@ internal interface LocalRepository {
             items: Map<SimpleRetrievedChild, Weight>
     ): Single<Either<ReplaceAllException, Map<SimpleRetrievedChild, Weight>>>
 
-    sealed class UpdateRetainingWeightException {
-        data class InternalException(val origin: Throwable) : UpdateRetainingWeightException()
-        data class UnknownException(val origin: Throwable) : UpdateRetainingWeightException()
+    sealed class InsertOrReplaceRetainingWeightException {
+        data class UnknownException(val origin: Throwable) : InsertOrReplaceRetainingWeightException()
     }
 
     sealed class FindAllSimpleWhereWeightExistsException {

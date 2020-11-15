@@ -4,6 +4,7 @@ import arrow.core.Either
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
+import dev.ahmedmourad.sherlock.domain.interactors.children.InvalidateAllQueriesInteractor
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -29,13 +30,15 @@ private fun AuthManager.SignOutException.map() = when (this) {
 
 @Reusable
 internal class SignOutInteractorImpl @Inject constructor(
-        private val authManager: Lazy<AuthManager>
+        private val authManager: Lazy<AuthManager>,
+        private val invalidateAllQueriesInteractor: Lazy<InvalidateAllQueriesInteractor>
 ) : SignOutInteractor {
     override fun invoke(): Single<Either<SignOutInteractor.Exception, Unit>> {
-        return authManager.get()
-                .signOut()
-                .map { either ->
-                    either.mapLeft(AuthManager.SignOutException::map)
-                }
+        return invalidateAllQueriesInteractor.get()
+                .invoke()
+                .andThen(authManager.get()
+                        .signOut()
+                        .map { either -> either.mapLeft(AuthManager.SignOutException::map) }
+                )
     }
 }

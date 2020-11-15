@@ -146,9 +146,6 @@ internal class AuthManagerImpl @Inject constructor(
             RemoteRepository.FindSimpleUsersException.NoSignedInUserException ->
                 AuthManager.FindSimpleUsersException.NoSignedInUserException
 
-            is RemoteRepository.FindSimpleUsersException.InternalException ->
-                AuthManager.FindSimpleUsersException.InternalException(this.origin)
-
             is RemoteRepository.FindSimpleUsersException.UnknownException ->
                 AuthManager.FindSimpleUsersException.UnknownException(this.origin)
         }

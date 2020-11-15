@@ -145,10 +145,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
-        fun LocalRepository.UpdateRetainingWeightException.map() = when (this) {
-            is LocalRepository.UpdateRetainingWeightException.InternalException ->
-                ChildrenRepository.FindException.InternalException(this.origin)
-            is LocalRepository.UpdateRetainingWeightException.UnknownException ->
+        fun LocalRepository.InsertOrReplaceRetainingWeightException.map() = when (this) {
+            is LocalRepository.InsertOrReplaceRetainingWeightException.UnknownException ->
                 ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
@@ -168,7 +166,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
                                     .map { either ->
-                                        either.mapLeft(LocalRepository.UpdateRetainingWeightException::map)
+                                        either.mapLeft(LocalRepository.InsertOrReplaceRetainingWeightException::map)
                                     }
                         }
                     })
@@ -201,9 +199,6 @@ internal class ChildrenRepositoryImpl @Inject constructor(
 
             RemoteRepository.FindAllException.NoSignedInUserException ->
                 ChildrenRepository.FindAllException.NoSignedInUserException
-
-            is RemoteRepository.FindAllException.InternalException ->
-                ChildrenRepository.FindAllException.InternalException(this.origin)
 
             is RemoteRepository.FindAllException.UnknownException ->
                 ChildrenRepository.FindAllException.UnknownException(this.origin)
@@ -310,9 +305,6 @@ internal class ChildrenRepositoryImpl @Inject constructor(
 
             RemoteRepository.FindAllInvestigationsException.NoSignedInUserException ->
                 ChildrenRepository.FindAllInvestigationsException.NoSignedInUserException
-
-            is RemoteRepository.FindAllInvestigationsException.InternalException ->
-                ChildrenRepository.FindAllInvestigationsException.InternalException(this.origin)
 
             is RemoteRepository.FindAllInvestigationsException.UnknownException ->
                 ChildrenRepository.FindAllInvestigationsException.UnknownException(this.origin)
