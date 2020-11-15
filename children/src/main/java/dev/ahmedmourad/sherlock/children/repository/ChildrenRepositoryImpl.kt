@@ -145,10 +145,8 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                 ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
-        fun LocalRepository.UpdateRetainingWeightException.map() = when (this) {
-            is LocalRepository.UpdateRetainingWeightException.InternalException ->
-                ChildrenRepository.FindException.InternalException(this.origin)
-            is LocalRepository.UpdateRetainingWeightException.UnknownException ->
+        fun LocalRepository.InsertOrReplaceRetainingWeightException.map() = when (this) {
+            is LocalRepository.InsertOrReplaceRetainingWeightException.UnknownException ->
                 ChildrenRepository.FindException.UnknownException(this.origin)
         }
 
@@ -168,7 +166,7 @@ internal class ChildrenRepositoryImpl @Inject constructor(
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(Schedulers.io())
                                     .map { either ->
-                                        either.mapLeft(LocalRepository.UpdateRetainingWeightException::map)
+                                        either.mapLeft(LocalRepository.InsertOrReplaceRetainingWeightException::map)
                                     }
                         }
                     })

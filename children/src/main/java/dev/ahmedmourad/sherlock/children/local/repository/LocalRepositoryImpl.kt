@@ -1,28 +1,18 @@
 package dev.ahmedmourad.sherlock.children.local.repository
 
 import arrow.core.*
-import arrow.core.extensions.fx
 import com.squareup.sqldelight.runtime.rx.asObservable
 import com.squareup.sqldelight.runtime.rx.mapToList
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.children.di.InternalApi
 import dev.ahmedmourad.sherlock.children.local.ChildrenQueries
 import dev.ahmedmourad.sherlock.children.local.UsersQueries
+import dev.ahmedmourad.sherlock.children.local.utils.map
 import dev.ahmedmourad.sherlock.children.repository.dependencies.LocalRepository
-import dev.ahmedmourad.sherlock.domain.constants.Gender
-import dev.ahmedmourad.sherlock.domain.constants.Hair
-import dev.ahmedmourad.sherlock.domain.constants.Skin
-import dev.ahmedmourad.sherlock.domain.constants.findEnum
-import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
-import dev.ahmedmourad.sherlock.domain.model.auth.SimpleRetrievedUser
-import dev.ahmedmourad.sherlock.domain.model.auth.submodel.DisplayName
 import dev.ahmedmourad.sherlock.domain.model.children.RetrievedChild
 import dev.ahmedmourad.sherlock.domain.model.children.SimpleRetrievedChild
-import dev.ahmedmourad.sherlock.domain.model.children.submodel.*
-import dev.ahmedmourad.sherlock.domain.model.common.Name
-import dev.ahmedmourad.sherlock.domain.model.common.Url
+import dev.ahmedmourad.sherlock.domain.model.children.submodel.Weight
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
-import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -83,65 +73,11 @@ internal class LocalRepositoryImpl @Inject constructor(
 
     override fun findAllSimpleWhereWeightExists():
             Flowable<Either<LocalRepository.FindAllSimpleWhereWeightExistsException, Map<SimpleRetrievedChild, Weight>>> {
-        return childrenQueries.findAllSimpleWhereWeightExists { childId,
-                                                                childTimestamp,
-                                                                childFirstName,
-                                                                childLastName,
-                                                                childLocationName,
-                                                                childLocationAddress,
-                                                                childPictureUrl,
-                                                                childWeight,
-                                                                childNotes,
-                                                                userId,
-                                                                userDisplayName,
-                                                                userPictureUrl ->
-
-            Either.fx<ModelCreationException, Pair<SimpleRetrievedChild, Weight>> {
-
-                val uDisplayName = DisplayName.of(userDisplayName)
-                        .mapLeft { ModelCreationException(it.toString()) }
-                        .bind()
-
-                val uPictureUrl = userPictureUrl?.let(Url::of)
-                        ?.mapLeft { ModelCreationException(it.toString()) }
-                        ?.bind()
-
-                val user = SimpleRetrievedUser.of(
-                        id = UserId(userId),
-                        displayName = uDisplayName,
-                        pictureUrl = uPictureUrl
-                ).right().bind()
-
-                val cName = parseName(childFirstName, childLastName).bind()
-
-                val cPictureUrl = childPictureUrl?.let(Url::of)
-                        ?.mapLeft { ModelCreationException(it.toString()) }
-                        ?.bind()
-
-                val cWeight = Weight.of(childWeight!!)
-                        .mapLeft { ModelCreationException(it.toString()) }
-                        .bind()
-
-                SimpleRetrievedChild.of(
-                        id = ChildId(childId),
-                        user = user,
-                        timestamp = childTimestamp,
-                        name = cName,
-                        notes = childNotes,
-                        locationName = childLocationName,
-                        locationAddress = childLocationAddress,
-                        pictureUrl = cPictureUrl
-                ).bimap(leftOperation = {
-                    ModelCreationException(it.toString())
-                }, rightOperation = {
-                    it to cWeight
-                }).bind()
-            }
-        }.asObservable()
+        return childrenQueries.findAllSimpleWhereWeightExists()
+                .asObservable()
                 .mapToList()
-                .map {
-                    it.mapNotNull(Either<ModelCreationException, Pair<SimpleRetrievedChild, Weight>>::orNull)
-                            .toMap()
+                .map { l ->
+                    l.mapNotNull { it.map().orNull() }.toMap()
                 }.subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
                 .distinctUntilChanged()
@@ -153,7 +89,7 @@ internal class LocalRepositoryImpl @Inject constructor(
 
     override fun insertOrReplaceRetainingWeight(
             item: RetrievedChild
-    ): Flowable<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
+    ): Flowable<Either<LocalRepository.InsertOrReplaceRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> {
         return Completable.fromAction {
 
             val (firstName, lastName) = item.name?.fold(ifLeft = {
@@ -209,213 +145,19 @@ internal class LocalRepositoryImpl @Inject constructor(
         }.andThen(findById(item.id).map { it.orNull()!! })
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map<Either<LocalRepository.UpdateRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> { it.right() }
+                .map<Either<LocalRepository.InsertOrReplaceRetainingWeightException, Tuple2<RetrievedChild, Weight?>>> { it.right() }
                 .onErrorReturn {
-                    LocalRepository.UpdateRetainingWeightException.UnknownException(it).left()
+                    LocalRepository.InsertOrReplaceRetainingWeightException.UnknownException(it).left()
                 }
     }
 
     private fun findById(id: ChildId): Flowable<Option<Tuple2<RetrievedChild, Weight?>>> {
-        return childrenQueries.findChildById(id.value) { childTimestamp,
-                                                         childFirstName,
-                                                         childLastName,
-                                                         childPictureUrl,
-                                                         childLocationId,
-                                                         childLocationName,
-                                                         childLocationAddress,
-                                                         childLocationLatitude,
-                                                         childLocationLongitude,
-                                                         childGender,
-                                                         childSkin,
-                                                         childHair,
-                                                         childMinAge,
-                                                         childMaxAge,
-                                                         childMinHeight,
-                                                         childMaxHeight,
-                                                         childWeight,
-                                                         childNotes,
-                                                         userId,
-                                                         userDisplayName,
-                                                         userPictureUrl ->
-
-            Either.fx<ModelCreationException, Tuple2<RetrievedChild, Weight?>> {
-
-                val uDisplayName = DisplayName.of(userDisplayName)
-                        .mapLeft { ModelCreationException(it.toString()) }
-                        .bind()
-
-                val uPictureUrl = userPictureUrl?.let(Url::of)
-                        ?.mapLeft { ModelCreationException(it.toString()) }
-                        ?.bind()
-
-                val user = SimpleRetrievedUser.of(
-                        id = UserId(userId),
-                        displayName = uDisplayName,
-                        pictureUrl = uPictureUrl
-                ).right().bind()
-
-                val cName = parseName(childFirstName, childLastName).bind()
-
-                val cPictureUrl = childPictureUrl?.let(Url::of)
-                        ?.mapLeft { ModelCreationException(it.toString()) }
-                        ?.bind()
-
-                val cLocation = parseLocation(
-                        childLocationId,
-                        childLocationName,
-                        childLocationAddress,
-                        childLocationLatitude,
-                        childLocationLongitude
-                ).bind()
-
-                val cAppearance = parseAppearance(
-                        childGender?.toInt(),
-                        childSkin?.toInt(),
-                        childHair?.toInt(),
-                        childMinAge?.toInt(),
-                        childMaxAge?.toInt(),
-                        childMinHeight?.toInt(),
-                        childMaxHeight?.toInt()
-                ).bind()
-
-                val cWeight = childWeight?.let(Weight::of)
-                        ?.mapLeft { ModelCreationException(it.toString()) }
-                        ?.bind()
-
-                RetrievedChild.of(
-                        id = id,
-                        user = user,
-                        timestamp = childTimestamp,
-                        name = cName,
-                        notes = childNotes,
-                        location = cLocation,
-                        appearance = cAppearance,
-                        pictureUrl = cPictureUrl
-                ).bimap(leftOperation = {
-                    ModelCreationException(it.toString())
-                }, rightOperation = {
-                    it toT cWeight
-                }).bind()
-            }
-        }.asObservable()
+        return childrenQueries.findChildById(id.value)
+                .asObservable()
                 .mapToList()
                 .map { l ->
-                    l.firstOrNull()?.orNull().toOption()
+                    l.firstOrNull()?.map(id)?.orNull().toOption()
                 }.subscribeOn(Schedulers.io())
                 .toFlowable(BackpressureStrategy.LATEST)
-    }
-
-    private fun parseName(
-            first: String?,
-            last: String?
-    ): Either<ModelCreationException, Either<Name, FullName>?> {
-        return Either.fx {
-            when {
-
-                first == null -> null
-
-                last == null -> {
-                    Name.of(first)
-                            .mapLeft { ModelCreationException(it.toString()) }
-                            .bind()
-                            .left()
-                }
-
-                else -> {
-
-                    val f = Name.of(first)
-                            .mapLeft { ModelCreationException(it.toString()) }
-                            .bind()
-
-                    val l = Name.of(last)
-                            .mapLeft { ModelCreationException(it.toString()) }
-                            .bind()
-
-                    FullName.of(f, l).right()
-                }
-            }
-        }
-    }
-
-    private fun parseLocation(
-            id: String?,
-            name: String?,
-            address: String?,
-            latitude: Double?,
-            longitude: Double?
-    ): Either<ModelCreationException, Location?> {
-        return Either.fx {
-
-            latitude ?: return@fx null.right().bind()
-            longitude ?: return@fx null.right().bind()
-
-            val coordinates = Coordinates.of(latitude, longitude)
-                    .mapLeft { ModelCreationException(it.toString()) }
-                    .bind()
-
-            Location.of(
-                    id,
-                    name,
-                    address,
-                    coordinates
-            ).right().bind()
-        }
-    }
-
-    private fun parseAppearance(
-            gender: Int?,
-            skin: Int?,
-            hair: Int?,
-            minAge: Int?,
-            maxAge: Int?,
-            minHeight: Int?,
-            maxHeight: Int?
-    ): Either<ModelCreationException, ApproximateAppearance> {
-        return Either.fx {
-
-            val g = gender?.let { findEnum(it, Gender.values()) }
-            val s = skin?.let { findEnum(it, Skin.values()) }
-            val h = hair?.let { findEnum(it, Hair.values()) }
-
-            val minAgeWrapped = minAge?.let(Age::of)
-                    ?.mapLeft { ModelCreationException(it.toString()) }
-                    ?.bind()
-
-            val maxAgeWrapped = maxAge?.let(Age::of)
-                    ?.mapLeft { ModelCreationException(it.toString()) }
-                    ?.bind()
-
-            val age = if (minAgeWrapped == null || maxAgeWrapped == null) {
-                null
-            } else {
-                AgeRange.of(minAgeWrapped, maxAgeWrapped)
-                        .mapLeft { ModelCreationException(it.toString()) }
-                        .bind()
-            }
-
-            val minHeightWrapped = minHeight?.let(Height::of)
-                    ?.mapLeft { ModelCreationException(it.toString()) }
-                    ?.bind()
-
-            val maxHeightWrapped = maxHeight?.let(Height::of)
-                    ?.mapLeft { ModelCreationException(it.toString()) }
-                    ?.bind()
-
-            val height = if (minHeightWrapped == null || maxHeightWrapped == null) {
-                null
-            } else {
-                HeightRange.of(minHeightWrapped, maxHeightWrapped)
-                        .mapLeft { ModelCreationException(it.toString()) }
-                        .bind()
-            }
-
-            ApproximateAppearance.of(
-                    g,
-                    s,
-                    h,
-                    age,
-                    height
-            ).mapLeft { ModelCreationException(it.toString()) }.bind()
-        }
     }
 }
