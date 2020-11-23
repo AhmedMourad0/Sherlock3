@@ -12,6 +12,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        multiDexEnabled true
         resValue "string", "google_sign_in_id_token", ""
         resValue "string", "facebook_app_id", ""
         resValue "string", "facebook_login_protocol_scheme", ""
@@ -63,6 +64,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     implementation "androidx.appcompat:appcompat:1.2.0"
+    implementation "androidx.multidex:multidex:2.0.1"
 
     implementation 'com.google.firebase:firebase-core:18.0.0'
     api "com.google.firebase:firebase-storage:19.2.0"
