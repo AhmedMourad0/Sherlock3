@@ -2,8 +2,10 @@ package dev.ahmedmourad.sherlock.children.fakes
 
 import arrow.core.Either
 import arrow.core.left
+import arrow.core.orNull
 import arrow.core.right
 import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
+import dev.ahmedmourad.sherlock.children.utils.randomString
 import dev.ahmedmourad.sherlock.domain.model.common.Url
 import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
 import io.reactivex.Single
@@ -39,9 +41,13 @@ internal class FakeImageRepository : ImageRepository {
                 }
 
                 else -> {
-                    Single.just(null.right())
+                    Single.just(randomUrl().right())
                 }
             }
         }
     }
+}
+
+private fun randomUrl(): Url {
+    return Url.of("https://www.${randomString(3, 15)}.com").orNull()!!
 }

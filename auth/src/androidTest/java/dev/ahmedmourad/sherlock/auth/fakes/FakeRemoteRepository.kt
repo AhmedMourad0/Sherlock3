@@ -140,8 +140,4 @@ internal class FakeRemoteRepository : RemoteRepository {
             }
         }
     }
-
-    fun allUsers(): List<Pair<SignedInUser, Long>> {
-        return fakeUsersDb
-    }
 }

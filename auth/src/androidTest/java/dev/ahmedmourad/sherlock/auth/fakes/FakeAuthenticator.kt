@@ -16,9 +16,9 @@ internal class FakeAuthenticator(
         var providersSignInUserFactory: () -> IncompleteUser
 ) : Authenticator {
 
-    private val googleUsers = mutableListOf<IncompleteUser>()
-    private val twitterUsers = mutableListOf<IncompleteUser>()
-    private val facebookUsers = mutableListOf<IncompleteUser>()
+    val googleUsers = mutableListOf<IncompleteUser>()
+    val twitterUsers = mutableListOf<IncompleteUser>()
+    val facebookUsers = mutableListOf<IncompleteUser>()
     private val regularUsers = mutableMapOf<UserCredentials, IncompleteUser>()
     private var signedInUser: IncompleteUser? = null
     val resetEmailsReceivers = mutableListOf<Email>()
@@ -68,9 +68,10 @@ internal class FakeAuthenticator(
                     }
 
                     emailOnlyMatches.isNotEmpty() ->
-                        Authenticator.SignInException.AccountDoesNotExistOrHasBeenDisabledException.left()
+                        Authenticator.SignInException.WrongPasswordException.left()
 
-                    else -> Authenticator.SignInException.WrongPasswordException.left()
+                    else ->
+                        Authenticator.SignInException.AccountDoesNotExistOrHasBeenDisabledException.left()
                 }
 
             } else {
@@ -107,7 +108,10 @@ internal class FakeAuthenticator(
             val e = signInWithGoogleException
             if (e == null) {
                 val user = providersSignInUserFactory.invoke()
-                googleUsers.add(user)
+                if (!googleUsers.contains(user)) {
+                    googleUsers.add(user)
+                }
+                signedInUser = user
                 user.right()
             } else {
                 e.left()
@@ -121,7 +125,10 @@ internal class FakeAuthenticator(
             val e = signInWithFacebookException
             if (e == null) {
                 val user = providersSignInUserFactory.invoke()
-                facebookUsers.add(user)
+                if (!facebookUsers.contains(user)) {
+                    facebookUsers.add(user)
+                }
+                signedInUser = user
                 user.right()
             } else {
                 e.left()
@@ -135,7 +142,10 @@ internal class FakeAuthenticator(
             val e = signInWithTwitterException
             if (e == null) {
                 val user = providersSignInUserFactory.invoke()
-                twitterUsers.add(user)
+                if (!twitterUsers.contains(user)) {
+                    twitterUsers.add(user)
+                }
+                signedInUser = user
                 user.right()
             } else {
                 e.left()
