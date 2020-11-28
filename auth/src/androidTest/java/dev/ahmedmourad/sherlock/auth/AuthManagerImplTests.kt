@@ -11,11 +11,10 @@ import dev.ahmedmourad.sherlock.auth.fakes.FakeRemoteRepository
 import dev.ahmedmourad.sherlock.auth.manager.AuthManagerImpl
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.auth.model.RemoteSignUpUser
-import dev.ahmedmourad.sherlock.auth.utils.randomString
+import dev.ahmedmourad.sherlock.auth.utils.*
 import dev.ahmedmourad.sherlock.domain.data.AuthManager
 import dev.ahmedmourad.sherlock.domain.model.auth.*
-import dev.ahmedmourad.sherlock.domain.model.auth.submodel.*
-import dev.ahmedmourad.sherlock.domain.model.common.Name
+import dev.ahmedmourad.sherlock.domain.model.auth.submodel.UserCredentials
 import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import org.junit.Assert.*
 import org.junit.Before
@@ -2086,122 +2085,4 @@ private fun UserCredentials.toIncompleteUser(id: UserId): IncompleteUser {
             null,
             null
     )
-}
-
-private fun signUpUser(): SignUpUser {
-    return SignUpUser.of(
-            userCredentials(),
-            randomDisplayName(),
-            PhoneNumber.of("+201200608893", null).orNull()!!,
-            null
-    ).orNull()!!
-}
-
-private fun completedUser(
-        id: UserId = UserId(UUID.randomUUID().toString()),
-        email: Email = randomEmail()
-): CompletedUser {
-    return CompletedUser.of(
-            id,
-            email,
-            randomDisplayName(),
-            PhoneNumber.of("+201200608893", null).orNull()!!,
-            ByteArray(0).right()
-    )
-}
-
-private fun userCredentials(): UserCredentials {
-    return UserCredentials.of(randomEmail(), randomPassword()).orNull()!!
-}
-
-private fun incompleteUser(id: UserId = UserId(UUID.randomUUID().toString())): IncompleteUser {
-    return IncompleteUser.of(
-            id,
-            randomEmail(),
-            randomDisplayName(),
-            PhoneNumber.of("+201200608893", null).orNull()!!,
-            null
-    )
-}
-
-private fun remoteSignUpUser(id: UserId, email: Email): RemoteSignUpUser {
-    val displayName = randomDisplayName()
-    return RemoteSignUpUser(
-            id,
-            email,
-            Username.from(displayName),
-            displayName,
-            PhoneNumber.of("+201200608893", null).orNull()!!,
-            null
-    )
-}
-
-private fun randomDisplayName(): DisplayName {
-    return DisplayName.of(
-            (1..(2..3).random()).joinToString(" ") { randomName().value }
-    ).orNull()!!
-}
-
-private fun randomName(): Name {
-    return Name.of(
-            randomString(
-                    4,
-                    9,
-                    allowUpperCaseLetters = true,
-                    allowLowerCaseLetters = true,
-                    allowDigits = false,
-                    allowSymbols = false
-            )
-    ).orNull()!!
-}
-
-private fun randomEmail(): Email {
-    return Email.of(
-            "${randomString(7, 12)}@${randomString(4, 7)}.${randomString(2, 4)}"
-    ).orNull()!!
-}
-
-private fun randomPassword(): Password {
-
-    val upperCase = randomString(
-            3,
-            5,
-            allowUpperCaseLetters = true,
-            allowLowerCaseLetters = false,
-            allowDigits = false,
-            allowSymbols = false
-    )
-
-    val lowerCase = randomString(
-            3,
-            5,
-            allowUpperCaseLetters = false,
-            allowLowerCaseLetters = true,
-            allowDigits = false,
-            allowSymbols = false
-    )
-
-    val digits = randomString(
-            3,
-            5,
-            allowUpperCaseLetters = false,
-            allowLowerCaseLetters = false,
-            allowDigits = true,
-            allowSymbols = false
-    )
-
-    val symbols = randomString(
-            3,
-            5,
-            allowUpperCaseLetters = false,
-            allowLowerCaseLetters = false,
-            allowDigits = false,
-            allowSymbols = true
-    )
-
-    return Password.of(
-            (upperCase + lowerCase + digits + symbols).toCharArray()
-                    .apply { shuffle() }
-                    .joinToString("")
-    ).orNull()!!
 }
