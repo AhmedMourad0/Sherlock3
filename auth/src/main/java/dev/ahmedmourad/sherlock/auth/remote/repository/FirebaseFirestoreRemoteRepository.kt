@@ -1,11 +1,8 @@
 package dev.ahmedmourad.sherlock.auth.remote.repository
 
 import androidx.annotation.VisibleForTesting
-import arrow.core.Either
+import arrow.core.*
 import arrow.core.extensions.fx
-import arrow.core.left
-import arrow.core.orNull
-import arrow.core.right
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
 import dagger.Lazy
@@ -246,7 +243,17 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                         Flowable.just(it.left())
                     }, ifRight = { isUserSignedIn ->
                         if (isUserSignedIn) {
-                            createFindSimpleUsers(ids)
+                            ids.chunked(10)
+                                    .map(this::createFindSimpleUsers)
+                                    .reduceOrNull { acc, flowable ->
+                                        acc.switchMap { firstEither ->
+                                            flowable.map { secondEither ->
+                                                firstEither.flatMap { first ->
+                                                    secondEither.map { second -> first + second }
+                                                }
+                                            }
+                                        }
+                                    } ?: Flowable.just(emptyList<SimpleRetrievedUser>().right())
                         } else {
                             Flowable.just(
                                     RemoteRepository.FindSimpleUsersException.NoSignedInUserException.left()
