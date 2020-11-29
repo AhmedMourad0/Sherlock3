@@ -108,7 +108,9 @@ internal fun randomName(): Name {
 
 internal fun randomEmail(): Email {
     return Email.of(
-            "${randomString(7, 12)}@${randomString(4, 7)}.${randomString(2, 4)}"
+            randomString(7, 12, allowUpperCaseLetters = false) +
+                    "@${randomString(4, 7, allowUpperCaseLetters = false, allowDigits = false)}" +
+                    ".${randomString(2, 4, allowUpperCaseLetters = false, allowDigits = false)}"
     ).orNull()!!
 }
 
@@ -156,3 +158,5 @@ internal fun randomPassword(): Password {
                     .joinToString("")
     ).orNull()!!
 }
+
+data class FirebaseToken(val value: String)
