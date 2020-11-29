@@ -705,5 +705,3 @@ private fun RemoteSignUpUser.matches(retrieved: SimpleRetrievedUser): Boolean {
             retrieved.displayName == this.displayName &&
             retrieved.pictureUrl == this.pictureUrl
 }
-
-private data class FirebaseToken(val value: String)
