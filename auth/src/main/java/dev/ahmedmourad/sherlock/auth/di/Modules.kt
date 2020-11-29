@@ -11,6 +11,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.FirebaseAuthenticator
+import dev.ahmedmourad.sherlock.auth.authenticator.messaging.CloudMessenger
+import dev.ahmedmourad.sherlock.auth.authenticator.messaging.FirebaseCloudMessenger
 import dev.ahmedmourad.sherlock.auth.images.repository.FirebaseStorageImageRepository
 import dev.ahmedmourad.sherlock.auth.manager.AuthManagerImpl
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
@@ -35,6 +37,12 @@ internal interface AuthBindingsModule {
     fun bindAuthenticator(
             impl: FirebaseAuthenticator
     ): Authenticator
+
+    @Binds
+    @InternalApi
+    fun bindCloudMessenger(
+            impl: FirebaseCloudMessenger
+    ): CloudMessenger
 
     @Binds
     @InternalApi

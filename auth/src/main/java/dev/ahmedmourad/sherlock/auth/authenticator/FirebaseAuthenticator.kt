@@ -2,6 +2,7 @@ package dev.ahmedmourad.sherlock.auth.authenticator
 
 import android.content.Intent
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import arrow.core.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
@@ -9,12 +10,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
-import com.google.firebase.messaging.FirebaseMessaging
 import com.twitter.sdk.android.core.*
 import dagger.Lazy
 import dagger.Reusable
 import dev.ahmedmourad.sherlock.auth.authenticator.activity.AuthSignInActivity
 import dev.ahmedmourad.sherlock.auth.authenticator.bus.AuthenticatorBus
+import dev.ahmedmourad.sherlock.auth.authenticator.messaging.CloudMessenger
 import dev.ahmedmourad.sherlock.auth.di.InternalApi
 import dev.ahmedmourad.sherlock.auth.manager.dependencies.Authenticator
 import dev.ahmedmourad.sherlock.domain.exceptions.ModelCreationException
@@ -42,7 +43,7 @@ private class AuthUserCollisionException(
 @Reusable
 internal class FirebaseAuthenticator @Inject constructor(
         @InternalApi private val auth: Lazy<FirebaseAuth>,
-        @InternalApi private val messaging: Lazy<FirebaseMessaging>,
+        @InternalApi private val messenger: Lazy<CloudMessenger>,
         private val connectivityManager: Lazy<ConnectivityManager>
 ) : Authenticator {
 
@@ -608,41 +609,17 @@ internal class FirebaseAuthenticator @Inject constructor(
     private fun subscribeToPushNotifications(
             userId: UserId
     ): Single<Either<Throwable, UserId>> {
-        return Single.create<Either<Throwable, UserId>> { emitter ->
-
-            val successListener = { _: Void? ->
-                emitter.onSuccess(userId.right())
-            }
-
-            val failureListener = { e: Exception ->
-                emitter.onSuccess(e.left())
-            }
-
-            messaging.get().subscribeToTopic(userId.value)
-                    .addOnSuccessListener(successListener)
-                    .addOnFailureListener(failureListener)
-
-        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+        return messenger.get().subscribe(userId.value).map { either ->
+            either.map { userId }
+        }
     }
 
     private fun unsubscribeFromPushNotifications(
             userId: UserId
     ): Single<Either<Throwable, UserId>> {
-        return Single.create<Either<Throwable, UserId>> { emitter ->
-
-            val successListener = { _: Void? ->
-                emitter.onSuccess(userId.right())
-            }
-
-            val failureListener = { e: Exception ->
-                emitter.onSuccess(e.left())
-            }
-
-            messaging.get().unsubscribeFromTopic(userId.value)
-                    .addOnSuccessListener(successListener)
-                    .addOnFailureListener(failureListener)
-
-        }.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+        return messenger.get().unsubscribe(userId.value).map { either ->
+            either.map { userId }
+        }
     }
 
     override fun sendPasswordResetEmail(
@@ -809,7 +786,8 @@ interface AuthActivityFactory {
     }
 }
 
-private fun FirebaseUser.toIncompleteUser(): IncompleteUser {
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun FirebaseUser.toIncompleteUser(): IncompleteUser {
 
     val id = UserId(this.uid)
 
