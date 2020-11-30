@@ -1,13 +1,13 @@
-package dev.ahmedmourad.sherlock.children.fakes
+package dev.ahmedmourad.sherlock.auth.fakes
 
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.orNull
 import arrow.core.right
-import dev.ahmedmourad.sherlock.children.repository.dependencies.ImageRepository
-import dev.ahmedmourad.sherlock.children.utils.randomString
+import dev.ahmedmourad.sherlock.auth.manager.dependencies.ImageRepository
+import dev.ahmedmourad.sherlock.auth.utils.randomString
 import dev.ahmedmourad.sherlock.domain.model.common.Url
-import dev.ahmedmourad.sherlock.domain.model.ids.ChildId
+import dev.ahmedmourad.sherlock.domain.model.ids.UserId
 import io.reactivex.Single
 
 internal class FakeImageRepository : ImageRepository {
@@ -17,27 +17,27 @@ internal class FakeImageRepository : ImageRepository {
     var triggerInternalException = false
     var triggerUnknownException = false
 
-    override fun storeChildPicture(
-            id: ChildId,
+    override fun storeUserPicture(
+            id: UserId,
             picture: ByteArray?
-    ): Single<Either<ImageRepository.StoreChildPictureException, Url?>> {
+    ): Single<Either<ImageRepository.StoreUserPictureException, Url?>> {
         return Single.defer {
             when {
 
                 !hasInternet -> {
-                    Single.just(ImageRepository.StoreChildPictureException.NoInternetConnectionException.left())
+                    Single.just(ImageRepository.StoreUserPictureException.NoInternetConnectionException.left())
                 }
 
                 !isUserSignedIn -> {
-                    Single.just(ImageRepository.StoreChildPictureException.NoSignedInUserException.left())
+                    Single.just(ImageRepository.StoreUserPictureException.NoSignedInUserException.left())
                 }
 
                 triggerInternalException -> {
-                    Single.just(ImageRepository.StoreChildPictureException.InternalException(RuntimeException()).left())
+                    Single.just(ImageRepository.StoreUserPictureException.InternalException(RuntimeException()).left())
                 }
 
                 triggerUnknownException -> {
-                    Single.just(ImageRepository.StoreChildPictureException.UnknownException(RuntimeException()).left())
+                    Single.just(ImageRepository.StoreUserPictureException.UnknownException(RuntimeException()).left())
                 }
 
                 else -> {
