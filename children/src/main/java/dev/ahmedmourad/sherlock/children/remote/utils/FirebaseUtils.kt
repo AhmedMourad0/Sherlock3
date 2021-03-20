@@ -67,7 +67,7 @@ private fun createNameHashMap(name: Either<Name, FullName>?): Map<String, Any?> 
 
 fun ChildrenQuery.toMap(): Map<String, Any?> = hashMapOf(
         Contract.Database.Queries.PAGE to this.page,
-        Contract.Database.Queries.TIMESTAMP to FieldValue.serverTimestamp(),
+        Contract.Database.Queries.TIMESTAMP to this.timestamp,
         Contract.Database.Queries.USER_ID to this.user.id.value,
         Contract.Database.Queries.FIRST_NAME to this.fullName.first.value,
         Contract.Database.Queries.LAST_NAME to this.fullName.last.value,

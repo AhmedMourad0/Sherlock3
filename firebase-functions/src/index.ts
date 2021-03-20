@@ -9,10 +9,6 @@ import DocumentSnapshot = admin.firestore.DocumentSnapshot;
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
-const project = process.env.GCLOUD_PROJECT;
-const token = functions.config().ci_token;
-const firebase_tools = require('firebase-tools');
-
 export const investigationsListener = functions.firestore
     .document("children/{childId}")
     .onWrite(childSnapshot => {
@@ -32,7 +28,8 @@ export const investigationsListener = functions.firestore
 
                             const payload = {
                                 data: {
-                                    id: childSnapshot.after.id,
+                                    investigation_id: investigationSnapshot.id,
+                                    child_id: childSnapshot.after.id,
                                     weight: weight.toString()
                                 }
                             };
@@ -53,8 +50,9 @@ export const investigationsListener = functions.firestore
 export const queriesCreateListener = functions.firestore
     .document("queries/{queryId}")
     .onCreate(querySnapshot => {
-        return  deleteCollection(
-            "queries/" + querySnapshot.id + "/results"
+        return deleteCollection(
+            "queries/" + querySnapshot.id + "/results",
+            querySnapshot.get("timestamp")
         ).then(function () {
             return onQuery(querySnapshot)
         })
@@ -63,15 +61,22 @@ export const queriesCreateListener = functions.firestore
 export const queriesUpdateListener = functions.firestore
     .document("queries/{queryId}")
     .onUpdate(querySnapshot => {
-        if (isSafe(querySnapshot.after) && querySnapshot.after.exists) {
-            return deleteCollection(
-                "queries/" + querySnapshot.after.id + "/results"
-            ).then(function () {
-                return onQuery(querySnapshot.after)
-            })
-        } else {
-            return deleteCollection("queries/" + querySnapshot.before.id + "/results")
-        }
+        return deleteCollection(
+            "queries/" + querySnapshot.before.id + "/results",
+            querySnapshot.before.get("timestamp") + 1
+        ).then(function () {
+            if (isSafe(querySnapshot.after) && querySnapshot.after.exists) {
+                return deleteCollection(
+                    "queries/" + querySnapshot.after.id + "/results",
+                    querySnapshot.after.get("timestamp")
+                ).then(function () {
+                   return onQuery(querySnapshot.after)
+                })
+            } else {
+                return Promise.resolve()
+            }
+        })
+
     })
 
 function onQuery(
@@ -83,7 +88,7 @@ function onQuery(
         .get()
         .then(function (allChildrenSnapshot) {
 
-            let results: { child_id: string, weight: number }[] = []
+            let results: { timestamp: number, child_id: string, weight: number }[] = []
 
             allChildrenSnapshot.forEach(function (childSnapshot) {
                 const weight = calculateWeight(function (key) {
@@ -92,6 +97,7 @@ function onQuery(
                     querySnapshot.get(key)
                 })
                 results.push({
+                    timestamp: childSnapshot.get("timestamp"),
                     child_id: childSnapshot.id,
                     weight: weight
                 })
@@ -127,16 +133,25 @@ function onQuery(
 export const queriesDeleteListener = functions.firestore
     .document("queries/{queryId}")
     .onDelete(handler => {
-        return deleteCollection("queries/" + handler.id + "/results");
+        return deleteCollection(
+            "queries/" + handler.id + "/results",
+            handler.get("timestamp") + 1
+        );
     })
 
 function deleteCollection(
-    path: string
+    path: string,
+    timestampLeastExclusive: number
 ): Promise<void> {
-    return firebase_tools.firestore.delete(path, {
-        project,
-        token,
-        recursive: true,
-        yes: true,
-    });
+    return admin.firestore()
+        .collection(path)
+        .where("timestamp", "<", timestampLeastExclusive)
+        .get()
+        .then(function (querySnapshot) {
+            querySnapshot.forEach(function (doc) {
+                doc.ref.delete().catch(function (reason) {
+                    console.log('Failed to delete query result: ', reason);
+                });
+            });
+        });
 }

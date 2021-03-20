@@ -21,6 +21,8 @@ data class ChildrenQuery private constructor(
         val page: Int
 ) {
 
+    val timestamp = System.currentTimeMillis()
+
     fun toInvestigation() = Investigation.of(
             System.currentTimeMillis(),
             user,

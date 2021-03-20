@@ -59,7 +59,7 @@ internal class TextFormatterImpl @Inject constructor(
 
     override fun formatAge(age: AgeRange?): String {
         return if (age != null) {
-            appCtx.getString(R.string.years_range, "${age.min} - ${age.max}")
+            appCtx.getString(R.string.years_range, "${age.min.value} - ${age.max.value}")
         } else {
             appCtx.getString(R.string.not_available)
         }

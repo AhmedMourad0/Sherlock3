@@ -12,7 +12,7 @@ abstract class BaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
-            val id = remoteMessage.data["id"]?.let(::ChildId) ?: return
+            val id = remoteMessage.data["child_id"]?.let(::ChildId) ?: return
             val weight = remoteMessage.data["weight"]
                     ?.toDoubleOrNull()
                     ?.let(Weight.Companion::of)

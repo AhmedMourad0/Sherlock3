@@ -49,6 +49,7 @@ internal object Contract {
 
                 const val PATH = "results"
 
+                const val TIMESTAMP = "timestamp"
                 const val CHILD_ID = "child_id"
                 const val WEIGHT = "weight"
             }

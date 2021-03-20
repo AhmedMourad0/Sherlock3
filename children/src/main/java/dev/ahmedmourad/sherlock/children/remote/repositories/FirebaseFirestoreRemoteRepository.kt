@@ -491,7 +491,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
             val id = preferencesManager.get().getDeviceId()
 
             val successListener = { _: Void? ->
-                emitter.onSuccess(QueryId(id).right())
+                emitter.onSuccess(QueryId(id, query.timestamp).right())
             }
 
             val failureListener = { throwable: Throwable ->
@@ -537,6 +537,7 @@ internal class FirebaseFirestoreRemoteRepository @Inject constructor(
                     .collection(Contract.Database.Queries.PATH)
                     .document(queryId.value)
                     .collection(Contract.Database.Queries.Results.PATH)
+                    .whereEqualTo(Contract.Database.Queries.Results.TIMESTAMP, queryId.timestamp)
                     .addSnapshotListener(snapshotListener)
 
             emitter.setCancellable { registration.remove() }
